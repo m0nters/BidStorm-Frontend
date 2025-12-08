@@ -61,7 +61,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow duration-300 hover:shadow-lg">
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-100">
       <Link href={`/san-pham/${product.slug}`} className="relative block">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           {/* Product Image */}
@@ -161,13 +161,25 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Allow unrated bidders to bid on products? */}
           <p className="mb-3 text-xs text-gray-600">
-            Cho phép người đấu giá CHƯA có đánh giá được đấu giá: <br />
+            Cho phép người chưa có đánh giá:{" "}
             <span
               className={`font-semibold ${
                 product.allowUnratedBidders ? "text-green-600" : "text-red-600"
               }`}
             >
               {product.allowUnratedBidders ? "Cho phép" : "Không"}
+            </span>
+          </p>
+
+          {/* Auto Extend */}
+          <p className="mb-3 text-xs text-gray-600">
+            * Tự động gia hạn:{" "}
+            <span
+              className={`font-semibold ${
+                product.autoExtend ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {product.autoExtend ? "Có" : "Không"}
             </span>
           </p>
 

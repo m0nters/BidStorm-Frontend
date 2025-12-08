@@ -5,6 +5,8 @@ export interface ProductListResponse {
   thumbnailUrl: string;
   currentPrice: number;
   buyNowPrice?: number;
+  allowUnratedBidders: boolean;
+  autoExtend: boolean;
   categoryId: number;
   categoryName: string;
   sellerId: number;
@@ -18,7 +20,6 @@ export interface ProductListResponse {
   endTime: string;
   isNew: boolean;
   hasBuyNow: boolean;
-  allowUnratedBidders: boolean;
 }
 
 // Product Detail Types

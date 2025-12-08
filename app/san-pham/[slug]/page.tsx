@@ -1,3 +1,4 @@
+import ImageGallery from "@/components/ui/ImageGallery";
 import ProductCard from "@/components/ui/ProductCard";
 import {
   getProductDetailBySlug,
@@ -30,7 +31,6 @@ export default async function ProductDetailPage({
 
   try {
     const product = await getProductDetailBySlug(slug);
-    console.log("Product fetched by slug:", product);
     const relatedProducts = await getRelatedProducts(product.id);
 
     // Calculate time remaining
@@ -137,51 +137,12 @@ export default async function ProductDetailPage({
           <div className="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Left: Image Gallery */}
             <div className="lg:col-span-2">
-              <div className="overflow-hidden rounded-lg bg-white shadow-sm">
-                {/* Main Image */}
-                <div className="relative aspect-square bg-gray-100">
-                  <Image
-                    src={product.images[0]?.imageUrl || "/placeholder.jpg"}
-                    alt={product.title}
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                  {product.isNew && (
-                    <div className="absolute top-4 left-4 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">
-                      MỚI
-                    </div>
-                  )}
-                  {product.isEnded && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                      <div className="rounded-lg bg-white px-6 py-3">
-                        <p className="text-lg font-bold text-gray-900">
-                          Đấu giá đã kết thúc
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Thumbnail Gallery */}
-                {product.images.length > 1 && (
-                  <div className="grid grid-cols-6 gap-2 border-t p-4">
-                    {product.images.map((image) => (
-                      <div
-                        key={image.id}
-                        className="relative aspect-square cursor-pointer overflow-hidden rounded bg-gray-100 hover:ring-2 hover:ring-blue-500"
-                      >
-                        <Image
-                          src={image.imageUrl}
-                          alt={`${product.title} - ${image.displayOrder}`}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ImageGallery
+                images={product.images}
+                title={product.title}
+                isNew={product.isNew}
+                isEnded={product.isEnded}
+              />
             </div>
 
             {/* Right: Product Info */}
@@ -327,10 +288,16 @@ export default async function ProductDetailPage({
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">
-                    Cho phép người chưa đánh giá
+                  <span className="max-w-3/5 text-gray-600">
+                    Cho phép người chưa đánh giá được tham gia đấu giá
                   </span>
-                  <span className="font-medium">
+                  <span
+                    className={`font-medium ${
+                      product.allowUnratedBidders
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
                     {product.allowUnratedBidders ? "Có" : "Không"}
                   </span>
                 </div>
