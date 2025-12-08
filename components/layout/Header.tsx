@@ -90,7 +90,7 @@ export default function Header({ categories }: HeaderProps) {
           {categories.map((category) => (
             <div key={category.id} className="group relative">
               <Link
-                href={`${category.slug}`}
+                href={`/danh-muc/${category.slug}`}
                 className="rounded px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
                 {category.name}
@@ -102,7 +102,7 @@ export default function Header({ categories }: HeaderProps) {
                   {category.children.map((child) => (
                     <Link
                       key={child.id}
-                      href={`${child.slug}`}
+                      href={`/danh-muc/${child.slug}`}
                       className="block px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-black"
                     >
                       {child.name}

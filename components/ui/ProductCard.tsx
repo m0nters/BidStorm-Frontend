@@ -62,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div className="overflow-hidden rounded-lg border border-gray-200 bg-white transition-shadow duration-300 hover:shadow-lg">
-      <Link href={`/${product.slug}`} className="relative block">
+      <Link href={`/san-pham/${product.slug}`} className="relative block">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           {/* Product Image */}
           <Image

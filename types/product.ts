@@ -20,3 +20,56 @@ export interface ProductListResponse {
   hasBuyNow: boolean;
   allowUnratedBidders: boolean;
 }
+
+// Product Detail Types
+export interface UserBasicInfo {
+  id: number;
+  fullName: string;
+  positiveRating: number;
+  negativeRating: number;
+  ratingPercentage: number;
+}
+
+export interface ProductImageResponse {
+  id: number;
+  imageUrl: string;
+  displayOrder: number;
+}
+
+export interface DescriptionLogResponse {
+  id: number;
+  updatedContent: string;
+  updatedAt: string;
+}
+
+export interface ProductDetailResponse {
+  id: number;
+  title: string;
+  slug: string;
+  description: string;
+  images: ProductImageResponse[];
+  startingPrice: number;
+  currentPrice: number;
+  buyNowPrice?: number;
+  priceStep: number;
+  isAutoExtend: boolean;
+  allowUnratedBidders: boolean;
+  categoryId: number;
+  categoryName: string;
+  categorySlug: string;
+  parentCategoryName: string;
+  parentCategorySlug: string;
+  seller: UserBasicInfo;
+  highestBidder?: UserBasicInfo;
+  winner?: UserBasicInfo;
+  bidCount: number;
+  viewCount: number;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  updatedAt: string;
+  isEnded: boolean;
+  isNew: boolean;
+  hasBuyNow: boolean;
+  descriptionLogs: DescriptionLogResponse[];
+}

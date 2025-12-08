@@ -26,7 +26,23 @@ export const getCategoryById = async (categoryId: number) => {
         revalidate: 3600,
         tags: [`category-${categoryId}`, "categories"],
       },
-    }
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Get parent category of a specific category by its ID
+ */
+export const getParentCategoryByCategoryId = async (categoryId: number) => {
+  const response = await fetchApi.get<CategoryResponse>(
+    `/categories/${categoryId}/parent`,
+    {
+      next: {
+        revalidate: 3600,
+        tags: [`category-${categoryId}-parent`, "categories"],
+      },
+    },
   );
   return response.data;
 };
@@ -42,7 +58,7 @@ export const getSubCategories = async (parentId: number) => {
         revalidate: 3600,
         tags: [`category-${parentId}-sub-categories`, "categories"],
       },
-    }
+    },
   );
   return response.data;
 };
@@ -59,7 +75,7 @@ export const getParentCategories = async () => {
         revalidate: 3600,
         tags: ["parent-categories", "categories"],
       },
-    }
+    },
   );
   return response.data;
 };
