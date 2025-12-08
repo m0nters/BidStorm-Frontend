@@ -15,4 +15,5 @@ export { default as fetchApi } from "./fetch";
 
 // Export API services
 export * from "./services/categories";
+export * from "./services/config";
 export * from "./services/products";

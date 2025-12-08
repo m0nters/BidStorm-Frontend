@@ -1,6 +1,10 @@
 import ImageGallery from "@/components/ui/ImageGallery";
 import ProductCard from "@/components/ui/ProductCard";
 import {
+  getAutoExtendByMin,
+  getAutoExtendTriggerMin,
+} from "@/lib/api/services/config";
+import {
   getProductDetailBySlug,
   getRelatedProducts,
 } from "@/lib/api/services/products";
@@ -32,6 +36,11 @@ export default async function ProductDetailPage({
   try {
     const product = await getProductDetailBySlug(slug);
     const relatedProducts = await getRelatedProducts(product.id);
+
+    const [autoExtendTriggerMin, autoExtendDurationMin] = await Promise.all([
+      getAutoExtendTriggerMin(),
+      getAutoExtendByMin(),
+    ]);
 
     // Calculate time remaining
     const endTime = new Date(product.endTime);
@@ -210,7 +219,9 @@ export default async function ProductDetailPage({
                   </p>
                   {product.isAutoExtend && !product.isEnded && (
                     <p className="mt-1 text-xs text-gray-500">
-                      * Tự động gia hạn nếu có lượt đấu giá mới
+                      * Tự động gia hạn {autoExtendDurationMin} phút nếu có lượt
+                      đấu giá mới trong vòng {autoExtendTriggerMin} phút cuối
+                      cùng
                     </p>
                   )}
                 </div>
