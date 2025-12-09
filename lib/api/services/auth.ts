@@ -38,12 +38,14 @@ export const refreshAccessToken = async () => {
 /**
  * Logout user (invalidate refresh token)
  * POST /api/v1/auth/logout
+ * Requires authentication (JWT access token in Authorization header)
  */
 export const logout = async () => {
   const response = await api.post(
     "/auth/logout",
     {},
     {
+      auth: true, // Include JWT token in Authorization header
       cache: "no-store",
       credentials: "include",
     },
