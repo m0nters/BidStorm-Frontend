@@ -12,7 +12,14 @@ import { formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FiClock, FiEye, FiHome, FiShoppingCart } from "react-icons/fi";
+import {
+  FiClock,
+  FiEye,
+  FiHome,
+  FiShoppingCart,
+  FiThumbsDown,
+  FiThumbsUp,
+} from "react-icons/fi";
 import { HiOutlineBell } from "react-icons/hi2";
 
 interface ProductDetailPageProps {
@@ -47,14 +54,26 @@ export default async function ProductDetailPage({
             {user.fullName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-gray-900">{user.fullName}</p>
-            {totalRatings > 0 && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-medium text-gray-900">
-                  {user.ratingPercentage.toFixed(1)}%
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-gray-900">{user.fullName}</p>
+              {totalRatings > 0 && (
+                <span className="text-sm font-medium text-gray-900">
+                  ({user.ratingPercentage.toFixed(1)}%)
                 </span>
-                <span className="text-gray-500">
-                  ({user.positiveRating}👍 / {user.negativeRating}👎)
+              )}
+            </div>
+            {totalRatings > 0 && (
+              <div className="flex items-center gap-3 text-sm">
+                <span className="flex items-center gap-1 text-gray-600">
+                  <FiThumbsUp className="h-3.5 w-3.5" />
+                  {user.positiveRating}
+                </span>
+                <div className="-translate-y-0.5 text-gray-400 select-none">
+                  |
+                </div>
+                <span className="flex items-center gap-1 text-gray-600">
+                  <FiThumbsDown className="h-3.5 w-3.5" />
+                  {user.negativeRating}
                 </span>
               </div>
             )}
@@ -149,20 +168,22 @@ export default async function ProductDetailPage({
                     </p>
                   </div>
 
-                  {product.hasBuyNow && product.buyNowPrice && (
-                    <div className="rounded-lg border-2 border-black bg-white p-4">
-                      <p className="mb-2 text-sm font-medium text-gray-600">
-                        Giá mua ngay
-                      </p>
-                      <p className="mb-2 text-2xl font-bold text-black">
-                        {formatPrice(product.buyNowPrice)}
-                      </p>
-                      <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
-                        <FiShoppingCart className="h-5 w-5" />
-                        Mua ngay
-                      </button>
-                    </div>
-                  )}
+                  {!product.isEnded &&
+                    product.hasBuyNow &&
+                    product.buyNowPrice && (
+                      <div className="rounded-lg border-2 border-black bg-white p-4">
+                        <p className="mb-2 text-sm font-medium text-gray-600">
+                          Giá mua ngay
+                        </p>
+                        <p className="mb-2 text-2xl font-bold text-black">
+                          {formatPrice(product.buyNowPrice)}
+                        </p>
+                        <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
+                          <FiShoppingCart className="h-5 w-5" />
+                          Mua ngay
+                        </button>
+                      </div>
+                    )}
 
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
@@ -219,19 +240,41 @@ export default async function ProductDetailPage({
                     <UserRating user={product.seller} />
                   </div>
 
-                  {product.highestBidder && (
+                  {product.highestBidderName && !product.isEnded && (
                     <div>
                       <p className="mb-2 text-sm text-gray-600">
                         Người đặt giá cao nhất
                       </p>
-                      <UserRating user={product.highestBidder} />
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900">
+                            {product.highestBidderName}
+                          </p>
+                          {product.highestBidderRating !== undefined && (
+                            <span className="text-sm font-medium text-gray-900">
+                              ({product.highestBidderRating.toFixed(1)}%)
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {product.winner && (
+                  {product.winnerName && product.isEnded && (
                     <div>
                       <p className="mb-2 text-sm text-gray-600">Người thắng</p>
-                      <UserRating user={product.winner} />
+                      <div className="rounded-lg bg-gray-50 p-3">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900">
+                            {product.winnerName}
+                          </p>
+                          {product.winnerRating !== undefined && (
+                            <span className="text-sm font-medium text-gray-900">
+                              ({product.winnerRating.toFixed(1)}%)
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

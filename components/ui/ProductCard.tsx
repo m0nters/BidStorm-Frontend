@@ -88,9 +88,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Product Info */}
         <div className="p-5">
           {/* Category */}
-          <p className="mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase">
+          <a
+            href={`/danh-muc/${product.categorySlug}`}
+            className="mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase hover:underline"
+          >
             {product.categoryName}
-          </p>
+          </a>
 
           {/* Title */}
           <h3

@@ -9,6 +9,7 @@ export interface ProductListResponse {
   autoExtend: boolean;
   categoryId: number;
   categoryName: string;
+  categorySlug: string;
   sellerId: number;
   sellerName: string;
   sellerRating: number;
@@ -60,8 +61,10 @@ export interface ProductDetailResponse {
   parentCategoryName: string;
   parentCategorySlug: string;
   seller: UserBasicInfo;
-  highestBidder?: UserBasicInfo;
-  winner?: UserBasicInfo;
+  highestBidderName?: string;
+  highestBidderRating?: number;
+  winnerName?: string;
+  winnerRating?: number;
   bidCount: number;
   viewCount: number;
   startTime: string;
