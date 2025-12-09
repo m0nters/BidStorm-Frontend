@@ -8,7 +8,7 @@ import {
   getProductDetailBySlug,
   getRelatedProducts,
 } from "@/lib/api/services/products";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -36,39 +36,7 @@ export default async function ProductDetailPage({
     ]);
 
     // Calculate time remaining
-    const endTime = new Date(product.endTime);
-    const now = new Date();
-    const diffInDays = Math.floor(
-      (endTime.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    let timeRemaining = "";
-    if (diffInDays <= 3) {
-      // Show relative time for products ending within 3 days
-      if (diffInDays < 1) {
-        const diffInHours = Math.floor(
-          (endTime.getTime() - now.getTime()) / (1000 * 60 * 60),
-        );
-        if (diffInHours < 1) {
-          const diffInMinutes = Math.floor(
-            (endTime.getTime() - now.getTime()) / (1000 * 60),
-          );
-          timeRemaining = `${diffInMinutes} phút nữa`;
-        } else {
-          timeRemaining = `${diffInHours} giờ nữa`;
-        }
-      } else {
-        timeRemaining = `${diffInDays} ngày nữa`;
-      }
-    } else {
-      timeRemaining = endTime.toLocaleDateString("vi-VN", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
+    const timeRemaining = formatTimeRemaining(product.endTime);
 
     // User rating display helper
     const UserRating = ({ user }: { user: typeof product.seller }) => {
