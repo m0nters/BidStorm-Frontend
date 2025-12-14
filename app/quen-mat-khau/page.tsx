@@ -36,7 +36,6 @@ export default function ForgotPasswordPage() {
         JSON.stringify({
           email: data.email,
           timestamp: Date.now(),
-          attempts: 0,
           purpose: "password-reset", // Distinguish from email verification
         }),
       );

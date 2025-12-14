@@ -225,10 +225,9 @@ export default function VerifyOtpPage() {
         response.message || "Mã OTP đã được gửi lại đến email của bạn.",
       );
 
-      // Reset attempts on successful resend
+      // Reset timestamp on successful resend
       const resetSession = {
         ...otpSession,
-        attempts: 0,
         timestamp: Date.now(), // Reset timestamp
       };
       sessionStorage.setItem(
