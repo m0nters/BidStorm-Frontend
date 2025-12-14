@@ -1,5 +1,17 @@
-import { LoginRequest, LoginResponse } from "@/types/auth";
+import { LoginRequest, LoginResponse, RegisterRequest } from "@/types/auth";
 import { api } from "../fetch";
+
+/**
+ * Register new user
+ * POST /api/v1/auth/register
+ * Returns void - OTP will be sent to email for verification
+ */
+export const register = async (data: RegisterRequest) => {
+  const response = await api.post<void>("/auth/register", data, {
+    cache: "no-store",
+  });
+  return response;
+};
 
 /**
  * Login user

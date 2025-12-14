@@ -1,11 +1,20 @@
 "use client";
 
+import { logout } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { CategoryResponse } from "@/types/category";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { FiMenu, FiSearch, FiUser, FiX } from "react-icons/fi";
+import { FaRegCircleUser } from "react-icons/fa6";
+import {
+  FiHeart,
+  FiLogOut,
+  FiMenu,
+  FiSearch,
+  FiUser,
+  FiX,
+} from "react-icons/fi";
 
 interface HeaderProps {
   categories: CategoryResponse[];
@@ -14,8 +23,10 @@ interface HeaderProps {
 export default function Header({ categories }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,13 +79,61 @@ export default function Header({ categories }: HeaderProps) {
 
           {/* Right Side - Desktop */}
           {isAuthenticated ? (
-            <Link
-              href="/tai-khoan"
-              className="flex items-center space-x-2 px-4 py-2 text-gray-700 transition-colors hover:text-black"
+            <div
+              className="relative"
+              onMouseEnter={() => setIsUserMenuOpen(true)}
+              onMouseLeave={() => setIsUserMenuOpen(false)}
             >
-              <FiUser className="h-5 w-5" />
-              <span>{user?.fullName}</span>
-            </Link>
+              <Link
+                href="/tai-khoan"
+                className="flex items-center space-x-2 rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
+              >
+                <FaRegCircleUser className="h-6 w-6" />
+              </Link>
+
+              {/* User Dropdown Menu */}
+              {isUserMenuOpen && (
+                <div className="absolute top-full right-0 z-50 w-56 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+                  <div className="border-b border-gray-100 px-4 py-3">
+                    <p className="text-sm font-semibold text-gray-900">
+                      {user?.fullName}
+                    </p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+
+                  <div className="py-1">
+                    <Link
+                      href="/tai-khoan"
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      <FiUser className="h-4 w-4" />
+                      <span>Tài khoản của tôi</span>
+                    </Link>
+                    <Link
+                      href="/tai-khoan?tab=yeu-thich"
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      <FiHeart className="h-4 w-4" />
+                      <span>Sản phẩm yêu thích</span>
+                    </Link>
+                  </div>
+
+                  <div className="border-t border-gray-100 py-1">
+                    <button
+                      onClick={async () => {
+                        await logout();
+                        clearAuth();
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="flex w-full cursor-pointer items-center space-x-3 px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50"
+                    >
+                      <FiLogOut className="h-4 w-4" />
+                      <span>Đăng xuất</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <Link
               href="/dang-nhap"

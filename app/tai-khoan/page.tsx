@@ -10,7 +10,7 @@ import { logout } from "@/lib/api/services/auth";
 import { getProfile } from "@/lib/api/services/profile";
 import { useAuthStore } from "@/store/authStore";
 import { UserProfileResponse } from "@/types/profile";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   FiCheckCircle,
@@ -22,7 +22,7 @@ import {
   FiXCircle,
 } from "react-icons/fi";
 
-type TabType = "info" | "change-password" | "favorites";
+type TabType = "thong-tin" | "doi-mat-khau" | "yeu-thich";
 
 export default function ProfilePage() {
   return (
@@ -34,10 +34,22 @@ export default function ProfilePage() {
 
 function ProfilePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const clearAuth = useAuthStore((state) => state.clearAuth);
-  const [activeTab, setActiveTab] = useState<TabType>("info");
+  const [activeTab, setActiveTab] = useState<TabType>("thong-tin");
   const [profile, setProfile] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Sync tab with URL on mount and URL changes
+  useEffect(() => {
+    const tabParam = searchParams.get("tab") as TabType | null;
+    if (
+      tabParam &&
+      ["thong-tin", "doi-mat-khau", "yeu-thich"].includes(tabParam)
+    ) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   // Load profile on mount
   useEffect(() => {
@@ -80,10 +92,15 @@ function ProfilePageContent() {
   };
 
   const tabs = [
-    { id: "info", label: "Thông tin cá nhân", icon: FiUser },
-    { id: "change-password", label: "Đổi mật khẩu", icon: FiLock },
-    { id: "favorites", label: "Sản phẩm yêu thích", icon: FiHeart },
+    { id: "thong-tin", label: "Thông tin cá nhân", icon: FiUser },
+    { id: "doi-mat-khau", label: "Đổi mật khẩu", icon: FiLock },
+    { id: "yeu-thich", label: "Sản phẩm yêu thích", icon: FiHeart },
   ];
+
+  const handleTabChange = (tabId: TabType) => {
+    setActiveTab(tabId);
+    router.push(`/tai-khoan?tab=${tabId}`);
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-white py-12">
@@ -158,7 +175,7 @@ function ProfilePageContent() {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id as TabType)}
+                      onClick={() => handleTabChange(tab.id as TabType)}
                       className={`flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition-all ${
                         activeTab === tab.id
                           ? "bg-black text-white"
@@ -185,14 +202,14 @@ function ProfilePageContent() {
           {/* Main content */}
           <div className="lg:col-span-3">
             <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-              {activeTab === "info" && (
+              {activeTab === "thong-tin" && (
                 <ProfileInfoSection
                   profile={profile}
                   onProfileUpdate={loadProfile}
                 />
               )}
-              {activeTab === "change-password" && <ChangePasswordSection />}
-              {activeTab === "favorites" && <FavoritesSection />}
+              {activeTab === "doi-mat-khau" && <ChangePasswordSection />}
+              {activeTab === "yeu-thich" && <FavoritesSection />}
             </div>
           </div>
         </div>

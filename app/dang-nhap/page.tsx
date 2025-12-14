@@ -1,5 +1,6 @@
 "use client";
 
+import { GuestGuard } from "@/components/auth/GuestGuard";
 import PasswordInput from "@/components/ui/PasswordInput";
 import { login } from "@/lib/api/services/auth";
 import { LoginFormData, loginSchema } from "@/lib/validations/auth";
@@ -7,22 +8,22 @@ import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FiArrowRight, FiMail } from "react-icons/fi";
 
 export default function LoginPage() {
+  return (
+    <GuestGuard>
+      <LoginPageContent />
+    </GuestGuard>
+  );
+}
+
+function LoginPageContent() {
   const router = useRouter();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const setAuth = useAuthStore((state) => state.setAuth);
   const [apiError, setApiError] = useState<string>("");
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/");
-    }
-  }, [isAuthenticated, router]);
 
   const {
     register,

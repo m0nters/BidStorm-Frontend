@@ -23,7 +23,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   fullName: string;
-  address?: string;
+  address: string;
   birthDate?: string; // ISO date string
   recaptchaToken: string;
 }
