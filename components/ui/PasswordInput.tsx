@@ -4,20 +4,24 @@ import { forwardRef, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+  label?: string | React.ReactNode;
   error?: string;
   helperText?: string;
+  isRequired?: boolean;
 }
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ label, error, helperText, className = "", ...props }, ref) => {
+  (
+    { label, error, helperText, isRequired = false, className = "", ...props },
+    ref,
+  ) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
       <div>
         {label && (
           <label className="mb-2 block text-sm font-medium text-gray-900">
-            {label}
+            {label} {isRequired && <span className="text-red-500">*</span>}
           </label>
         )}
         <div className="relative">
@@ -30,7 +34,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 focus:outline-none"
             tabIndex={-1}
           >
             {showPassword ? (

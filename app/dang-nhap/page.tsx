@@ -8,9 +8,9 @@ import { useAuthStore } from "@/store/authStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FiArrowRight, FiMail } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   return (
@@ -23,7 +23,6 @@ export default function LoginPage() {
 function LoginPageContent() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
-  const [apiError, setApiError] = useState<string>("");
 
   const {
     register,
@@ -38,8 +37,6 @@ function LoginPageContent() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setApiError("");
-
     try {
       const response = await login(data);
 
@@ -52,11 +49,17 @@ function LoginPageContent() {
       } else {
         router.push("/");
       }
+
+      toast.success("Đăng nhập thành công!");
     } catch (error: any) {
       console.error("Login error:", error);
-      setApiError(
-        error.message || "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.",
-      );
+
+      const errorMessage =
+        error?.message ||
+        error?.error ||
+        "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.";
+
+      toast.error(errorMessage);
     }
   };
 
@@ -76,12 +79,6 @@ function LoginPageContent() {
               <h2 className="text-3xl font-bold text-gray-900">Đăng nhập</h2>
               <p className="mt-2 text-gray-600">Nhập thông tin để tiếp tục</p>
             </div>
-
-            {apiError && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-                <p className="text-sm text-red-800">{apiError}</p>
-              </div>
-            )}
 
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -125,7 +122,7 @@ function LoginPageContent() {
                 id="password"
                 label="Mật khẩu"
                 {...register("password")}
-                placeholder="••••••••"
+                placeholder="password123"
                 disabled={isSubmitting}
                 error={errors.password?.message}
                 className={`${
@@ -149,7 +146,7 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <>

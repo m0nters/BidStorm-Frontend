@@ -64,10 +64,19 @@ async function request<T>(
     const data: ApiResponse<T> = await response.json();
 
     // Handle 401 Unauthorized - token expired or invalid
+    // Don't redirect if already on guest pages (login, register, verify-otp)
     if (response.status === 401) {
       clearAccessToken();
       if (typeof window !== "undefined") {
-        window.location.href = "/dang-nhap";
+        const currentPath = window.location.pathname;
+        const guestPages = ["/dang-nhap", "/dang-ky", "/xac-nhan-otp"];
+        const isOnGuestPage = guestPages.some((page) =>
+          currentPath.startsWith(page),
+        );
+
+        if (!isOnGuestPage) {
+          window.location.href = "/dang-nhap";
+        }
       }
     }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { resendEmailVerificationOtp } from "@/lib/api/services/auth";
 import { updateProfile } from "@/lib/api/services/profile";
 import {
   UpdateProfileFormData,
@@ -7,6 +8,7 @@ import {
 } from "@/lib/validations/profile";
 import { UserProfileResponse } from "@/types/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -29,6 +31,8 @@ export function ProfileInfoSection({
   onProfileUpdate,
 }: ProfileInfoSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -73,6 +77,36 @@ export function ProfileInfoSection({
     } catch (error: any) {
       console.error("Update profile error:", error);
       toast.error(error.message || "Có lỗi xảy ra khi cập nhật thông tin");
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    if (!profile?.email) return;
+
+    setIsSendingOtp(true);
+    try {
+      await resendEmailVerificationOtp(profile.email);
+
+      // Create OTP session for verification page
+      sessionStorage.setItem(
+        "otp_verification_session",
+        JSON.stringify({
+          email: profile.email,
+          timestamp: Date.now(),
+        }),
+      );
+
+      toast.success("Mã OTP đã được gửi đến email của bạn.");
+
+      // Redirect to OTP verification page
+      router.push("/xac-nhan-otp");
+    } catch (error: any) {
+      console.error("Resend OTP error:", error);
+      toast.error(
+        error?.message || "Không thể gửi mã OTP. Vui lòng thử lại sau.",
+      );
+    } finally {
+      setIsSendingOtp(false);
     }
   };
 
@@ -244,6 +278,13 @@ export function ProfileInfoSection({
                   <span className="inline-flex items-center gap-2 font-semibold text-red-600">
                     <FiXCircle className="h-5 w-5" />
                     Chưa xác thực
+                    <button
+                      onClick={handleVerifyEmail}
+                      disabled={isSendingOtp}
+                      className="translate-y-px cursor-pointer text-xs text-gray-500 hover:underline disabled:opacity-50"
+                    >
+                      {isSendingOtp ? "Đang gửi..." : "Xác thực ngay"}
+                    </button>
                   </span>
                 )}
               </p>

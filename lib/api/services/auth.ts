@@ -1,4 +1,5 @@
 import { LoginRequest, LoginResponse, RegisterRequest } from "@/types/auth";
+import { OtpRequest } from "@/types/otp";
 import { api } from "../fetch";
 
 /**
@@ -10,6 +11,35 @@ export const register = async (data: RegisterRequest) => {
   const response = await api.post<void>("/auth/register", data, {
     cache: "no-store",
   });
+  return response;
+};
+
+/**
+ * Verify OTP
+ * POST /api/v1/auth/verify-otp
+ * Returns void - activates the user account
+ */
+export const verifyEmailOtp = async (data: OtpRequest) => {
+  const response = await api.post<void>("/auth/verify-email-otp", data, {
+    cache: "no-store",
+  });
+  return response;
+};
+
+/**
+ * Resend OTP
+ * POST /api/v1/auth/resend-otp
+ * with request param as email
+ * Returns void - OTP will be resent to email
+ */
+export const resendEmailVerificationOtp = async (email: string) => {
+  const response = await api.post<void>(
+    `/auth/resend-email-verification-otp?email=${encodeURIComponent(email)}`,
+    {},
+    {
+      cache: "no-store",
+    },
+  );
   return response;
 };
 

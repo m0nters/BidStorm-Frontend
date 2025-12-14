@@ -7,7 +7,7 @@ import { RegisterFormData, registerSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useForm } from "react-hook-form";
 import {
@@ -29,7 +29,6 @@ export default function RegisterPage() {
 
 function RegisterPageContent() {
   const router = useRouter();
-  const [apiError, setApiError] = useState<string>("");
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const {
@@ -55,30 +54,37 @@ function RegisterPageContent() {
   };
 
   const onSubmit = async (data: RegisterFormData) => {
-    setApiError("");
-
     try {
       // Exclude confirmPassword from API request
       const { confirmPassword, ...registerData } = data;
-      const response = await register(registerData);
+
+      // after verfiy everthing ok, the backend will send a verification email
+      await register(registerData);
+
+      // Create OTP session for verification page
+      sessionStorage.setItem(
+        "otp_verification_session",
+        JSON.stringify({
+          email: registerData.email,
+          timestamp: Date.now(),
+        }),
+      );
 
       // Show success message
       toast.success(
-        response.message ||
-          "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
-        { autoClose: 5000 },
+        "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
+        { autoClose: 3000 },
       );
 
-      router.push("/dang-nhap");
+      // Redirect to OTP verification page
+      router.push("/xac-nhan-otp");
     } catch (error: any) {
       console.error("Register error:", error);
 
-      // Handle API error response
-      const errorMessage =
-        error?.message ||
-        error?.error ||
-        "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.";
-      setApiError(errorMessage);
+      // Show error message
+      toast.error(
+        error?.message || "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin.",
+      );
 
       // Reset reCAPTCHA on error
       recaptchaRef.current?.reset();
@@ -119,12 +125,6 @@ function RegisterPageContent() {
                 Tạo tài khoản để bắt đầu đấu giá
               </p>
             </div>
-
-            {apiError && (
-              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-                <p className="text-sm text-red-800">{apiError}</p>
-              </div>
-            )}
 
             <form
               onSubmit={handleSubmit(onSubmit)}
@@ -199,8 +199,9 @@ function RegisterPageContent() {
               <PasswordInput
                 id="password"
                 label="Mật khẩu"
+                isRequired
                 {...formRegister("password")}
-                placeholder="••••••••"
+                placeholder="password123"
                 disabled={isSubmitting}
                 error={errors.password?.message}
                 helperText="Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
@@ -215,8 +216,9 @@ function RegisterPageContent() {
               <PasswordInput
                 id="confirmPassword"
                 label="Xác nhận mật khẩu"
+                isRequired
                 {...formRegister("confirmPassword")}
-                placeholder="••••••••"
+                placeholder="password123"
                 disabled={isSubmitting}
                 error={errors.confirmPassword?.message}
                 className={`${
@@ -232,7 +234,7 @@ function RegisterPageContent() {
                   htmlFor="address"
                   className="mb-2 block text-sm font-medium text-gray-900"
                 >
-                  Địa chỉ
+                  Địa chỉ <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -307,7 +309,7 @@ function RegisterPageContent() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <>
