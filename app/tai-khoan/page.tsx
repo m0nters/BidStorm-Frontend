@@ -190,7 +190,7 @@ function ProfilePageContent() {
 
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 transition-all hover:bg-red-50"
+                  className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 transition-all hover:bg-red-50"
                 >
                   <FiLogOut className="h-5 w-5" />
                   <span>Đăng xuất</span>

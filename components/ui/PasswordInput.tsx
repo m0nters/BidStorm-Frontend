@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useState } from "react";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string | React.ReactNode;
@@ -25,10 +25,13 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           </label>
         )}
         <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <FiLock className="h-5 w-5 text-gray-400" />
+          </div>
           <input
             ref={ref}
             type={showPassword ? "text" : "password"}
-            className={`w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 focus:border-black focus:ring-2 focus:ring-black focus:outline-none ${className}`}
+            className={`w-full rounded-lg border border-gray-300 py-3 pr-12 pl-10 focus:border-black focus:ring-2 focus:ring-black focus:outline-none ${className}`}
             {...props}
           />
           <button

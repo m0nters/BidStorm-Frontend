@@ -94,3 +94,51 @@ export const logout = async () => {
   );
   return response.data;
 };
+
+/**
+ * Forgot password - Send OTP to email
+ * POST /api/v1/auth/forgot-password
+ * Request body: { email: string }
+ */
+export const forgotPassword = async (email: string) => {
+  const response = await api.post<void>(
+    "/auth/forgot-password",
+    { email },
+    {
+      cache: "no-store",
+    },
+  );
+  return response;
+};
+
+/**
+ * Verify reset password OTP
+ * POST /api/v1/auth/verify-reset-password-otp
+ * Request body: { email: string, otpCode: string }
+ */
+export const verifyResetPasswordOtp = async (data: OtpRequest) => {
+  const response = await api.post<void>(
+    "/auth/verify-reset-password-otp",
+    data,
+    {
+      cache: "no-store",
+    },
+  );
+  return response;
+};
+
+/**
+ * Reset password
+ * POST /api/v1/auth/reset-password
+ * Request body: { email: string, newPassword: string }
+ */
+export const resetPassword = async (email: string, newPassword: string) => {
+  const response = await api.post<void>(
+    "/auth/reset-password",
+    { email, newPassword },
+    {
+      cache: "no-store",
+    },
+  );
+  return response;
+};

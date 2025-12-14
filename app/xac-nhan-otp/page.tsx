@@ -3,6 +3,7 @@
 import {
   resendEmailVerificationOtp,
   verifyEmailOtp,
+  verifyResetPasswordOtp,
 } from "@/lib/api/services/auth";
 import { verifyOtpSchema } from "@/lib/validations/otp";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,17 +18,18 @@ import { toast } from "react-toastify";
  *
  * Security Model:
  * - One-time access only via session-based validation
- * - Requires valid sessionStorage entry created during registration
+ * - Requires valid sessionStorage entry created during registration or forgot password
  * - Session expires after 15 minutes
- * - Maximum 5 verification attempts
- * - Session is cleared on successful verification or max attempts
  * - Cannot be accessed directly via URL manipulation
  * - Not a guest-guarded page but uses sessionStorage for access control
+ * - Supports multiple purposes: email verification and password reset
  */
 
 interface OtpSession {
   email: string;
   timestamp: number;
+  purpose?: "email-verification" | "password-reset"; // Purpose of OTP
+  redirectTo?: string; // Where to redirect after successful password reset
 }
 
 export default function VerifyOtpPage() {
@@ -150,22 +152,49 @@ export default function VerifyOtpPage() {
 
   const onSubmit = async (data: { email: string; otpCode: string }) => {
     if (!otpSession) return;
-
     setIsSubmitting(true);
 
     try {
-      const response = await verifyEmailOtp(data);
+      const purpose = otpSession.purpose || "email-verification";
 
-      // If we reach here, the request was successful
-      // Clear the session immediately on success
-      sessionStorage.removeItem("otp_verification_session");
+      // Call appropriate API based on purpose
+      if (purpose === "password-reset") {
+        const response = await verifyResetPasswordOtp(data);
 
-      toast.success(
-        response.message || "Xác thực thành công! Vui lòng đăng nhập.",
-      );
+        // Clear the session immediately on success
+        sessionStorage.removeItem("otp_verification_session");
 
-      // Redirect to login
-      router.push("/dang-nhap");
+        // Store email and redirectTo for reset password page
+        sessionStorage.setItem("reset_password_email", data.email);
+        if (otpSession.redirectTo) {
+          sessionStorage.setItem(
+            "reset_password_redirect",
+            otpSession.redirectTo,
+          );
+        }
+
+        toast.success(
+          response.message || "Xác thực thành công! Vui lòng đặt lại mật khẩu.",
+          { autoClose: 3000 },
+        );
+
+        // Redirect to reset password page
+        router.push("/dat-lai-mat-khau");
+      } else {
+        // Email verification (registration or profile)
+        const response = await verifyEmailOtp(data);
+
+        // Clear the session immediately on success
+        sessionStorage.removeItem("otp_verification_session");
+
+        toast.success(
+          response.message || "Xác thực thành công! Vui lòng đăng nhập.",
+          { autoClose: 3000 },
+        );
+
+        // Redirect to login
+        router.push("/dang-nhap");
+      }
     } catch (error: any) {
       console.error("Verify OTP error:", error);
 
@@ -174,7 +203,7 @@ export default function VerifyOtpPage() {
         error?.message || "Xác thực thất bại. Vui lòng thử lại.";
 
       // Show error in toast
-      toast.error(errorMessage);
+      toast.error(errorMessage, { autoClose: 4000 });
 
       // Clear OTP inputs on error
       setOtp(["", "", "", "", "", ""]);
