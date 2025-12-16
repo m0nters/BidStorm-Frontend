@@ -1,6 +1,6 @@
 "use client";
 
-import { getFavorites } from "@/lib/api/services/profile";
+import { getFavorites } from "@/services/profile";
 import { FavoriteProductResponse } from "@/types/profile";
 import Image from "next/image";
 import { useEffect, useState } from "react";

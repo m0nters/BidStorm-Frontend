@@ -1,5 +1,5 @@
 import { ProductDetailResponse, ProductListResponse } from "@/types/product";
-import { api } from "../fetch";
+import { api } from "../api/fetch";
 
 /**
  * Get top 5 products with most bids

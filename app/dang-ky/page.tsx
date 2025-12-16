@@ -2,8 +2,8 @@
 
 import { GuestGuard } from "@/components/auth/GuestGuard";
 import PasswordInput from "@/components/ui/PasswordInput";
-import { register } from "@/lib/api/services/auth";
-import { RegisterFormData, registerSchema } from "@/lib/validations/auth";
+import { register } from "@/services/auth";
+import { RegisterFormData, registerSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -67,6 +67,7 @@ function RegisterPageContent() {
         JSON.stringify({
           email: registerData.email,
           timestamp: Date.now(),
+          purpose: "email-verification",
         }),
       );
 

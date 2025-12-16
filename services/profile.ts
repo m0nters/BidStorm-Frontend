@@ -4,7 +4,7 @@ import {
   UpdateProfileRequest,
   UserProfileResponse,
 } from "@/types/profile";
-import { api } from "../fetch";
+import { api } from "../api/fetch";
 
 /**
  * Get user profile
@@ -35,7 +35,7 @@ export const updateProfile = async (data: UpdateProfileRequest) => {
  * PUT /api/v1/profile/password
  */
 export const changePassword = async (data: ChangePasswordRequest) => {
-  await api.put("/profile/password", data, {
+  return await api.put("/profile/password", data, {
     auth: true,
     cache: "no-store",
   });

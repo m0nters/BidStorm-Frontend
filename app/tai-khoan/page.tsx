@@ -6,8 +6,8 @@ import {
   FavoritesSection,
   ProfileInfoSection,
 } from "@/components/profile/";
-import { logout } from "@/lib/api/services/auth";
-import { getProfile } from "@/lib/api/services/profile";
+import { logout } from "@/services/auth";
+import { getProfile } from "@/services/profile";
 import { useAuthStore } from "@/store/authStore";
 import { UserProfileResponse } from "@/types/profile";
 import { useRouter, useSearchParams } from "next/navigation";

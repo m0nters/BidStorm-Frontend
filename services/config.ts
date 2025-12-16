@@ -1,4 +1,4 @@
-import { api } from "../fetch";
+import { api } from "../api/fetch";
 
 /**
  * Get auto extend trigger time in minutes

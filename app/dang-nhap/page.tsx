@@ -2,9 +2,9 @@
 
 import { GuestGuard } from "@/components/auth/GuestGuard";
 import PasswordInput from "@/components/ui/PasswordInput";
-import { login } from "@/lib/api/services/auth";
-import { LoginFormData, loginSchema } from "@/lib/validations/auth";
+import { login } from "@/services/auth";
 import { useAuthStore } from "@/store/authStore";
+import { LoginFormData, loginSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

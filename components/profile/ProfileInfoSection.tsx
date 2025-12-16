@@ -1,12 +1,12 @@
 "use client";
 
-import { resendEmailVerificationOtp } from "@/lib/api/services/auth";
-import { updateProfile } from "@/lib/api/services/profile";
+import { resendEmailVerificationOtp } from "@/services/auth";
+import { updateProfile } from "@/services/profile";
+import { UserProfileResponse } from "@/types/profile";
 import {
   UpdateProfileFormData,
   updateProfileSchema,
-} from "@/lib/validations/profile";
-import { UserProfileResponse } from "@/types/profile";
+} from "@/validations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

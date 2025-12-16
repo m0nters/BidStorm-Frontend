@@ -1,3 +1,3 @@
+export * from "../services";
 export * from "./config";
 export * from "./fetch";
-export * from "./services/";

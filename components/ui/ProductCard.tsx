@@ -90,6 +90,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Category */}
           <Link
             href={`/danh-muc/${product.categorySlug}`}
+            onClick={(e) => e.stopPropagation()}
             className="mb-2 text-xs font-medium tracking-wider text-gray-500 uppercase hover:text-black hover:underline"
           >
             {product.categoryName}

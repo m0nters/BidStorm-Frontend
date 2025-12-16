@@ -1,10 +1,10 @@
 "use client";
 
-import { forgotPassword } from "@/lib/api/services/auth";
+import { forgotPassword } from "@/services/auth";
 import {
   ForgotPasswordFormData,
   forgotPasswordSchema,
-} from "@/lib/validations/auth";
+} from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

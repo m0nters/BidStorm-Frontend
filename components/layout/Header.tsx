@@ -1,6 +1,6 @@
 "use client";
 
-import { logout } from "@/lib/api";
+import { logout } from "@/api";
 import { useAuthStore } from "@/store/authStore";
 import { CategoryResponse } from "@/types/category";
 import Image from "next/image";

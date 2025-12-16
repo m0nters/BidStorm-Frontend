@@ -1,5 +1,5 @@
-import { setAccessToken as setApiAccessToken } from "@/lib/api/config";
-import { refreshAccessToken } from "@/lib/api/services/auth";
+import { setAccessToken as setApiAccessToken } from "@/api/config";
+import { refreshAccessToken } from "@/services/auth";
 import { AuthState, UserInfo } from "@/types/auth";
 import { create } from "zustand";
 

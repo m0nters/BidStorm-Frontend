@@ -1,7 +1,7 @@
+import { getAllCategories } from "@/api";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import { AuthProvider } from "@/components/providers/AuthProvider";
-import { getAllCategories } from "@/lib/api";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { ToastContainer } from "react-toastify";
@@ -31,7 +31,9 @@ export default async function RootLayout({
 
   return (
     <html lang="vi">
-      <body className={`${montserrat.className} font-sans antialiased`}>
+      <body
+        className={`${montserrat.className} suppressHydrationWarning font-sans antialiased`}
+      >
         <AuthProvider>
           <div className="flex min-h-screen flex-col">
             <Header categories={categories} />

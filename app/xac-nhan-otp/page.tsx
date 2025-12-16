@@ -1,11 +1,12 @@
 "use client";
 
 import {
+  forgotPassword,
   resendEmailVerificationOtp,
   verifyEmailOtp,
   verifyResetPasswordOtp,
-} from "@/lib/api/services/auth";
-import { verifyOtpSchema } from "@/lib/validations/otp";
+} from "@/services/auth";
+import { verifyOtpSchema } from "@/validations/otp";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -37,6 +38,7 @@ export default function VerifyOtpPage() {
   const [otpSession, setOtpSession] = useState<OtpSession | null>(null);
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resendOtpInterval, setResendOtpInterval] = useState(60); // seconds
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Validate OTP session on mount
@@ -44,31 +46,48 @@ export default function VerifyOtpPage() {
     const sessionData = sessionStorage.getItem("otp_verification_session");
 
     if (!sessionData) {
-      toast.error("Phiên xác thực không hợp lệ. Vui lòng đăng ký lại.");
-      router.push("/dang-ky");
+      toast.error(
+        "Phiên xác thực không hợp lệ. Vui lòng thao tác lại quy trình xác thực OTP.",
+      );
+      router.push("/");
       return;
     }
 
     try {
       const session: OtpSession = JSON.parse(sessionData);
 
-      // Check if session is expired (15 minutes)
+      // Check if session is expired (must match the backend -- 10 minutes)
       const sessionAge = Date.now() - session.timestamp;
 
-      if (sessionAge > 15 * 60 * 1000) {
+      if (sessionAge > 10 * 60 * 1000) {
         sessionStorage.removeItem("otp_verification_session");
-        toast.error("Phiên xác thực đã hết hạn. Vui lòng đăng ký lại.");
-        router.push("/dang-ky");
+        toast.error(
+          "Phiên xác thực đã hết hạn. Vui lòng thao tác lại quy trình xác thực OTP.",
+        );
+        router.push("/");
         return;
       }
 
       setOtpSession(session);
     } catch (error) {
       sessionStorage.removeItem("otp_verification_session");
-      toast.error("Phiên xác thực không hợp lệ. Vui lòng đăng ký lại.");
-      router.push("/dang-ky");
+      toast.error(
+        "Phiên xác thực không hợp lệ. Vui lòng thao tác lại quy trình xác thực OTP.",
+      );
+      router.push("/");
     }
   }, [router]);
+
+  // after resend OTP, start countdown, and disable resend button
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendOtpInterval > 0) {
+      timer = setInterval(() => {
+        setResendOtpInterval((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendOtpInterval]);
 
   const {
     handleSubmit,
@@ -155,7 +174,7 @@ export default function VerifyOtpPage() {
     setIsSubmitting(true);
 
     try {
-      const purpose = otpSession.purpose || "email-verification";
+      const purpose = otpSession.purpose;
 
       // Call appropriate API based on purpose
       if (purpose === "password-reset") {
@@ -196,8 +215,6 @@ export default function VerifyOtpPage() {
         router.push("/dang-nhap");
       }
     } catch (error: any) {
-      console.error("Verify OTP error:", error);
-
       // API errors have message/error fields from ApiErrorResponse
       const errorMessage =
         error?.message || "Xác thực thất bại. Vui lòng thử lại.";
@@ -218,12 +235,17 @@ export default function VerifyOtpPage() {
     if (!otpSession) return;
 
     try {
-      const response = await resendEmailVerificationOtp(email);
+      const purpose = otpSession.purpose || "email-verification";
+
+      // Call appropriate API based on purpose
+      if (purpose === "password-reset") {
+        await forgotPassword(email);
+      } else {
+        await resendEmailVerificationOtp(email);
+      }
 
       // If we reach here, the request was successful
-      toast.success(
-        response.message || "Mã OTP đã được gửi lại đến email của bạn.",
-      );
+      toast.success("Mã OTP đã được gửi lại đến email của bạn.");
 
       // Reset timestamp on successful resend
       const resetSession = {
@@ -315,24 +337,34 @@ export default function VerifyOtpPage() {
 
             {/* Resend OTP */}
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Không nhận được mã?{" "}
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  className="cursor-pointer font-semibold text-black hover:underline disabled:opacity-50"
-                  onClick={() => onResendOtp(otpSession.email)}
-                >
-                  Gửi lại
-                </button>
-              </p>
+              <div className="flex flex-col items-center justify-center text-sm text-gray-600">
+                <p className="flex gap-2">
+                  <span>Không nhận được mã?</span>
+                  <button
+                    type="button"
+                    disabled={isSubmitting || resendOtpInterval > 0}
+                    className="cursor-pointer font-semibold text-black hover:underline disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:no-underline"
+                    onClick={() => {
+                      onResendOtp(otpSession.email);
+                      setResendOtpInterval(60);
+                    }}
+                  >
+                    Gửi lại
+                  </button>
+                </p>
+                {resendOtpInterval > 0 && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Vui lòng chờ {resendOtpInterval} giây để gửi lại.
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Back to login */}
             <div className="mt-4 text-center">
               <button
                 onClick={() => router.back()}
-                className="cursor-pointer text-sm text-gray-600 hover:text-black hover:underline"
+                className="cursor-pointer text-sm font-semibold text-gray-800 hover:text-black hover:underline"
               >
                 Xác thực sau, đưa tôi trở về trang trước
               </button>

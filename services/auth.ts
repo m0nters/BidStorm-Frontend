@@ -1,6 +1,6 @@
 import { LoginRequest, LoginResponse, RegisterRequest } from "@/types/auth";
 import { OtpRequest } from "@/types/otp";
-import { api } from "../fetch";
+import { api } from "../api/fetch";
 
 /**
  * Register new user

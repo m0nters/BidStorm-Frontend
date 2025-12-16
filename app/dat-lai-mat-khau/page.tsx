@@ -1,11 +1,8 @@
 "use client";
 
 import PasswordInput from "@/components/ui/PasswordInput";
-import { resetPassword } from "@/lib/api/services/auth";
-import {
-  ResetPasswordFormData,
-  resetPasswordSchema,
-} from "@/lib/validations/auth";
+import { resetPassword } from "@/services/auth";
+import { ResetPasswordFormData, resetPasswordSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +14,7 @@ import { toast } from "react-toastify";
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
 
   const {
     register,
@@ -38,7 +36,7 @@ export default function ResetPasswordPage() {
 
     if (!storedEmail) {
       toast.error("Phiên đặt lại mật khẩu không hợp lệ. Vui lòng thử lại.");
-      router.push("/quen-mat-khau");
+      router.push(redirectTo || "/dang-nhap");
       return;
     }
 
@@ -46,12 +44,15 @@ export default function ResetPasswordPage() {
     setValue("email", storedEmail); // IMPORTANT: Set email in form for validation
   }, [router, setValue]);
 
+  // set redirectTo from sessionStorage (if exists)
+  useEffect(() => {
+    const storedRedirect = sessionStorage.getItem("reset_password_redirect");
+    setRedirectTo(storedRedirect);
+  }, []);
+
   const onSubmit = async (data: ResetPasswordFormData) => {
     try {
       await resetPassword(data.email, data.newPassword);
-
-      // Get redirect URL if exists
-      const redirectTo = sessionStorage.getItem("reset_password_redirect");
 
       // Clear all stored session data
       sessionStorage.removeItem("reset_password_email");
@@ -171,10 +172,10 @@ export default function ResetPasswordPage() {
             {/* Back to login */}
             <div className="mt-8 text-center">
               <Link
-                href="/dang-nhap"
+                href={redirectTo || "/dang-nhap"}
                 className="text-sm text-gray-600 hover:text-black"
               >
-                Quay lại đăng nhập
+                Quay lại trang trước
               </Link>
             </div>
           </div>

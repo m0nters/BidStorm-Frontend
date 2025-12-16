@@ -1,13 +1,13 @@
 "use client";
 
 import PasswordInput from "@/components/ui/PasswordInput";
-import { forgotPassword } from "@/lib/api/services/auth";
-import { changePassword } from "@/lib/api/services/profile";
+import { forgotPassword } from "@/services/auth";
+import { changePassword } from "@/services/profile";
+import { useAuthStore } from "@/store/authStore";
 import {
   ChangePasswordFormData,
   changePasswordSchema,
-} from "@/lib/validations/profile";
-import { useAuthStore } from "@/store/authStore";
+} from "@/validations/profile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,8 +35,8 @@ export function ChangePasswordSection() {
   const onSubmit = async (data: ChangePasswordFormData) => {
     try {
       const { confirmPassword, ...changePasswordData } = data;
-      await changePassword(changePasswordData);
-      toast.success("Đổi mật khẩu thành công!");
+      const response = await changePassword(changePasswordData);
+      toast.success(response.message || "Đổi mật khẩu thành công!");
       reset();
     } catch (error: any) {
       console.error("Change password error:", error);
@@ -46,7 +46,9 @@ export function ChangePasswordSection() {
 
   const handleForgotPassword = async () => {
     if (!user?.email) {
-      toast.error("Không tìm thấy email của bạn.");
+      toast.error(
+        "Không tìm thấy email của bạn. Nhập email ở phần chỉnh sửa hồ sơ để tiếp tục.",
+      );
       return;
     }
 
@@ -61,7 +63,7 @@ export function ChangePasswordSection() {
           email: user.email,
           timestamp: Date.now(),
           purpose: "password-reset",
-          redirectTo: "/tai-khoan?tab=doi-mat-khau", // Redirect back to change password tab
+          redirectTo: "/tai-khoan?tab=doi-mat-khau", // Redirect back to change password tab after finish
         }),
       );
 
@@ -108,7 +110,6 @@ export function ChangePasswordSection() {
           placeholder="Nhập lại mật khẩu mới"
           {...register("confirmPassword")}
           error={errors.confirmPassword?.message}
-          helperText="Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
         />
 
         {/* Forgot password? */}
@@ -116,7 +117,7 @@ export function ChangePasswordSection() {
           type="button"
           onClick={handleForgotPassword}
           disabled={isSendingOtp}
-          className="cursor-pointer text-left text-sm font-medium text-blue-600 hover:underline disabled:opacity-50"
+          className="w-fit cursor-pointer text-left text-sm font-medium text-blue-600 hover:underline disabled:opacity-50"
         >
           {isSendingOtp ? "Đang gửi OTP..." : "Quên mật khẩu?"}
         </button>

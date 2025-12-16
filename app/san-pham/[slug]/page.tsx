@@ -1,13 +1,10 @@
 import ImageGallery from "@/components/ui/ImageGallery";
 import ProductCard from "@/components/ui/ProductCard";
-import {
-  getAutoExtendByMin,
-  getAutoExtendTriggerMin,
-} from "@/lib/api/services/config";
+import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
   getProductDetailBySlug,
   getRelatedProducts,
-} from "@/lib/api/services/products";
+} from "@/services/products";
 import { formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";

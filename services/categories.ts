@@ -1,5 +1,5 @@
 import { CategoryResponse } from "@/types/category";
-import { api } from "../fetch";
+import { api } from "../api/fetch";
 
 /**
  * Get all categories
