@@ -3,8 +3,7 @@ import {
   getTopHighestPriceProducts,
   getTopMostBidsProducts,
 } from "@/api";
-import Hero from "@/components/ui/Hero";
-import ProductSection from "@/components/ui/ProductSection";
+import { Hero, ProductSection } from "@/components/ui";
 import { FiClock, FiDollarSign, FiTrendingUp } from "react-icons/fi";
 
 export default async function Home() {

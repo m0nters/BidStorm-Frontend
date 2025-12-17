@@ -1,7 +1,7 @@
 "use client";
 
-import { GuestGuard } from "@/components/auth/GuestGuard";
-import PasswordInput from "@/components/ui/PasswordInput";
+import { GuestGuard } from "@/components/auth/";
+import { PasswordInput } from "@/components/ui/form/";
 import { login } from "@/services/auth";
 import { useAuthStore } from "@/store/authStore";
 import { LoginFormData, loginSchema } from "@/validations/auth";

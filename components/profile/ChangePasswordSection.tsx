@@ -1,6 +1,6 @@
 "use client";
 
-import PasswordInput from "@/components/ui/PasswordInput";
+import { PasswordInput } from "@/components/ui/";
 import { forgotPassword } from "@/services/auth";
 import { changePassword } from "@/services/profile";
 import { useAuthStore } from "@/store/authStore";

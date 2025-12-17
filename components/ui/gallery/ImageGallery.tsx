@@ -14,7 +14,7 @@ interface ImageGalleryProps {
   isEnded?: boolean;
 }
 
-export default function ImageGallery({
+export function ImageGallery({
   images,
   title,
   isNew,

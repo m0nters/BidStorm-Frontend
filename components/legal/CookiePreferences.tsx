@@ -45,7 +45,7 @@ const defaultCategories: CookieCategory[] = [
   },
 ];
 
-export default function CookiePreferences() {
+export function CookiePreferences() {
   const [categories, setCategories] =
     useState<CookieCategory[]>(defaultCategories);
   const [showToast, setShowToast] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
-import PageHero from "@/components/layout/PageHero";
-import CookiePreferences from "@/components/legal/CookiePreferences";
+import { PageHero } from "@/components/layout/";
+import { CookiePreferences } from "@/components/legal/";
 
 export default function CookiePolicyPage() {
   return (

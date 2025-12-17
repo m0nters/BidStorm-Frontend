@@ -16,7 +16,7 @@ interface ProductCardProps {
   product: ProductListResponse;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isUrgent, setIsUrgent] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState(false);

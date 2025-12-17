@@ -1,7 +1,7 @@
 "use client";
 
-import { GuestGuard } from "@/components/auth/GuestGuard";
-import PasswordInput from "@/components/ui/PasswordInput";
+import { GuestGuard } from "@/components/auth/";
+import { PasswordInput } from "@/components/ui/";
 import { register } from "@/services/auth";
 import { RegisterFormData, registerSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";

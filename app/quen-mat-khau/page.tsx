@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
         JSON.stringify({
           email: data.email,
           timestamp: Date.now(),
-          purpose: "password-reset", // Distinguish from email verification
+          purpose: "password-reset",
         }),
       );
 

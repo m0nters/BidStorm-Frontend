@@ -20,7 +20,7 @@ interface HeaderProps {
   categories: CategoryResponse[];
 }
 
-export default function Header({ categories }: HeaderProps) {
+export function Header({ categories }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);

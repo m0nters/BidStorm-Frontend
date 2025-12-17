@@ -1,6 +1,6 @@
 "use client";
 
-import PasswordInput from "@/components/ui/PasswordInput";
+import { PasswordInput } from "@/components/ui/";
 import { resetPassword } from "@/services/auth";
 import { ResetPasswordFormData, resetPasswordSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";

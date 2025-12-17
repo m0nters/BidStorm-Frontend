@@ -1,4 +1,4 @@
-import PageHero from "@/components/layout/PageHero";
+import { PageHero } from "@/components/layout/";
 
 export default function DisclaimerPage() {
   return (

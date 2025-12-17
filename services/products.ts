@@ -1,3 +1,4 @@
+import { PaginatedResponse } from "@/types/api";
 import { ProductDetailResponse, ProductListResponse } from "@/types/product";
 import { api } from "../api/fetch";
 
@@ -75,6 +76,35 @@ export const getRelatedProducts = async (id: string | number) => {
         revalidate: 600, // Cache for 10 minutes
         tags: ["products", `related-${id}`],
       },
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Get products by category ID with pagination
+ * For category page
+ */
+export const getProductsByCategory = async (
+  categoryId: number,
+  params?: {
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDirection?: "asc" | "desc";
+  },
+) => {
+  const queryParams = new URLSearchParams({
+    page: (params?.page ?? 0).toString(),
+    size: (params?.size ?? 20).toString(),
+    sortBy: params?.sortBy ?? "endTime",
+    sortDirection: params?.sortDirection ?? "asc",
+  });
+
+  const response = await api.get<PaginatedResponse<ProductListResponse>>(
+    `/products/category/${categoryId}?${queryParams}`,
+    {
+      cache: "no-store", // Don't cache - product listings change frequently
     },
   );
   return response.data;

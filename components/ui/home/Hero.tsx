@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FiArrowRight, FiRadio } from "react-icons/fi";
 
-export default function Hero() {
+export function Hero() {
   return (
     <section className="relative overflow-hidden bg-linear-to-br from-gray-50 to-white py-20 md:py-32">
       {/* Background Pattern */}

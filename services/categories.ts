@@ -16,15 +16,15 @@ export const getAllCategories = async () => {
 };
 
 /**
- * Get category by ID
+ * Get category by slug
  */
-export const getCategoryById = async (categoryId: number) => {
+export const getCategoryBySlug = async (slug: string) => {
   const response = await api.get<CategoryResponse>(
-    `/categories/${categoryId}`,
+    `/categories/slug?slug=${slug}`,
     {
       next: {
         revalidate: 3600,
-        tags: [`category-${categoryId}`, "categories"],
+        tags: [`category-slug-${slug}`, "categories"],
       },
     },
   );

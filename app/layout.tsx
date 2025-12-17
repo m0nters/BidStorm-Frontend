@@ -1,6 +1,5 @@
 import { getAllCategories } from "@/api";
-import Footer from "@/components/layout/Footer";
-import Header from "@/components/layout/Header";
+import { Footer, Header } from "@/components/layout/";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";

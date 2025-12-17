@@ -22,6 +22,19 @@ export interface ApiErrorResponse {
 
 export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
 
+// Pagination types (matching Spring Boot Page response)
+export interface PaginatedResponse<T> {
+  content: T[];
+  empty: boolean;
+  first: boolean;
+  last: boolean;
+  number: number; // Current page number (0-indexed)
+  numberOfElements: number; // Number of elements in current page
+  size: number; // Page size
+  totalElements: number; // Total number of elements
+  totalPages: number; // Total number of pages
+}
+
 // Helper type guards
 export function isApiSuccess<T>(
   response: ApiResponse<T>,

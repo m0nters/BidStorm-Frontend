@@ -4,7 +4,7 @@ import { ProductListResponse } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
-import ProductCard from "./ProductCard";
+import { ProductCard } from "./ProductCard";
 
 interface ProductSectionProps {
   title: string;
@@ -13,8 +13,7 @@ interface ProductSectionProps {
   icon?: React.ReactNode;
   viewAllLink?: string;
 }
-
-export default function ProductSection({
+export function ProductSection({
   title,
   description,
   products,

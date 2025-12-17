@@ -3,7 +3,7 @@ interface PageHeroProps {
   subtitle: string;
 }
 
-export default function PageHero({ title, subtitle }: PageHeroProps) {
+export function PageHero({ title, subtitle }: PageHeroProps) {
   return (
     <section className="relative overflow-hidden bg-linear-to-br from-gray-900 to-black py-20 text-white">
       <div className="absolute inset-0 opacity-10">

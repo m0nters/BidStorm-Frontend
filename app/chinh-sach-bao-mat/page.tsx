@@ -1,4 +1,4 @@
-import PageHero from "@/components/layout/PageHero";
+import { PageHero } from "@/components/layout/";
 import Link from "next/link";
 
 export default function PrivacyPolicyPage() {

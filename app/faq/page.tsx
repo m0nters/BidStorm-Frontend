@@ -1,6 +1,6 @@
 "use client";
 
-import PageHero from "@/components/layout/PageHero";
+import { PageHero } from "@/components/layout/";
 import { useState } from "react";
 import { FiChevronDown } from "react-icons/fi";
 
