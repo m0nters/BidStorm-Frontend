@@ -57,7 +57,7 @@ export default async function CategoryPage({
 
     // Parse pagination params
     const page = parseInt(search.page || "1") - 1; // Convert to 0-indexed
-    const size = parseInt(search.size || "20");
+    const size = parseInt(search.size || "20"); // currently using `lg:grid-cols-4`, meaning 5 rows
     const sortBy = search.sortBy || "endTime";
     const sortDirection = search.sortDirection || "asc";
 

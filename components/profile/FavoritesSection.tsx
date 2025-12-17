@@ -1,11 +1,10 @@
 "use client";
 
+import { FavoriteProductCard, Pagination } from "@/components/ui";
 import { getFavorites } from "@/services/profile";
 import { FavoriteProductResponse } from "@/types/profile";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { FavoriteProductCard } from "./FavoriteProductCard";
 
 export function FavoritesSection() {
   const [favorites, setFavorites] = useState<FavoriteProductResponse[]>([]);
@@ -13,7 +12,6 @@ export function FavoritesSection() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const size = 12;
 
   useEffect(() => {
     loadFavorites();
@@ -23,14 +21,28 @@ export function FavoritesSection() {
   const loadFavorites = async () => {
     try {
       setLoading(true);
-      const response = await getFavorites(page, size);
+      const response = await getFavorites(page);
       setFavorites(response.content);
-      setTotalPages(response.page.totalPages);
-      setTotalElements(response.page.totalElements);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
     } catch (error) {
       console.error("Failed to load favorites:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRemoveFavorite = (productId: number) => {
+    // In case the logic is getting out of hand, just call `loadFavorites()`.
+    // Currently I'm (trying) handling this in memory for better efficiency.
+    // (think about it, otherwise we have to fetch ALL the data just for one removal)
+
+    setFavorites((prev) => prev.filter((item) => item.productId !== productId));
+    setTotalElements((prev) => prev - 1);
+
+    // If the current page becomes empty after removal, go to the previous page
+    if (favorites.length === 1 && page > 0) {
+      setPage(page - 1);
     }
   };
 
@@ -76,46 +88,22 @@ export function FavoritesSection() {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {favorites.map((item) => (
-          <FavoriteProductCard key={item.productId} product={item} />
+          <FavoriteProductCard
+            key={item.productId}
+            product={item}
+            onRemove={handleRemoveFavorite}
+          />
         ))}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-8 flex items-center justify-center gap-2">
-          <button
-            onClick={() => setPage(page - 1)}
-            disabled={page === 0}
-            className="rounded-lg border border-gray-300 p-2 hover:bg-gray-50 disabled:opacity-50"
-          >
-            <FiChevronLeft className="h-5 w-5" />
-          </button>
-
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => setPage(i)}
-                className={`h-10 w-10 rounded-lg font-semibold transition-all ${
-                  page === i
-                    ? "bg-black text-white"
-                    : "border border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages - 1}
-            className="rounded-lg border border-gray-300 p-2 hover:bg-gray-50 disabled:opacity-50"
-          >
-            <FiChevronRight className="h-5 w-5" />
-          </button>
-        </div>
-      )}
+      <Pagination
+        currentPage={page + 1}
+        totalPages={totalPages}
+        onPageChange={(newPage) => setPage(newPage - 1)}
+        isFirst={page === 0}
+        isLast={page === totalPages - 1}
+        className="mt-8"
+      />
     </div>
   );
 }

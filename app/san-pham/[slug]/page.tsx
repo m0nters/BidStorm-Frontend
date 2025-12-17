@@ -1,5 +1,5 @@
-import ImageGallery from "@/components/ui/gallery/ImageGallery";
-import ProductCard from "@/components/ui/product/ProductCard";
+import { ImageGallery, ProductCard } from "@/components/ui";
+import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
 import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
   getProductDetailBySlug,
@@ -18,6 +18,7 @@ import {
   FiThumbsUp,
 } from "react-icons/fi";
 import { HiOutlineBell } from "react-icons/hi2";
+import { RiAuctionFill } from "react-icons/ri";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -138,15 +139,19 @@ export default async function ProductDetailPage({
             <div className="space-y-6">
               {/* Title */}
               <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                <h1 className="mb-4 text-3xl font-bold text-gray-900">
-                  {product.title}
-                </h1>
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <h1 className="flex-1 text-3xl font-bold text-gray-900">
+                    {product.title}
+                  </h1>
+
+                  <FavoriteButton productId={product.id} />
+                </div>
 
                 {/* Stats */}
                 <div className="mb-6 flex items-center gap-4 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
-                    <HiOutlineBell className="h-4 w-4" />
-                    <span>{product.bidCount} lượt</span>
+                    <RiAuctionFill className="h-4 w-4" />
+                    <span>{product.bidCount} lượt đấu giá</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <FiEye className="h-4 w-4" />
@@ -278,16 +283,10 @@ export default async function ProductDetailPage({
 
                 {/* Action Buttons */}
                 {!product.isEnded && (
-                  <div className="space-y-3">
-                    <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800">
-                      <HiOutlineBell className="h-5 w-5" />
-                      Đặt giá ngay
-                    </button>
-
-                    <button className="w-full rounded-lg border-2 border-gray-300 py-3 font-semibold text-gray-700 transition-all hover:border-black hover:text-black">
-                      Thêm vào yêu thích
-                    </button>
-                  </div>
+                  <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800">
+                    <HiOutlineBell className="h-5 w-5" />
+                    Đặt giá ngay
+                  </button>
                 )}
               </div>
 

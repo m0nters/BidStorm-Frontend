@@ -22,6 +22,21 @@ export interface ApiErrorResponse {
 
 export type ApiResponse<T = any> = ApiSuccessResponse<T> | ApiErrorResponse;
 
+interface Sort {
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
+}
+
+interface Pagable {
+  offset: number;
+  pageNumber: number;
+  pageSize: number;
+  paged: boolean;
+  sort: Sort;
+  unpaged: boolean;
+}
+
 // Pagination types (matching Spring Boot Page response)
 export interface PaginatedResponse<T> {
   content: T[];
@@ -30,7 +45,9 @@ export interface PaginatedResponse<T> {
   last: boolean;
   number: number; // Current page number (0-indexed)
   numberOfElements: number; // Number of elements in current page
+  pagable: Pagable;
   size: number; // Page size
+  sort: Sort;
   totalElements: number; // Total number of elements
   totalPages: number; // Total number of pages
 }

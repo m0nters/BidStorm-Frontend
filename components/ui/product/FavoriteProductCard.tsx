@@ -1,17 +1,25 @@
 "use client";
 
 import { FavoriteProductResponse } from "@/types/profile";
-import { calculateCountdown, formatPrice } from "@/utils";
+import { calculateCountdown, formatFullDateTime, formatPrice } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FiClock, FiDollarSign } from "react-icons/fi";
+import { FiClock } from "react-icons/fi";
+import { RiAuctionFill } from "react-icons/ri";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface FavoriteProductCardProps {
   product: FavoriteProductResponse;
+  onRemove?: (productId: number) => void;
 }
 
-export function FavoriteProductCard({ product }: FavoriteProductCardProps) {
+// basically a more compact version of `ProductCard` for favorite section (just
+// quick look, have basic functionality, don't need all details)
+export function FavoriteProductCard({
+  product,
+  onRemove,
+}: FavoriteProductCardProps) {
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isUrgent, setIsUrgent] = useState(false);
 
@@ -37,6 +45,15 @@ export function FavoriteProductCard({ product }: FavoriteProductCardProps) {
             alt={product.title}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+          <FavoriteButton
+            productId={product.productId}
+            className="absolute top-3 right-3 z-10"
+            onFavoriteChange={(isFavorited) => {
+              if (!isFavorited) {
+                onRemove?.(product.productId);
+              }
+            }}
           />
           {product.isEnded && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/60">
@@ -71,17 +88,23 @@ export function FavoriteProductCard({ product }: FavoriteProductCardProps) {
 
           <div className="flex items-center justify-between border-t border-gray-100 pt-3">
             <div className="flex items-center gap-1 text-xs text-gray-600">
-              <FiDollarSign className="h-3.5 w-3.5" />
+              <RiAuctionFill className="h-3.5 w-3.5" />
               <span>{product.bidCount} lượt đấu giá</span>
             </div>
-            {!product.isEnded && (
+            {!product.isEnded ? (
               <div
                 className={`flex items-center gap-1 text-xs ${
                   isUrgent ? "font-semibold text-red-600" : "text-gray-600"
                 }`}
+                title={`Sẽ kết thúc vào ${formatFullDateTime(product.endTime)}`}
               >
                 <FiClock className="h-3.5 w-3.5" />
                 <span>{timeLeft}</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-1 rounded-full bg-black px-2 py-1 text-xs text-white">
+                <FiClock className="h-3.5 w-3.5" />
+                <span>Đã kết thúc</span>
               </div>
             )}
           </div>

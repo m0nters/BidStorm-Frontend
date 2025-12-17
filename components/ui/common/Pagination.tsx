@@ -8,6 +8,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   isFirst: boolean;
   isLast: boolean;
+  className?: string;
 }
 
 export function Pagination({
@@ -16,6 +17,7 @@ export function Pagination({
   onPageChange,
   isFirst,
   isLast,
+  className = "",
 }: PaginationProps) {
   // Generate page numbers to display
   const getPageNumbers = () => {
@@ -59,7 +61,7 @@ export function Pagination({
   }
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className={`flex items-center justify-center gap-2 ${className}`}>
       {/* Previous Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}

@@ -10,7 +10,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FiClock, FiHeart, FiShoppingCart } from "react-icons/fi";
+import { FiClock, FiShoppingCart } from "react-icons/fi";
+import { RiAuctionFill } from "react-icons/ri";
+import { FavoriteButton } from "./FavoriteButton";
 
 interface ProductCardProps {
   product: ProductListResponse;
@@ -19,7 +21,6 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isUrgent, setIsUrgent] = useState(false);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Real time countdown
   useEffect(() => {
@@ -34,11 +35,6 @@ export function ProductCard({ product }: ProductCardProps) {
 
     return () => clearInterval(timer);
   }, [product.endTime]);
-
-  const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    // TODO: Call API to update wishlist
-  };
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-100">
@@ -69,20 +65,11 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* Wishlist Button */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              toggleWishlist();
-            }}
-            className="absolute top-3 right-3 cursor-pointer rounded-full bg-white/90 p-2.5 shadow-lg backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
-          >
-            <FiHeart
-              className={`h-5 w-5 transition-colors ${
-                isWishlisted ? "fill-black text-black" : "text-gray-600"
-              }`}
-            />
-          </button>
+          {/* Wishlist Button - Only show when authenticated */}
+          <FavoriteButton
+            productId={product.id}
+            className="absolute top-3 right-3"
+          />
         </div>
 
         {/* Product Info */}
@@ -152,7 +139,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Bids Count */}
           <div className="mb-3 rounded-lg bg-gray-50 px-3 py-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2 text-sm">
+              <RiAuctionFill className="h-3.5 w-3.5" />
               <span className="font-medium text-gray-900">
                 {product.bidCount > 0
                   ? `${product.bidCount} lượt đấu giá`
