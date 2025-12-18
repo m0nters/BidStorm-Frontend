@@ -2,6 +2,7 @@
 
 import { AuthenticatedLayout } from "@/components/auth";
 import {
+  BiddingSection,
   ChangePasswordSection,
   FavoritesSection,
   ProfileInfoSection,
@@ -18,11 +19,12 @@ import {
   FiLock,
   FiLogOut,
   FiStar,
+  FiTrendingUp,
   FiUser,
   FiXCircle,
 } from "react-icons/fi";
 
-type TabType = "thong-tin" | "doi-mat-khau" | "yeu-thich";
+type TabType = "thong-tin" | "doi-mat-khau" | "yeu-thich" | "dau-gia";
 
 export default function ProfilePage() {
   return (
@@ -45,7 +47,7 @@ function ProfilePageContent() {
     const tabParam = searchParams.get("tab") as TabType | null;
     if (
       tabParam &&
-      ["thong-tin", "doi-mat-khau", "yeu-thich"].includes(tabParam)
+      ["thong-tin", "doi-mat-khau", "yeu-thich", "dau-gia"].includes(tabParam)
     ) {
       setActiveTab(tabParam);
     }
@@ -95,6 +97,7 @@ function ProfilePageContent() {
     { id: "thong-tin", label: "Thông tin cá nhân", icon: FiUser },
     { id: "doi-mat-khau", label: "Đổi mật khẩu", icon: FiLock },
     { id: "yeu-thich", label: "Sản phẩm yêu thích", icon: FiHeart },
+    { id: "dau-gia", label: "Đấu giá", icon: FiTrendingUp },
   ];
 
   const handleTabChange = (tabId: TabType) => {
@@ -210,6 +213,7 @@ function ProfilePageContent() {
               )}
               {activeTab === "doi-mat-khau" && <ChangePasswordSection />}
               {activeTab === "yeu-thich" && <FavoritesSection />}
+              {activeTab === "dau-gia" && <BiddingSection />}
             </div>
           </div>
         </div>

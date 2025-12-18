@@ -12,6 +12,7 @@ import {
   FiLogOut,
   FiMenu,
   FiSearch,
+  FiTrendingUp,
   FiUser,
   FiX,
 } from "react-icons/fi";
@@ -115,6 +116,13 @@ export function Header({ categories }: HeaderProps) {
                     >
                       <FiHeart className="h-4 w-4" />
                       <span>Sản phẩm yêu thích</span>
+                    </Link>
+                    <Link
+                      href="/tai-khoan?tab=dau-gia"
+                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                    >
+                      <FiTrendingUp className="h-4 w-4" />
+                      <span>Đấu giá</span>
                     </Link>
                   </div>
 

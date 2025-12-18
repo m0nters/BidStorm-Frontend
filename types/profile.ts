@@ -38,3 +38,28 @@ export interface FavoriteProductResponse {
   isEnded: boolean;
   favoritedAt: string; // ISO datetime string (ZonedDateTime)
 }
+
+export interface BiddingProductResponse {
+  productId: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string;
+  currentPrice: number;
+  userHighestBid: number;
+  isWinning: boolean;
+  bidCount: number;
+  endTime: string; // ISO datetime string (ZonedDateTime)
+  isEnded: boolean;
+}
+
+export interface WonProductResponse {
+  productId: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string;
+  winningBid: number;
+  sellerId: number;
+  sellerName: string;
+  endTime: string; // ISO datetime string (ZonedDateTime)
+  hasReviewed: boolean;
+}

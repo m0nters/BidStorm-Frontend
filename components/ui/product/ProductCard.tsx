@@ -52,7 +52,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="absolute right-3 bottom-3 flex flex-col gap-2">
             {product.isNew && (
               <span className="w-fit rounded-lg bg-black px-3 py-1 text-xs font-semibold text-white shadow-lg">
                 MỚI
@@ -60,7 +60,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
             {product.hasBuyNow && (
               <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
-                MUA NGAY
+                CÓ THỂ MUA NGAY
               </span>
             )}
           </div>

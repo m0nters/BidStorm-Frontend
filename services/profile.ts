@@ -1,9 +1,11 @@
 import { PaginatedResponse } from "@/types/api";
 import {
+  BiddingProductResponse,
   ChangePasswordRequest,
   FavoriteProductResponse,
   UpdateProfileRequest,
   UserProfileResponse,
+  WonProductResponse,
 } from "@/types/profile";
 import { api } from "../api/fetch";
 
@@ -86,6 +88,39 @@ export const removeFavorite = async (productId: number) => {
 export const isFavorite = async (productId: number) => {
   const response = await api.get<boolean>(
     `/profile/favorites/check/${productId}`,
+    {
+      auth: true,
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Get products user is currently bidding on (paginated)
+ * GET /api/v1/profile/bidding
+ */
+export const getBiddingProducts = async (
+  page: number = 0,
+  size: number = 10,
+) => {
+  const response = await api.get<PaginatedResponse<BiddingProductResponse>>(
+    `/profile/bidding?page=${page}&size=${size}`,
+    {
+      auth: true,
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Get products user has won (paginated)
+ * GET /api/v1/profile/won
+ */
+export const getWonProducts = async (page: number = 0, size: number = 10) => {
+  const response = await api.get<PaginatedResponse<WonProductResponse>>(
+    `/profile/won?page=${page}&size=${size}`,
     {
       auth: true,
       cache: "no-store",
