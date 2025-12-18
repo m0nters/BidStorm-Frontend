@@ -58,6 +58,7 @@ export const getProductDetailBySlug = async (slug: string) => {
   const response = await api.get<ProductDetailResponse>(
     `/products/slug/${slug}`,
     {
+      auth: true,
       cache: "no-store", // Don't cache - data changes frequently with bids
     },
   );

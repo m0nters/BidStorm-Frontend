@@ -53,16 +53,18 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Badges */}
           <div className="absolute right-3 bottom-3 flex flex-col gap-2">
-            {product.isNew && (
-              <span className="w-fit rounded-lg bg-black px-3 py-1 text-xs font-semibold text-white shadow-lg">
-                MỚI
-              </span>
-            )}
-            {product.hasBuyNow && (
-              <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
-                CÓ THỂ MUA NGAY
-              </span>
-            )}
+            <div className="flex flex-col items-end justify-center gap-2">
+              {product.isNew && (
+                <span className="w-fit rounded-lg bg-black px-3 py-1 text-xs font-semibold text-white shadow-lg">
+                  MỚI
+                </span>
+              )}
+              {product.hasBuyNow && (
+                <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
+                  CÓ THỂ MUA NGAY
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Wishlist Button - Only show when authenticated */}
