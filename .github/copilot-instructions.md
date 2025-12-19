@@ -26,6 +26,7 @@ For the full project requirements, see [Project requirements.md](../Project%20re
 - **Forms**: React Hook Form + `@hookform/resolvers` with Zod validation (`validations/`)
 - **API**: Custom fetch wrapper (`api/fetch.ts`)
 - **Auth**: JWT access tokens + httpOnly refresh cookies
+- **Real-time**: STOMP over SockJS for WebSocket (`@stomp/stompjs`, `sockjs-client`)
 - **UI**: react-icons (Feather), react-toastify
 
 ## Design Features
@@ -188,6 +189,35 @@ import { ProductCard, CategoryTree } from "@/components/ui";
 **Price formatting** (`utils/price.ts`):
 
 - Vietnamese currency format (₫)
+
+### 9. Real-time WebSocket
+
+**Location**: `hooks/useProductComments.ts`
+
+All real-time features use **STOMP over SockJS** connecting to backend `/ws` endpoint:
+
+```typescript
+import { useProductComments } from "@/hooks/useProductComments";
+
+const { comments, loading } = useProductComments(productId);
+```
+
+**Event format** (from backend):
+
+```typescript
+interface CommentEvent {
+  type: "NEW_COMMENT" | "DELETE_COMMENT";
+  productId: number;
+  comment?: CommentResponse; // For NEW_COMMENT
+  commentId?: number; // For DELETE_COMMENT
+}
+```
+
+**Backend requirements**:
+
+- WebSocket endpoint must allow public access (`/ws/**` in Spring Security)
+- Backend broadcasts to `/topic/product/{productId}/comments`
+- Use `SimpMessagingTemplate.convertAndSend()` after create/delete operations
 
 ## Development Workflow
 

@@ -136,10 +136,12 @@ export const getProductComments = async (productId: number | string) => {
  * For product detail page Q&A section
  */
 export const createComment = async (request: CreateCommentRequest) => {
+  console.log("[API] Creating comment:", request);
   const response = await api.post<CommentResponse>("/comments", request, {
     auth: true,
     cache: "no-store",
   });
+  console.log("[API] Comment created successfully:", response.data);
   return response.data;
 };
 
@@ -148,7 +150,9 @@ export const createComment = async (request: CreateCommentRequest) => {
  * For product detail page Q&A section
  */
 export const deleteComment = async (commentId: number) => {
+  console.log("[API] Deleting comment:", commentId);
   await api.delete(`/comments/${commentId}`, {
     auth: true,
   });
+  console.log("[API] Comment deleted successfully");
 };

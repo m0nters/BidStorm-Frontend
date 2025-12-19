@@ -1,9 +1,9 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/ui/common";
-import { createComment, deleteComment, getProductComments } from "@/services";
+import { ConfirmDialog } from "@/components/ui";
+import { useProductComments } from "@/hooks";
+import { createComment, deleteComment } from "@/services";
 import { useAuthStore } from "@/store/authStore";
-import { CommentResponse } from "@/types";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,8 +18,8 @@ interface QASectionProps {
 export const QASection = ({ productId, isEnded }: QASectionProps) => {
   const user = useAuthStore((state) => state.user);
   const searchParams = useSearchParams();
-  const [comments, setComments] = useState<CommentResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { comments, loading, addCommentOptimistically } =
+    useProductComments(productId);
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<{
     id: number;
@@ -30,10 +30,6 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
   const [highlightedCommentId, setHighlightedCommentId] = useState<
     number | null
   >(null);
-
-  useEffect(() => {
-    loadComments();
-  }, [productId]);
 
   useEffect(() => {
     const commentId = searchParams.get("comment_id");
@@ -56,19 +52,6 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
     }
   }, [searchParams, comments]);
 
-  const loadComments = async () => {
-    try {
-      setLoading(true);
-      const data = await getProductComments(productId);
-      setComments(data);
-    } catch (error) {
-      console.error("Error loading comments:", error);
-      toast.error("Không thể tải câu hỏi");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -84,15 +67,32 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
 
     try {
       setSubmitting(true);
-      await createComment({
+      const createdComment = await createComment({
         productId,
         parentId: replyingTo?.id,
         content: newComment.trim(),
       });
 
+      // Add comment using personalized response from API
+      // This prevents receiving masked username from WebSocket broadcast
+      addCommentOptimistically(createdComment);
+
+      // Highlight and scroll to the new comment
+      setHighlightedCommentId(createdComment.id);
+      setTimeout(() => {
+        const element = document.getElementById(`comment-${createdComment.id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+
+      // Remove highlight after 3 seconds
+      setTimeout(() => {
+        setHighlightedCommentId(null);
+      }, 3000);
+
       setNewComment("");
       setReplyingTo(null);
-      await loadComments();
     } catch (error: any) {
       console.error("Error creating comment:", error);
       const errorMessage = error.message || "Không thể gửi bình luận";
@@ -105,8 +105,8 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
   const handleDelete = async (commentId: number) => {
     try {
       await deleteComment(commentId);
-      await loadComments();
       setDeleteConfirm(null);
+      // WebSocket will handle removing the comment automatically
     } catch (error) {
       console.error("Error deleting comment:", error);
       toast.error("Không thể xóa bình luận");
