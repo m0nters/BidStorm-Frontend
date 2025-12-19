@@ -17,6 +17,34 @@ export const formatFullDateTime = (
 };
 
 /**
+ * Format relative time for comments
+ * - "Vừa xong" for < 1 minute
+ * - "X phút" for < 1 hour
+ * - "X giờ" for < 24 hours
+ * - "X ngày" for < 30 days
+ * - "X tháng" for < 12 months
+ * - "X năm" for >= 12 months
+ */
+export const formatRelativeTime = (date: Date | string): string => {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - dateObj.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+  const diffMonth = Math.floor(diffDay / 30);
+  const diffYear = Math.floor(diffDay / 365);
+
+  if (diffSec < 60) return "Vừa xong";
+  if (diffMin < 60) return `${diffMin} phút`;
+  if (diffHour < 24) return `${diffHour} giờ`;
+  if (diffDay < 30) return `${diffDay} ngày`;
+  if (diffMonth < 12) return `${diffMonth} tháng`;
+  return `${diffYear} năm`;
+};
+
+/**
  * Logic:
  * - "Vừa xong" for < 1 minute
  * - "X phút trước" for < 1 hour

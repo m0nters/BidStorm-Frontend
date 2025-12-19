@@ -1,5 +1,9 @@
+"use client";
+
 import { CommentResponse } from "@/types";
-import { FiMessageCircle, FiTrash2 } from "react-icons/fi";
+import { formatFullDateTime, formatRelativeTime } from "@/utils";
+import { usePathname, useRouter } from "next/navigation";
+import { FiClock, FiMessageCircle, FiTrash2 } from "react-icons/fi";
 
 interface CommentItemProps {
   comment: CommentResponse;
@@ -7,6 +11,7 @@ interface CommentItemProps {
   onDelete: (commentId: number) => void;
   currentUserId?: number;
   level?: number;
+  highlightedCommentId?: number | null;
 }
 
 export const CommentItem = ({
@@ -15,28 +20,53 @@ export const CommentItem = ({
   onDelete,
   currentUserId,
   level = 0,
+  highlightedCommentId,
 }: CommentItemProps) => {
   const canDelete = currentUserId === comment.userId;
-  const isReply = !comment.isQuestion;
+  const router = useRouter();
+  const pathname = usePathname();
+  const isHighlighted = highlightedCommentId === comment.id;
+
+  const handleTimeClick = () => {
+    router.push(`${pathname}?comment_id=${comment.id}`);
+  };
 
   return (
     <div
+      id={`comment-${comment.id}`}
       className={`${level > 0 ? "ml-8 border-l-2 border-gray-200 pl-4" : ""}`}
     >
-      <div className="rounded-lg bg-gray-50 p-4">
+      <div
+        className={`rounded-lg p-4 transition-colors duration-500 ${
+          isHighlighted ? "bg-blue-100" : "bg-gray-50"
+        }`}
+      >
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <div>
-              <p className="font-semibold text-gray-900">{comment.userName}</p>
-              <p className="text-xs text-gray-500">
-                {new Date(comment.createdAt).toLocaleDateString("vi-VN", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-gray-900">
+                  {comment.userName}
+                  {comment.isYourself ? ` (Bạn)` : ""}
+                </p>
+                {comment.isProductSeller && (
+                  <span className="rounded bg-black px-2 py-0.5 text-xs font-medium text-white">
+                    Người bán
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={handleTimeClick}
+                className="flex cursor-pointer items-center gap-1 hover:underline hover:underline-offset-2"
+              >
+                <FiClock className="h-3.5 w-3.5 text-gray-400" />
+                <p
+                  className="text-xs text-gray-500"
+                  title={formatFullDateTime(comment.createdAt)}
+                >
+                  {formatRelativeTime(comment.createdAt)}
+                </p>
+              </button>
             </div>
           </div>
           {canDelete && (
@@ -71,6 +101,7 @@ export const CommentItem = ({
               onDelete={onDelete}
               currentUserId={currentUserId}
               level={level + 1}
+              highlightedCommentId={highlightedCommentId}
             />
           ))}
         </div>

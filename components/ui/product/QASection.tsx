@@ -5,6 +5,7 @@ import { createComment, deleteComment, getProductComments } from "@/services";
 import { useAuthStore } from "@/store/authStore";
 import { CommentResponse } from "@/types";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { CommentItem } from "../comment/CommentItem";
@@ -16,6 +17,7 @@ interface QASectionProps {
 
 export const QASection = ({ productId, isEnded }: QASectionProps) => {
   const user = useAuthStore((state) => state.user);
+  const searchParams = useSearchParams();
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState("");
@@ -25,10 +27,34 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
   } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+  const [highlightedCommentId, setHighlightedCommentId] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     loadComments();
   }, [productId]);
+
+  useEffect(() => {
+    const commentId = searchParams.get("comment_id");
+    if (commentId && comments.length > 0) {
+      const id = parseInt(commentId);
+      setHighlightedCommentId(id);
+
+      // Wait for render, then scroll to comment
+      setTimeout(() => {
+        const element = document.getElementById(`comment-${id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 100);
+
+      // Remove highlight after 3 seconds
+      setTimeout(() => {
+        setHighlightedCommentId(null);
+      }, 3000);
+    }
+  }, [searchParams, comments]);
 
   const loadComments = async () => {
     try {
@@ -97,9 +123,7 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
   if (loading) {
     return (
       <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-        <h2 className="mb-6 text-2xl font-bold text-gray-900">
-          Câu hỏi & Trả lời
-        </h2>
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">Hỏi đáp</h2>
         <div className="flex items-center justify-center py-8">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
         </div>
@@ -109,9 +133,7 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
 
   return (
     <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-      <h2 className="mb-6 text-2xl font-bold text-gray-900">
-        Câu hỏi & Trả lời
-      </h2>
+      <h2 className="mb-6 text-2xl font-bold text-gray-900">Hỏi đáp</h2>
 
       {/* Comment List */}
       {comments.length > 0 ? (
@@ -123,6 +145,7 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
               onReply={handleReply}
               onDelete={(id) => setDeleteConfirm(id)}
               currentUserId={user?.id}
+              highlightedCommentId={highlightedCommentId}
             />
           ))}
         </div>

@@ -90,6 +90,9 @@ export function Header({ categories }: HeaderProps) {
                 className="flex items-center space-x-2 rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
                 <FaRegCircleUser className="h-6 w-6" />
+                <span className="hidden font-medium md:inline-block">
+                  {user?.fullName}
+                </span>
               </Link>
 
               {/* User Dropdown Menu */}

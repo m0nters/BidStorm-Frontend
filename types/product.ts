@@ -86,7 +86,8 @@ export interface CommentResponse {
   content: string;
   createdAt: string;
   replies: CommentResponse[];
-  isQuestion: boolean;
+  isYourself?: boolean;
+  isProductSeller?: boolean;
 }
 
 export interface CreateCommentRequest {
