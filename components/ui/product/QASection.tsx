@@ -6,7 +6,7 @@ import { createComment, deleteComment } from "@/services";
 import { useAuthStore } from "@/store/authStore";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { CommentItem } from "../comment/CommentItem";
 
@@ -30,6 +30,7 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
   const [highlightedCommentId, setHighlightedCommentId] = useState<
     number | null
   >(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const commentId = searchParams.get("comment_id");
@@ -115,9 +116,14 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
 
   const handleReply = (parentId: number, userName: string) => {
     setReplyingTo({ id: parentId, userName });
-    // Scroll to the comment form
+    // Scroll to the comment form and focus textarea
     const form = document.getElementById("comment-form");
     form?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // Focus textarea after scroll animation
+    setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 500);
   };
 
   if (loading) {
@@ -184,6 +190,7 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
           )}
 
           <textarea
+            ref={textareaRef}
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={
