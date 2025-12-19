@@ -99,7 +99,9 @@ export function ProductCard({ product }: ProductCardProps) {
             title={formatFullDateTime(product.createdAt)}
           >
             <FiClock className="h-3.5 w-3.5" />
-            <span>Đã đăng: {formatDateForFeed(product.createdAt)}</span>
+            <span className="line-clamp-1">
+              Đã đăng: {formatDateForFeed(product.createdAt)}
+            </span>
           </div>
 
           {/* Current Price */}
@@ -171,7 +173,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Additional Info */}
           <div className="mb-4 space-y-2 text-xs">
             <div className="flex items-start justify-between">
-              <span className="text-gray-600">Xét đánh giá</span>
+              <span className="text-gray-600">Xét đánh giá để đấu giá</span>
               <span
                 className={`font-semibold ${
                   !product.allowUnratedBidders

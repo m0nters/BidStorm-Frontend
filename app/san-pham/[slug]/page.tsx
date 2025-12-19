@@ -268,7 +268,7 @@ export default function ProductDetailPage() {
                 </div>
                 {product.isAutoExtend && !product.isEnded && (
                   <p className="mt-3 text-xs text-gray-500">
-                    * Tự động gia hạn{" "}
+                    * Tự động gia hạn thêm{" "}
                     <span className="font-bold">
                       {autoExtendDurationMin} phút
                     </span>{" "}
@@ -276,7 +276,8 @@ export default function ProductDetailPage() {
                     <span className="font-bold">
                       {autoExtendTriggerMin} phút
                     </span>{" "}
-                    cuối cùng
+                    trước khi hết giờ. Điều này để tránh các hình thức gian lận
+                    đấu giá phút chót.
                   </p>
                 )}
               </div>
