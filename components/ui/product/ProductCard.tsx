@@ -171,17 +171,15 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Additional Info */}
           <div className="mb-4 space-y-2 text-xs">
             <div className="flex items-start justify-between">
-              <span className="text-gray-600">
-                Cho phép người chưa có đánh giá đấu giá
-              </span>
+              <span className="text-gray-600">Xét đánh giá</span>
               <span
                 className={`font-semibold ${
-                  product.allowUnratedBidders
+                  !product.allowUnratedBidders
                     ? "text-gray-900"
                     : "text-gray-400"
                 }`}
               >
-                {product.allowUnratedBidders ? "Cho phép" : "Không"}
+                {!product.allowUnratedBidders ? "Có" : "Không"}
               </span>
             </div>
             <div className="flex items-center justify-between">

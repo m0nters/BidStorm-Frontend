@@ -18,6 +18,7 @@ import {
   FiClock,
   FiEye,
   FiHome,
+  FiInfo,
   FiShoppingCart,
   FiThumbsDown,
   FiThumbsUp,
@@ -289,9 +290,15 @@ export default function ProductDetailPage() {
 
                 {product.highestBidderName && !product.isEnded && (
                   <div>
-                    <p className="mb-2 text-sm text-gray-600">
-                      Người đặt giá cao nhất
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="mb-2 text-sm text-gray-600">
+                        Người đặt giá cao nhất
+                      </p>
+                      <FiInfo
+                        className="h-3 w-3 -translate-y-1 text-gray-400"
+                        title="Chỉ người bán mới có thể thấy đầy đủ thông tin các người mua"
+                      />
+                    </div>
                     <div className="rounded-lg bg-gray-50 p-3">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">
@@ -372,7 +379,7 @@ export default function ProductDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="max-w-3/5 text-gray-600">
-                  Cho phép người chưa đánh giá được tham gia đấu giá
+                  Cho phép ai cũng được tham gia đấu giá bất kể rating
                 </span>
                 <span
                   className={`font-semibold ${
