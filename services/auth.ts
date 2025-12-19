@@ -59,7 +59,7 @@ export const login = async (credentials: LoginRequest) => {
  * Refresh access token using refresh token stored in httpOnly cookie
  * POST /api/v1/auth/refresh
  *
- * Note: The refresh token is stored in an httpOnly cookie by the backend.
+ * Note: The refresh token is stored in an httpOnly cookie at the client side.
  * Since httpOnly cookies cannot be accessed via JavaScript, we rely on the browser
  * automatically sending the cookie with credentials: 'include'.
  * The backend should extract the refresh token from the cookie on the server side.

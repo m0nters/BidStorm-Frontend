@@ -1,0 +1,220 @@
+"use client";
+
+import { ConfirmDialog } from "@/components/ui/common";
+import { createComment, deleteComment, getProductComments } from "@/services";
+import { useAuthStore } from "@/store/authStore";
+import { CommentResponse } from "@/types";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { CommentItem } from "../comment/CommentItem";
+
+interface QASectionProps {
+  productId: number;
+  isEnded: boolean;
+}
+
+export const QASection = ({ productId, isEnded }: QASectionProps) => {
+  const user = useAuthStore((state) => state.user);
+  const [comments, setComments] = useState<CommentResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newComment, setNewComment] = useState("");
+  const [replyingTo, setReplyingTo] = useState<{
+    id: number;
+    userName: string;
+  } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+
+  useEffect(() => {
+    loadComments();
+  }, [productId]);
+
+  const loadComments = async () => {
+    try {
+      setLoading(true);
+      const data = await getProductComments(productId);
+      setComments(data);
+    } catch (error) {
+      console.error("Error loading comments:", error);
+      toast.error("Không thể tải câu hỏi");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newComment.trim()) {
+      toast.error("Vui lòng nhập nội dung");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Vui lòng đăng nhập để bình luận");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await createComment({
+        productId,
+        parentId: replyingTo?.id,
+        content: newComment.trim(),
+      });
+
+      setNewComment("");
+      setReplyingTo(null);
+      await loadComments();
+    } catch (error: any) {
+      console.error("Error creating comment:", error);
+      const errorMessage = error.message || "Không thể gửi bình luận";
+      toast.error(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (commentId: number) => {
+    try {
+      await deleteComment(commentId);
+      await loadComments();
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      toast.error("Không thể xóa bình luận");
+    }
+  };
+
+  const handleReply = (parentId: number, userName: string) => {
+    setReplyingTo({ id: parentId, userName });
+    // Scroll to the comment form
+    const form = document.getElementById("comment-form");
+    form?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  if (loading) {
+    return (
+      <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">
+          Câu hỏi & Trả lời
+        </h2>
+        <div className="flex items-center justify-center py-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+      <h2 className="mb-6 text-2xl font-bold text-gray-900">
+        Câu hỏi & Trả lời
+      </h2>
+
+      {/* Comment List */}
+      {comments.length > 0 ? (
+        <div className="mb-6 space-y-4">
+          {comments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              onReply={handleReply}
+              onDelete={(id) => setDeleteConfirm(id)}
+              currentUserId={user?.id}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="mb-6 flex flex-col items-center justify-center gap-1 py-8">
+          <Image
+            src="/no-questions.png"
+            alt="Không tìm thấy câu hỏi"
+            width={164}
+            height={164}
+          />
+          <p className="text-gray-500">Chưa có câu hỏi nào</p>
+          <p className="font-semibold">
+            Hãy là người đầu tiên đặt câu hỏi về sản phẩm này!
+          </p>
+        </div>
+      )}
+
+      {/* Comment Form */}
+      {!isEnded && user && (
+        <form id="comment-form" onSubmit={handleSubmit} className="space-y-4">
+          {replyingTo && (
+            <div className="flex items-center justify-between rounded-lg bg-gray-100 p-3">
+              <p className="text-sm text-gray-700">
+                Đang trả lời{" "}
+                <span className="font-semibold">{replyingTo.userName}</span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setReplyingTo(null)}
+                className="cursor-pointer text-sm font-medium text-gray-600 hover:text-black"
+              >
+                Hủy
+              </button>
+            </div>
+          )}
+
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder={
+              replyingTo
+                ? "Nhập câu trả lời của bạn..."
+                : "Đặt câu hỏi về sản phẩm..."
+            }
+            className="w-full resize-none rounded-lg border border-gray-300 p-4 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+            rows={4}
+            disabled={submitting}
+          />
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting || !newComment.trim()}
+              className="cursor-pointer rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            >
+              {submitting
+                ? "Đang gửi..."
+                : replyingTo
+                  ? "Gửi trả lời"
+                  : "Gửi câu hỏi"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {!isEnded && !user && (
+        <div className="rounded-lg bg-gray-50 p-6 text-center">
+          <p className="mb-3 text-gray-700">
+            Vui lòng đăng nhập để đặt câu hỏi
+          </p>
+          <a
+            href="/dang-nhap"
+            className="inline-block rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800"
+          >
+            Đăng nhập
+          </a>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirm !== null && (
+        <ConfirmDialog
+          isOpen={deleteConfirm !== null}
+          title="Xóa bình luận"
+          message="Bạn có chắc chắn muốn xóa bình luận này? Hành động này không thể hoàn tác."
+          confirmText="Xóa"
+          cancelText="Hủy"
+          onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
+          onCancel={() => setDeleteConfirm(null)}
+        />
+      )}
+    </div>
+  );
+};

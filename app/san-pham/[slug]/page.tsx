@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageGallery, ProductCard } from "@/components/ui";
+import { ImageGallery, ProductCard, QASection } from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
 import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
@@ -432,30 +432,12 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Q&A Section */}
-        <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">
-            Câu hỏi & Trả lời
-          </h2>
-          <div className="flex flex-col items-center justify-center py-8">
-            <Image
-              src="/no-questions.png"
-              alt="Không tìm thấy câu hỏi"
-              width={164}
-              height={164}
-            />
-            <p className="text-gray-500">Chưa có câu hỏi nào</p>
-            {!product.isEnded && (
-              <button className="mt-6 cursor-pointer rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800">
-                Hãy là người đầu tiên đặt câu hỏi
-              </button>
-            )}
-          </div>
-        </div>
+        <QASection productId={product.id} isEnded={product.isEnded} />
 
         {/* Related Products */}
         <div>
           <h2 className="mb-8 text-3xl font-bold text-gray-900">
-            Sản phẩm cùng chuyên mục
+            Sản phẩm liên quan
           </h2>
           {relatedProducts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">

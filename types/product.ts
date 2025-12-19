@@ -76,3 +76,21 @@ export interface ProductDetailResponse {
   hasBuyNow: boolean;
   descriptionLogs: DescriptionLogResponse[];
 }
+
+export interface CommentResponse {
+  id: number;
+  productId: number;
+  userId: number;
+  userName: string;
+  parentId?: number;
+  content: string;
+  createdAt: string;
+  replies: CommentResponse[];
+  isQuestion: boolean;
+}
+
+export interface CreateCommentRequest {
+  productId: number;
+  parentId?: number;
+  content: string;
+}

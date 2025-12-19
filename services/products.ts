@@ -1,5 +1,10 @@
 import { PaginatedResponse } from "@/types/api";
-import { ProductDetailResponse, ProductListResponse } from "@/types/product";
+import {
+  CommentResponse,
+  CreateCommentRequest,
+  ProductDetailResponse,
+  ProductListResponse,
+} from "@/types/product";
 import { api } from "../api/fetch";
 
 /**
@@ -109,4 +114,41 @@ export const getProductsByCategory = async (
     },
   );
   return response.data;
+};
+
+/**
+ * Get all Q&A comments for a product
+ * For product detail page Q&A section
+ */
+export const getProductComments = async (productId: number | string) => {
+  const response = await api.get<CommentResponse[]>(
+    `/comments/product/${productId}`,
+    {
+      auth: true,
+      cache: "no-store", // Don't cache - comments can change frequently
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Create a new comment (question or reply)
+ * For product detail page Q&A section
+ */
+export const createComment = async (request: CreateCommentRequest) => {
+  const response = await api.post<CommentResponse>("/comments", request, {
+    auth: true,
+    cache: "no-store",
+  });
+  return response.data;
+};
+
+/**
+ * Delete a comment
+ * For product detail page Q&A section
+ */
+export const deleteComment = async (commentId: number) => {
+  await api.delete(`/comments/${commentId}`, {
+    auth: true,
+  });
 };
