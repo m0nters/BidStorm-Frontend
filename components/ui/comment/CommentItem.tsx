@@ -2,7 +2,8 @@
 
 import { CommentResponse } from "@/types";
 import { formatFullDateTime, formatRelativeTime } from "@/utils";
-import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { FiClock, FiMessageCircle, FiTrash2 } from "react-icons/fi";
 
 interface CommentItemProps {
@@ -25,13 +26,8 @@ export const CommentItem = ({
   isSeller = false,
 }: CommentItemProps) => {
   const canDelete = currentUserId === comment.userId;
-  const router = useRouter();
   const pathname = usePathname();
   const isHighlighted = highlightedCommentId === comment.id;
-
-  const handleTimeClick = () => {
-    router.push(`${pathname}?comment_id=${comment.id}`);
-  };
 
   return (
     <div
@@ -57,8 +53,8 @@ export const CommentItem = ({
                   </span>
                 )}
               </div>
-              <button
-                onClick={handleTimeClick}
+              <Link
+                href={`${pathname}?comment_id=${comment.id}`}
                 className="flex cursor-pointer items-center gap-1 hover:underline hover:underline-offset-2"
               >
                 <FiClock className="h-3.5 w-3.5 text-gray-400" />
@@ -68,7 +64,7 @@ export const CommentItem = ({
                 >
                   {formatRelativeTime(comment.createdAt)}
                 </p>
-              </button>
+              </Link>
             </div>
           </div>
           {canDelete && (
