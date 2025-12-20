@@ -71,6 +71,38 @@ export const getProductDetailBySlug = async (slug: string) => {
 };
 
 /**
+ * Search products with filters and sorting
+ * For search page
+ */
+export const searchProducts = async (params: {
+  keyword?: string;
+  categoryId?: number;
+  page?: number;
+  size?: number;
+  sortBy?: "endTime" | "currentPrice" | "createdAt" | "bidCount";
+  sortDirection?: "asc" | "desc";
+}) => {
+  const searchParams = new URLSearchParams();
+  if (params.keyword) searchParams.set("keyword", params.keyword);
+  if (params.categoryId)
+    searchParams.set("categoryId", params.categoryId.toString());
+  if (params.page !== undefined)
+    searchParams.set("page", params.page.toString());
+  if (params.size) searchParams.set("size", params.size.toString());
+  if (params.sortBy) searchParams.set("sortBy", params.sortBy);
+  if (params.sortDirection)
+    searchParams.set("sortDirection", params.sortDirection);
+
+  const response = await api.get<PaginatedResponse<ProductListResponse>>(
+    `/products/search?${searchParams.toString()}`,
+    {
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
  * Get related products (same category)
  * For product detail page bottom section
  */
@@ -136,12 +168,10 @@ export const getProductComments = async (productId: number | string) => {
  * For product detail page Q&A section
  */
 export const createComment = async (request: CreateCommentRequest) => {
-  console.log("[API] Creating comment:", request);
   const response = await api.post<CommentResponse>("/comments", request, {
     auth: true,
     cache: "no-store",
   });
-  console.log("[API] Comment created successfully:", response.data);
   return response.data;
 };
 
@@ -150,9 +180,7 @@ export const createComment = async (request: CreateCommentRequest) => {
  * For product detail page Q&A section
  */
 export const deleteComment = async (commentId: number) => {
-  console.log("[API] Deleting comment:", commentId);
   await api.delete(`/comments/${commentId}`, {
     auth: true,
   });
-  console.log("[API] Comment deleted successfully");
 };

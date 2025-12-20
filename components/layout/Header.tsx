@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 import { CategoryResponse } from "@/types/category";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegCircleUser } from "react-icons/fa6";
 import {
@@ -22,6 +23,7 @@ interface HeaderProps {
 }
 
 export function Header({ categories }: HeaderProps) {
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -31,8 +33,10 @@ export function Header({ categories }: HeaderProps) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement search functionality
-    console.log("Search:", searchQuery);
+    if (searchQuery.trim()) {
+      router.push(`/tim-kiem?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsMobileMenuOpen(false);
+    }
   };
 
   return (
