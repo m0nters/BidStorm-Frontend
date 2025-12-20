@@ -149,6 +149,7 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
               onDelete={(id) => setDeleteConfirm(id)}
               currentUserId={user?.id}
               highlightedCommentId={highlightedCommentId}
+              isSeller={isSeller}
             />
           ))}
         </div>

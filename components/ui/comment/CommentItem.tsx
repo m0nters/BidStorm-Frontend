@@ -12,6 +12,7 @@ interface CommentItemProps {
   currentUserId?: number;
   level?: number;
   highlightedCommentId?: number | null;
+  isSeller?: boolean;
 }
 
 export const CommentItem = ({
@@ -21,6 +22,7 @@ export const CommentItem = ({
   currentUserId,
   level = 0,
   highlightedCommentId,
+  isSeller = false,
 }: CommentItemProps) => {
   const canDelete = currentUserId === comment.userId;
   const router = useRouter();
@@ -82,13 +84,15 @@ export const CommentItem = ({
 
         <p className="whitespace-pre-wrap text-gray-900">{comment.content}</p>
 
-        <button
-          onClick={() => onReply(comment.id, comment.userName)}
-          className="mt-2 flex cursor-pointer items-center gap-1 text-sm font-medium text-gray-600 transition-colors hover:text-black"
-        >
-          <FiMessageCircle className="h-3.5 w-3.5" />
-          Trả lời
-        </button>
+        {isSeller && (
+          <button
+            onClick={() => onReply(comment.id, comment.userName)}
+            className="mt-2 flex cursor-pointer items-center gap-1 text-sm font-medium text-gray-600 transition-colors hover:text-black"
+          >
+            <FiMessageCircle className="h-3.5 w-3.5" />
+            Trả lời
+          </button>
+        )}
       </div>
 
       {comment.replies && comment.replies.length > 0 && (
@@ -102,6 +106,7 @@ export const CommentItem = ({
               currentUserId={currentUserId}
               level={level + 1}
               highlightedCommentId={highlightedCommentId}
+              isSeller={isSeller}
             />
           ))}
         </div>
