@@ -45,7 +45,6 @@ export default async function CategoryPage({
 }: CategoryPageProps) {
   const { slug } = await params;
   const slugString = slug.join("/");
-  console.log(slugString);
   const search = await searchParams;
 
   try {

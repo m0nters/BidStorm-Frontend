@@ -7,21 +7,23 @@ import { useAuthStore } from "@/store/authStore";
 import { LoginFormData, loginSchema } from "@/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { FiArrowRight, FiMail } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo");
+
   return (
-    <GuestGuard>
+    <GuestGuard redirectTo={redirectTo || "/"}>
       <LoginPageContent />
     </GuestGuard>
   );
 }
 
 function LoginPageContent() {
-  const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
 
   const {
@@ -41,14 +43,8 @@ function LoginPageContent() {
       const response = await login(data);
 
       // Store access token in memory via zustand
+      // This will trigger GuestGuard to redirect automatically
       setAuth(response.user, response.accessToken);
-
-      // Redirect based on role
-      if (response.user.role === "ADMIN") {
-        router.push("/admin");
-      } else {
-        router.push("/");
-      }
 
       toast.success("Đăng nhập thành công!");
     } catch (error: any) {

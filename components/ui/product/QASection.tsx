@@ -4,11 +4,17 @@ import { ConfirmDialog } from "@/components/ui";
 import { useProductComments } from "@/hooks";
 import { createComment, deleteComment } from "@/services";
 import { useAuthStore } from "@/store/authStore";
+import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { CommentItem } from "../comment/CommentItem";
+
+// Register GSAP plugin
+gsap.registerPlugin(ScrollToPlugin);
 
 interface QASectionProps {
   productId: number;
@@ -18,6 +24,7 @@ interface QASectionProps {
 
 export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
   const user = useAuthStore((state) => state.user);
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { comments, loading, addCommentOptimistically } = useProductComments(
     productId,
@@ -35,26 +42,85 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
   >(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Handle scroll to comment from query param
   useEffect(() => {
     const commentId = searchParams.get("comment_id");
-    if (commentId && comments.length > 0) {
+    if (!commentId || comments.length === 0) return;
+
+    const scrollToElement = () => {
       const id = parseInt(commentId);
       setHighlightedCommentId(id);
 
-      // Wait for render, then scroll to comment
-      setTimeout(() => {
-        const element = document.getElementById(`comment-${id}`);
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }, 100);
+      const element = document.getElementById(`comment-${id}`);
+      if (element) {
+        // Get element position
+        const elementRect = element.getBoundingClientRect();
+        const absoluteElementTop = elementRect.top + window.pageYOffset;
+        const middle =
+          absoluteElementTop - window.innerHeight / 2 + elementRect.height / 2;
 
-      // Remove highlight after 3 seconds
-      setTimeout(() => {
-        setHighlightedCommentId(null);
-      }, 3000);
-    }
+        // Use GSAP for smooth scroll with exact duration control
+        gsap.to(window, {
+          duration: 0.8,
+          scrollTo: { y: middle, autoKill: true },
+          ease: "power2.out",
+          onComplete: () => {
+            setTimeout(() => {
+              setHighlightedCommentId(null);
+            }, 1000);
+          },
+        });
+      }
+    };
+
+    // Wait for browser to finish rendering
+    requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToElement);
+    });
   }, [searchParams, comments]);
+
+  // Handle scroll to comment form after redirect from login
+  useEffect(() => {
+    if (loading) return;
+
+    // Get the hash of the url
+    const scrollTarget = window.location.hash.substring(1);
+
+    if (scrollTarget) {
+      // Use requestAnimationFrame to wait for next paint cycle when DOM is ready
+      const scrollToElement = () => {
+        const element = document.getElementById(scrollTarget);
+
+        if (element) {
+          // Get element position
+          const elementRect = element.getBoundingClientRect();
+          const absoluteElementTop = elementRect.top + window.pageYOffset;
+          const middle =
+            absoluteElementTop -
+            window.innerHeight / 2 +
+            elementRect.height / 2;
+
+          // Use GSAP for smooth scroll with exact duration control
+          gsap.to(window, {
+            duration: 0.8,
+            scrollTo: { y: middle, autoKill: true },
+            ease: "power2.out",
+            onComplete: () => {
+              // Focus textarea after scroll completes (only for comment-form)
+              if (scrollTarget === "comment-form" && user) {
+                textareaRef.current?.focus();
+              }
+            },
+          });
+        }
+      };
+
+      // Wait for browser to finish rendering
+      requestAnimationFrame(() => {
+        requestAnimationFrame(scrollToElement);
+      });
+    }
+  }, [loading, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,12 +288,12 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
           <p className="mb-3 text-gray-700">
             Vui lòng đăng nhập để đặt câu hỏi
           </p>
-          <a
-            href="/dang-nhap"
+          <Link
+            href={`/dang-nhap?redirectTo=${encodeURIComponent(pathname + "#comment-form")}`}
             className="inline-block rounded-lg bg-black px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800"
           >
             Đăng nhập
-          </a>
+          </Link>
         </div>
       )}
 

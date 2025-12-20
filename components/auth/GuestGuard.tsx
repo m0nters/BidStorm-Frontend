@@ -19,7 +19,7 @@ export function GuestGuard({ children, redirectTo = "/" }: GuestGuardProps) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push(redirectTo);
+      router.replace(redirectTo);
     }
   }, [isAuthenticated, redirectTo, router]);
 
