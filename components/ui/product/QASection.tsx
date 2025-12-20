@@ -41,18 +41,40 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
     number | null
   >(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const processedCommentIdRef = useRef<number | null>(null); // if we don't use this var, the error toast will show 2 times for no reason
 
   // Handle scroll to comment from query param
   useEffect(() => {
     const commentId = searchParams.get("comment_id");
-    if (!commentId || comments.length === 0) return;
+    if (!commentId || loading || comments.length === 0) {
+      return;
+    }
+
+    const id = parseInt(commentId);
+
+    // Skip if we've already processed this comment ID
+    if (processedCommentIdRef.current === id) return;
 
     const scrollToElement = () => {
-      const id = parseInt(commentId);
+      // Check if comment exists
+      const commentExists = (list: any[]): boolean => {
+        return list.some(
+          (c) => c.id === id || (c.replies && commentExists(c.replies)),
+        );
+      };
+
+      if (!commentExists(comments)) {
+        toast.error("Bình luận đã bị xóa hoặc không tồn tại");
+        processedCommentIdRef.current = id;
+        return;
+      }
+
       setHighlightedCommentId(id);
 
       const element = document.getElementById(`comment-${id}`);
       if (element) {
+        processedCommentIdRef.current = id;
+
         // Get element position
         const elementRect = element.getBoundingClientRect();
         const absoluteElementTop = elementRect.top + window.pageYOffset;
@@ -77,7 +99,7 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(scrollToElement);
     });
-  }, [searchParams, comments]);
+  }, [searchParams, loading, comments]);
 
   // Handle scroll to comment form after redirect from login
   useEffect(() => {
