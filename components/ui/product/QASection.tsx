@@ -13,13 +13,16 @@ import { CommentItem } from "../comment/CommentItem";
 interface QASectionProps {
   productId: number;
   isEnded: boolean;
+  isSeller: boolean;
 }
 
-export const QASection = ({ productId, isEnded }: QASectionProps) => {
+export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
   const user = useAuthStore((state) => state.user);
   const searchParams = useSearchParams();
-  const { comments, loading, addCommentOptimistically } =
-    useProductComments(productId);
+  const { comments, loading, addCommentOptimistically } = useProductComments(
+    productId,
+    { isSeller },
+  );
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<{
     id: number;
@@ -74,26 +77,20 @@ export const QASection = ({ productId, isEnded }: QASectionProps) => {
         content: newComment.trim(),
       });
 
-      // Add comment using personalized response from API
-      // This prevents receiving masked username from WebSocket broadcast
+      // Add comment immediately with personalized response (unmasked name, isYourself flag)
+      // This ensures commenter sees their own unmasked name
+      // WebSocket duplicate check will ignore the masked broadcast
       addCommentOptimistically(createdComment);
-
-      // Highlight and scroll to the new comment
-      setHighlightedCommentId(createdComment.id);
-      setTimeout(() => {
-        const element = document.getElementById(`comment-${createdComment.id}`);
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }, 100);
-
-      // Remove highlight after 3 seconds
-      setTimeout(() => {
-        setHighlightedCommentId(null);
-      }, 3000);
 
       setNewComment("");
       setReplyingTo(null);
+
+      // Scroll to and highlight the new comment
+      setHighlightedCommentId(createdComment.id);
+      setTimeout(() => {
+        const element = document.getElementById(`comment-${createdComment.id}`);
+        element?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
     } catch (error: any) {
       console.error("Error creating comment:", error);
       const errorMessage = error.message || "Không thể gửi bình luận";

@@ -1,6 +1,6 @@
 "use client";
 
-import { WS_BASE_URL } from "@/api/config";
+import { WS_BASE_URL, getAccessToken } from "@/api/config";
 import { getProductComments } from "@/services";
 import { CommentResponse } from "@/types";
 import { Client } from "@stomp/stompjs";
@@ -15,7 +15,15 @@ interface CommentEvent {
   commentId?: number;
 }
 
-export const useProductComments = (productId: number) => {
+interface UseProductCommentsOptions {
+  isSeller?: boolean;
+}
+
+export const useProductComments = (
+  productId: number,
+  options: UseProductCommentsOptions = {},
+) => {
+  const { isSeller = false } = options;
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const stompClientRef = useRef<Client | null>(null);
@@ -67,12 +75,12 @@ export const useProductComments = (productId: number) => {
       switch (event.type) {
         case "NEW_COMMENT":
           if (event.comment) {
-            // Ignore if this comment was already added via API (don't delete from set)
+            // Skip if this comment was added via API (user's own comment)
             if (ignoredCommentIdsRef.current.has(event.comment.id)) {
               return;
             }
 
-            // Also check if comment already exists in state (prevent duplicates)
+            // Check if comment already exists in state (prevent duplicates)
             setComments((prev) => {
               const commentExists = (list: CommentResponse[]): boolean => {
                 return list.some(
@@ -129,30 +137,47 @@ export const useProductComments = (productId: number) => {
     const connect = () => {
       socket = new SockJS(WS_BASE_URL);
 
+      const token = getAccessToken();
+      const connectHeaders: any = {};
+
+      // Add JWT token to connection headers if available (required for seller channel)
+      if (token) {
+        connectHeaders.Authorization = `Bearer ${token}`;
+      }
+
       stompClient = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
+        connectHeaders, // Send JWT in CONNECT frame
         onConnect: () => {
           if (!mounted) return;
 
           isConnectedRef.current = true;
 
-          stompClient!.subscribe(
-            `/topic/product/${productId}/comments`,
-            (message) => {
-              try {
-                const event: CommentEvent = JSON.parse(message.body);
-                handleCommentEvent(event);
-              } catch (error) {
-                console.error("Error parsing WebSocket message:", error);
-              }
-            },
-          );
+          // Subscribe to appropriate channel based on user role
+          const channel = isSeller
+            ? `/topic/product/${productId}/comments/seller` // Seller sees unmasked names
+            : `/topic/product/${productId}/comments`; // Others see masked names
+
+          stompClient!.subscribe(channel, (message) => {
+            try {
+              const event: CommentEvent = JSON.parse(message.body);
+              handleCommentEvent(event);
+            } catch (error) {
+              console.error("Error parsing WebSocket message:", error);
+            }
+          });
         },
-        onStompError: () => {
+        onStompError: (frame) => {
+          console.error("STOMP error:", frame);
           isConnectedRef.current = false;
+
+          // Handle authentication errors
+          if (frame.headers.message?.includes("Authentication required")) {
+            console.error("WebSocket authentication failed");
+          }
         },
         onWebSocketError: () => {
           isConnectedRef.current = false;
@@ -179,11 +204,11 @@ export const useProductComments = (productId: number) => {
       }
       isConnectedRef.current = false;
     };
-  }, [productId, handleCommentEvent]);
+  }, [productId, isSeller, handleCommentEvent]);
 
   const addCommentOptimistically = useCallback(
     (comment: CommentResponse) => {
-      // Mark this comment ID to be ignored when it arrives via WebSocket
+      // Mark this comment ID to be ignored when WebSocket broadcast arrives
       ignoredCommentIdsRef.current.add(comment.id);
 
       // Add or replace comment in local state

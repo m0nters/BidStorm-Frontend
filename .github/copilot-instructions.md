@@ -194,13 +194,24 @@ import { ProductCard, CategoryTree } from "@/components/ui";
 
 **Location**: `hooks/useProductComments.ts`
 
-All real-time features use **STOMP over SockJS** connecting to backend `/ws` endpoint:
+All real-time features use **STOMP over SockJS** with **JWT authentication** and dual-channel broadcasting:
 
 ```typescript
 import { useProductComments } from "@/hooks/useProductComments";
 
-const { comments, loading } = useProductComments(productId);
+// For sellers - see unmasked names
+const { comments, loading } = useProductComments(productId, { isSeller: true });
+
+// For other users - see masked names
+const { comments, loading } = useProductComments(productId, {
+  isSeller: false,
+});
 ```
+
+**Channel Architecture**:
+
+- **Public channel**: `/topic/product/{id}/comments` - Masked names for privacy
+- **Seller channel**: `/topic/product/{id}/comments/seller` - Unmasked names (authenticated sellers only)
 
 **Event format** (from backend):
 
@@ -213,10 +224,20 @@ interface CommentEvent {
 }
 ```
 
+**Security Features**:
+
+- JWT token sent in WebSocket CONNECT headers (`Authorization: Bearer {token}`)
+- Backend validates JWT and authorizes seller channel subscriptions
+- Only product sellers can subscribe to `/topic/product/{id}/comments/seller`
+- Public channel remains accessible without authentication
+
 **Backend requirements**:
 
 - WebSocket endpoint must allow public access (`/ws/**` in Spring Security)
-- Backend broadcasts to `/topic/product/{productId}/comments`
+- `WebSocketAuthChannelInterceptor` authenticates JWT and authorizes seller channel
+- Backend broadcasts to BOTH channels after create operations:
+  - Public channel: masked names (`viewerId=null, isSeller=false`)
+  - Seller channel: unmasked names (`viewerId=null, isSeller=true`)
 - Use `SimpMessagingTemplate.convertAndSend()` after create/delete operations
 
 ## Development Workflow

@@ -30,6 +30,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
   const isInitializing = useAuthStore((state) => state.isInitializing);
+  const user = useAuthStore((state) => state.user);
 
   const [product, setProduct] = useState<ProductDetailResponse | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<ProductListResponse[]>(
@@ -433,7 +434,11 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Q&A Section */}
-        <QASection productId={product.id} isEnded={product.isEnded} />
+        <QASection
+          productId={product.id}
+          isEnded={product.isEnded}
+          isSeller={user?.id === product.seller?.id}
+        />
 
         {/* Related Products */}
         <div>
