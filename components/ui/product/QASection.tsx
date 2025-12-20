@@ -9,7 +9,7 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { CommentItem } from "../comment/CommentItem";
 
@@ -122,51 +122,56 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
     }
   }, [loading, user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!newComment.trim()) {
-      toast.error("Vui lòng nhập nội dung");
-      return;
-    }
+      if (!newComment.trim()) {
+        toast.error("Vui lòng nhập nội dung");
+        return;
+      }
 
-    if (!user) {
-      toast.error("Vui lòng đăng nhập để bình luận");
-      return;
-    }
+      if (!user) {
+        toast.error("Vui lòng đăng nhập để bình luận");
+        return;
+      }
 
-    try {
-      setSubmitting(true);
-      const createdComment = await createComment({
-        productId,
-        parentId: replyingTo?.id,
-        content: newComment.trim(),
-      });
+      try {
+        setSubmitting(true);
+        const createdComment = await createComment({
+          productId,
+          parentId: replyingTo?.id,
+          content: newComment.trim(),
+        });
 
-      // Add comment immediately with personalized response (unmasked name, isYourself flag)
-      // This ensures commenter sees their own unmasked name
-      // WebSocket duplicate check will ignore the masked broadcast
-      addCommentOptimistically(createdComment);
+        // Add comment immediately with personalized response (unmasked name, isYourself flag)
+        // This ensures commenter sees their own unmasked name
+        // WebSocket duplicate check will ignore the masked broadcast
+        addCommentOptimistically(createdComment);
 
-      setNewComment("");
-      setReplyingTo(null);
+        setNewComment("");
+        setReplyingTo(null);
 
-      // Scroll to and highlight the new comment
-      setHighlightedCommentId(createdComment.id);
-      setTimeout(() => {
-        const element = document.getElementById(`comment-${createdComment.id}`);
-        element?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 100);
-    } catch (error: any) {
-      console.error("Error creating comment:", error);
-      const errorMessage = error.message || "Không thể gửi bình luận";
-      toast.error(errorMessage);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+        // Scroll to and highlight the new comment
+        setHighlightedCommentId(createdComment.id);
+        setTimeout(() => {
+          const element = document.getElementById(
+            `comment-${createdComment.id}`,
+          );
+          element?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      } catch (error: any) {
+        console.error("Error creating comment:", error);
+        const errorMessage = error.message || "Không thể gửi bình luận";
+        toast.error(errorMessage);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [newComment, user, productId, replyingTo, addCommentOptimistically],
+  );
 
-  const handleDelete = async (commentId: number) => {
+  const handleDelete = useCallback(async (commentId: number) => {
     try {
       await deleteComment(commentId);
       setDeleteConfirm(null);
@@ -175,9 +180,9 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
       console.error("Error deleting comment:", error);
       toast.error("Không thể xóa bình luận");
     }
-  };
+  }, []);
 
-  const handleReply = (parentId: number, userName: string) => {
+  const handleReply = useCallback((parentId: number, userName: string) => {
     setReplyingTo({ id: parentId, userName });
     // Scroll to the comment form and focus textarea
     const form = document.getElementById("comment-form");
@@ -187,7 +192,25 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
     setTimeout(() => {
       textareaRef.current?.focus();
     }, 500);
-  };
+  }, []);
+
+  // Memoize comment list to prevent re-render when typing
+  // Must be before early return to maintain hook order
+  const commentList = useMemo(
+    () =>
+      comments.map((comment) => (
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          onReply={handleReply}
+          onDelete={(id) => setDeleteConfirm(id)}
+          currentUserId={user?.id}
+          highlightedCommentId={highlightedCommentId}
+          isSeller={isSeller}
+        />
+      )),
+    [comments, handleReply, user?.id, highlightedCommentId, isSeller],
+  );
 
   if (loading) {
     return (
@@ -206,19 +229,7 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
 
       {/* Comment List */}
       {comments.length > 0 ? (
-        <div className="mb-6 space-y-4">
-          {comments.map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              onReply={handleReply}
-              onDelete={(id) => setDeleteConfirm(id)}
-              currentUserId={user?.id}
-              highlightedCommentId={highlightedCommentId}
-              isSeller={isSeller}
-            />
-          ))}
-        </div>
+        <div className="mb-6 space-y-4">{commentList}</div>
       ) : (
         <div className="mb-6 flex flex-col items-center justify-center gap-1 py-8">
           <Image
