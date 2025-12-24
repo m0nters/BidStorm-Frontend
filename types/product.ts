@@ -20,7 +20,6 @@ export interface ProductListResponse {
   createdAt: string;
   endTime: string;
   isNew: boolean;
-  hasBuyNow: boolean;
 }
 
 export interface UserBasicInfo {
@@ -73,7 +72,6 @@ export interface ProductDetailResponse {
   updatedAt: string;
   isEnded: boolean;
   isNew: boolean;
-  hasBuyNow: boolean;
   descriptionLogs: DescriptionLogResponse[];
 }
 

@@ -59,11 +59,12 @@ export function ProductCard({ product }: ProductCardProps) {
                   MỚI
                 </span>
               )}
-              {product.hasBuyNow && (
-                <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
-                  CÓ THỂ MUA NGAY
-                </span>
-              )}
+              {product.buyNowPrice &&
+                new Date(product.endTime) > new Date() && (
+                  <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
+                    CÓ THỂ MUA NGAY
+                  </span>
+                )}
             </div>
           </div>
 
@@ -197,7 +198,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Buy Now Button */}
-          {product.hasBuyNow && product.buyNowPrice && (
+          {product.buyNowPrice && new Date(product.endTime) > new Date() && (
             <button
               onClick={(e) => {
                 e.preventDefault();

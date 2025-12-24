@@ -218,22 +218,20 @@ export default function ProductDetailPage() {
                   </p>
                 </div>
 
-                {!product.isEnded &&
-                  product.hasBuyNow &&
-                  product.buyNowPrice && (
-                    <div className="rounded-lg border-2 border-black bg-white p-4">
-                      <p className="mb-2 text-sm font-medium text-gray-600">
-                        Giá mua ngay
-                      </p>
-                      <p className="mb-2 text-2xl font-bold text-black">
-                        {formatPrice(product.buyNowPrice)}
-                      </p>
-                      <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
-                        <FiShoppingCart className="h-5 w-5" />
-                        Mua ngay
-                      </button>
-                    </div>
-                  )}
+                {!product.isEnded && product.buyNowPrice && (
+                  <div className="rounded-lg border-2 border-black bg-white p-4">
+                    <p className="mb-2 text-sm font-medium text-gray-600">
+                      Giá mua ngay
+                    </p>
+                    <p className="mb-2 text-2xl font-bold text-black">
+                      {formatPrice(product.buyNowPrice)}
+                    </p>
+                    <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
+                      <FiShoppingCart className="h-5 w-5" />
+                      Mua ngay
+                    </button>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
