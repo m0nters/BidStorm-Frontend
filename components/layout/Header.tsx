@@ -29,6 +29,7 @@ export function Header({ categories }: HeaderProps) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitializing = useAuthStore((state) => state.isInitializing);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -83,7 +84,12 @@ export function Header({ categories }: HeaderProps) {
           </form>
 
           {/* Right Side - Desktop */}
-          {isAuthenticated ? (
+          {isInitializing ? (
+            <div className="flex items-center justify-center">
+              <div className="mr-2 h-6 w-6 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
+              Đang tải thông tin
+            </div>
+          ) : isAuthenticated ? (
             <div
               className="relative"
               onMouseEnter={() => setIsUserMenuOpen(true)}

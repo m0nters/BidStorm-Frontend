@@ -15,10 +15,11 @@ export const getTopMostBidsProducts = async () => {
   const response = await api.get<ProductListResponse[]>(
     "/products/top/most-bids",
     {
-      next: {
-        revalidate: 300, // Cache for 5 minutes (bid counts change frequently)
-        tags: ["products", "top-most-bids"],
-      },
+      // next: {
+      //   revalidate: 300, // Cache for 5 minutes (bid counts change frequently)
+      //   tags: ["products", "top-most-bids"],
+      // },
+      cache: "no-store",
     },
   );
   return response.data;
@@ -32,10 +33,11 @@ export const getTopHighestPriceProducts = async () => {
   const response = await api.get<ProductListResponse[]>(
     "/products/top/highest-price",
     {
-      next: {
-        revalidate: 300, // Cache for 5 minutes
-        tags: ["products", "top-highest-price"],
-      },
+      // next: {
+      //   revalidate: 300, // Cache for 5 minutes
+      //   tags: ["products", "top-highest-price"],
+      // },
+      cache: "no-store",
     },
   );
   return response.data;
@@ -110,10 +112,11 @@ export const getRelatedProducts = async (id: string | number) => {
   const response = await api.get<ProductListResponse[]>(
     `/products/${id}/related`,
     {
-      next: {
-        revalidate: 600, // Cache for 10 minutes
-        tags: ["products", `related-${id}`],
-      },
+      // next: {
+      //   revalidate: 600, // Cache for 10 minutes
+      //   tags: ["products", `related-${id}`],
+      // },
+      cache: "no-store",
     },
   );
   return response.data;

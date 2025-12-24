@@ -8,7 +8,7 @@ import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { CommentItem } from "../comment/CommentItem";
@@ -23,6 +23,7 @@ interface QASectionProps {
 }
 
 export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -65,6 +66,7 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
 
       if (!commentExists(comments)) {
         toast.error("Bình luận đã bị xóa hoặc không tồn tại");
+        router.replace(pathname);
         processedCommentIdRef.current = id;
         return;
       }
@@ -176,12 +178,28 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
 
         // Scroll to and highlight the new comment
         setHighlightedCommentId(createdComment.id);
-        setTimeout(() => {
-          const element = document.getElementById(
-            `comment-${createdComment.id}`,
-          );
-          element?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }, 100);
+        const element = document.getElementById(`comment-${createdComment.id}`);
+        if (element) {
+          // Get element position
+          const elementRect = element.getBoundingClientRect();
+          const absoluteElementTop = elementRect.top + window.pageYOffset;
+          const middle =
+            absoluteElementTop -
+            window.innerHeight / 2 +
+            elementRect.height / 2;
+
+          // Use GSAP for smooth scroll with exact duration control
+          gsap.to(window, {
+            duration: 0.8,
+            scrollTo: { y: middle, autoKill: true },
+            ease: "power2.out",
+            onComplete: () => {
+              setTimeout(() => {
+                setHighlightedCommentId(null);
+              }, 1000);
+            },
+          });
+        }
       } catch (error: any) {
         console.error("Error creating comment:", error);
         const errorMessage = error.message || "Không thể gửi bình luận";
@@ -198,9 +216,9 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
       await deleteComment(commentId);
       setDeleteConfirm(null);
       // WebSocket will handle removing the comment automatically
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      toast.error("Không thể xóa bình luận");
+    } catch (error: any) {
+      const errorMessage = error.message || "Không thể xóa bình luận";
+      toast.error(errorMessage);
     }
   }, []);
 

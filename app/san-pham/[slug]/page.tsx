@@ -87,7 +87,6 @@ export default function ProductDetailPage() {
 
   if (error || !product) {
     notFound();
-    return null;
   }
 
   // Calculate time remaining
