@@ -3,6 +3,7 @@ export interface ProductListResponse {
   title: string;
   slug: string;
   thumbnailUrl: string;
+  startingPrice: number;
   currentPrice: number;
   buyNowPrice?: number;
   allowUnratedBidders: boolean;

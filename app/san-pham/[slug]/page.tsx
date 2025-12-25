@@ -1,7 +1,14 @@
 "use client";
 
-import { ImageGallery, ProductCard, QASection } from "@/components/ui";
+import {
+  BidDialog,
+  ImageGallery,
+  ProductCard,
+  QASection,
+} from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
+import { useProductBids } from "@/hooks/useProductBids";
+import { placeBid } from "@/services/bids";
 import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
   getProductDetailBySlug,
@@ -9,10 +16,15 @@ import {
 } from "@/services/products";
 import { useAuthStore } from "@/store/authStore";
 import { ProductDetailResponse, ProductListResponse } from "@/types/product";
-import { formatPrice, formatTimeRemaining } from "@/utils";
+import {
+  formatDateForFeed,
+  formatFullDateTime,
+  formatPrice,
+  formatTimeRemaining,
+} from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   FiClock,
@@ -25,10 +37,12 @@ import {
 } from "react-icons/fi";
 import { HiOutlineBell } from "react-icons/hi2";
 import { RiAuctionFill } from "react-icons/ri";
+import { toast } from "react-toastify";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const pathname = usePathname();
   const isInitializing = useAuthStore((state) => state.isInitializing);
   const user = useAuthStore((state) => state.user);
 
@@ -40,6 +54,43 @@ export default function ProductDetailPage() {
   const [autoExtendDurationMin, setAutoExtendDurationMin] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showBidDialog, setShowBidDialog] = useState(false);
+
+  // Get real-time bid data (only after product is loaded)
+  const {
+    bids,
+    loading: bidsLoading,
+    addBidOptimistically,
+    currentPrice: realtimePrice,
+    highestBidder: realtimeHighestBidder,
+  } = useProductBids(product?.id || 0, {
+    isSeller: user?.id === product?.seller?.id,
+  });
+
+  // Sync real-time price and highest bidder from WebSocket to product state
+  useEffect(() => {
+    if (!product) return;
+
+    let needsUpdate = false;
+    const updates: Partial<ProductDetailResponse> = {};
+
+    if (realtimePrice !== null && realtimePrice !== product.currentPrice) {
+      updates.currentPrice = realtimePrice;
+      needsUpdate = true;
+    }
+
+    if (
+      realtimeHighestBidder !== null &&
+      realtimeHighestBidder !== product.highestBidderName
+    ) {
+      updates.highestBidderName = realtimeHighestBidder;
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
+      setProduct((prev) => (prev ? { ...prev, ...updates } : prev));
+    }
+  }, [realtimePrice, realtimeHighestBidder, product]);
 
   useEffect(() => {
     // Wait for auth initialization to complete before fetching
@@ -89,8 +140,37 @@ export default function ProductDetailPage() {
     notFound();
   }
 
-  // Calculate time remaining
+  // Calculate time remaining and minimum bid
   const timeRemaining = formatTimeRemaining(product.endTime);
+  const minimumBid = product.currentPrice + product.priceStep;
+
+  const handleBidSubmit = async (bidValue: number) => {
+    if (isNaN(bidValue) || bidValue < minimumBid) {
+      toast.error(
+        `Số tiền đấu giá tối thiểu là ${minimumBid.toLocaleString("vi-VN")}₫`,
+      );
+      throw new Error("Invalid bid amount");
+    }
+
+    try {
+      const bidResponse = await placeBid(product.id, {
+        maxBidAmount: bidValue,
+      });
+
+      toast.success("Đặt giá thành công!");
+
+      // Calculate new price based on bid response
+      const newPrice = bidResponse.bidAmount;
+
+      // Add bid optimistically to UI immediately
+      // Real-time price/bidder updates will come via WebSocket
+      addBidOptimistically(bidResponse, newPrice);
+    } catch (error: any) {
+      const errorMessage = error?.message || "Không thể đặt giá";
+      toast.error(errorMessage);
+      throw error;
+    }
+  };
 
   // User rating display helper
   const UserRating = ({ user }: { user: typeof product.seller }) => {
@@ -301,13 +381,16 @@ export default function ProductDetailPage() {
                     <div className="rounded-lg bg-gray-50 p-3">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">
-                          {product.highestBidderName}
+                          {product.highestBidderName.includes("*")
+                            ? product.highestBidderName
+                            : `${product.highestBidderName} (Bạn)`}
                         </p>
-                        {product.highestBidderRating !== undefined && (
-                          <span className="text-sm font-medium text-gray-900">
-                            ({product.highestBidderRating.toFixed(1)}%)
-                          </span>
-                        )}
+                        {product.highestBidderRating !== undefined &&
+                          product.highestBidderRating !== null && (
+                            <span className="text-sm font-medium text-gray-900">
+                              ({product.highestBidderRating.toFixed(1)}%)
+                            </span>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -333,11 +416,23 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Action Buttons */}
-              {!product.isEnded && (
-                <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800">
+              {!product.isEnded && user && (
+                <button
+                  onClick={() => setShowBidDialog(true)}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800"
+                >
                   <HiOutlineBell className="h-5 w-5" />
                   Đặt giá ngay
                 </button>
+              )}
+              {!product.isEnded && !user && (
+                <Link
+                  href={`/dang-nhap?redirectTo=${encodeURIComponent(pathname)}`}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-black py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800"
+                >
+                  <HiOutlineBell className="h-5 w-5" />
+                  Đăng nhập để đấu giá
+                </Link>
               )}
             </div>
 
@@ -437,6 +532,134 @@ export default function ProductDetailPage() {
           isSeller={user?.id === product.seller?.id}
         />
 
+        {/* Bidding History Section */}
+        <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Lịch sử đấu giá (gần đây)
+            </h2>
+            {bids.length > 0 && (
+              <Link
+                href={`/san-pham/${slug}/lich-su-dau-gia`}
+                className="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
+              >
+                Xem chi tiết
+              </Link>
+            )}
+          </div>
+
+          {bidsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
+            </div>
+          ) : bids.length > 0 ? (
+            <div>
+              <div className="relative overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Người đấu giá
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Giá đặt
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Giá tối đa
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        Thời điểm
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bids.slice(0, 10).map((bid, index) => {
+                      return (
+                        <tr
+                          key={bid.id}
+                          className={`border-b last:border-b-0 ${
+                            bid.isYourself ? "bg-blue-50" : ""
+                          }`}
+                        >
+                          <td className="px-4 py-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              {bid.isHighestBidder && (
+                                <span
+                                  className="text-yellow-500"
+                                  title="Người đặt giá cao nhất"
+                                >
+                                  🏆
+                                </span>
+                              )}
+                              <span className="font-medium">
+                                {bid.bidderName}
+                                {bid.isYourself && (
+                                  <span className="ml-1 text-xs text-blue-600">
+                                    (Bạn)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-sm font-semibold">
+                            {bid.bidAmount.toLocaleString("vi-VN")}₫
+                          </td>
+                          {(bid.isYourself ||
+                            user?.id === product.seller?.id) &&
+                          bid.maxBidAmount ? (
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              {bid.maxBidAmount.toLocaleString("vi-VN")}₫
+                            </td>
+                          ) : (
+                            <td className="px-4 py-3 text-sm text-gray-400">
+                              ******
+                            </td>
+                          )}
+                          <td className="px-4 py-3 text-sm text-gray-600">
+                            <span title={formatFullDateTime(bid.createdAt)}>
+                              {formatDateForFeed(bid.createdAt)}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                {/* Fade effect at bottom of table only */}
+                {bids.length > 10 && (
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent"></div>
+                )}
+              </div>
+
+              {/* "Xem thêm" button - outside fade effect */}
+              {bids.length > 10 && (
+                <div className="mt-6 flex justify-center">
+                  <Link
+                    href={`/san-pham/${slug}/lich-su-dau-gia`}
+                    className="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
+                  >
+                    Xem thêm ({bids.length - 10} lượt đấu giá)
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center rounded-lg py-12">
+              <Image
+                src="/no-bid.png"
+                alt="Chưa có người đấu giá"
+                width={150}
+                height={150}
+              />
+              <p className="mt-4 text-gray-500">Chưa có người đấu giá</p>
+              <p className="font-semibold">
+                Hãy là người đầu tiên đặt giá cho sản phẩm này!
+              </p>
+            </div>
+          )}
+        </div>
+
         {/* Related Products */}
         <div>
           <h2 className="mb-8 text-3xl font-bold text-gray-900">
@@ -466,6 +689,16 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Bid Dialog */}
+      <BidDialog
+        isOpen={showBidDialog}
+        onClose={() => setShowBidDialog(false)}
+        onSubmit={handleBidSubmit}
+        currentPrice={product.currentPrice}
+        minimumBid={minimumBid}
+        priceStep={product.priceStep}
+      />
     </div>
   );
 }

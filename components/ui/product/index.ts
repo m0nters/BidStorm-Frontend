@@ -1,3 +1,4 @@
+export * from "./BidDialog";
 export * from "./BiddingProductCard";
 export * from "./EmptyState";
 export * from "./FavoriteButton";

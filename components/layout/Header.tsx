@@ -184,7 +184,7 @@ export function Header({ categories }: HeaderProps) {
             <div key={category.id} className="group relative">
               <Link
                 href={`/danh-muc/${category.slug}`}
-                className="rounded px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
+                className="block rounded px-4 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
                 {category.name}
               </Link>
@@ -196,7 +196,7 @@ export function Header({ categories }: HeaderProps) {
                     <Link
                       key={child.id}
                       href={`/danh-muc/${child.slug}`}
-                      className="block px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-black"
+                      className="block px-4 py-2 text-center text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-black"
                     >
                       {child.name}
                     </Link>

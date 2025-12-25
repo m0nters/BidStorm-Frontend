@@ -110,9 +110,19 @@ export function ProductCard({ product }: ProductCardProps) {
             <p className="mb-1 text-xs font-medium text-gray-500">
               Giá hiện tại
             </p>
+            {product.currentPrice > product.startingPrice && (
+              <p className="text-sm text-gray-400 line-through">
+                {formatPrice(product.startingPrice)}
+              </p>
+            )}
             <p className="text-2xl font-bold text-black">
               {formatPrice(product.currentPrice)}
             </p>
+            {product.currentPrice > product.startingPrice && (
+              <p className="text-xs font-semibold text-green-600">
+                +{formatPrice(product.currentPrice - product.startingPrice)}
+              </p>
+            )}
           </div>
 
           {/* Divider */}
