@@ -240,6 +240,117 @@ interface CommentEvent {
   - Seller channel: unmasked names (`viewerId=null, isSeller=true`)
 - Use `SimpMessagingTemplate.convertAndSend()` after create/delete operations
 
+### 10. Bidding Real-time System
+
+**Location**: `hooks/useProductBids.ts`, `types/bid.ts`
+
+Bidding uses the **same WebSocket architecture** with dual-channel broadcasting and adds automatic bidding algorithm:
+
+```typescript
+import { useProductBids } from "@/hooks/useProductBids";
+
+// For sellers - see unmasked names and max bid amounts
+const { bids, currentPrice, highestBidder } = useProductBids(productId, {
+  isSeller: true,
+});
+
+// For bidders - see masked names, own max bid only
+const { bids, currentPrice, highestBidder } = useProductBids(productId, {
+  isSeller: false,
+});
+```
+
+**Channel Architecture**:
+
+- **Public channel**: `/topic/product/{id}/bids` - Masked names for privacy
+- **Seller channel**: `/topic/product/{id}/bids/seller` - Unmasked names + all max bids
+
+**Event types**:
+
+```typescript
+interface BidEvent {
+  type: "NEW_BID" | "BID_REJECTED";
+  productId: number;
+  bid?: BidResponse; // Contains isHighestBidder flag
+  bidderId?: number; // For BID_REJECTED (may be at event level or inside bid object)
+  currentPrice?: number; // Updated auction price
+  highestBidder?: string; // Updated highest bidder name (masked if needed)
+}
+```
+
+**Critical Pattern - Automatic Bidding Algorithm**:
+
+- **Backend determines `isHighestBidder`** via automatic bidding algorithm (maxBidAmount + chronological tie-breaking)
+- Frontend **NEVER** calculates who has the trophy - always uses backend's `isHighestBidder` flag
+- When new bid arrives with `isHighestBidder: true`, clear the flag from ALL previous bids
+
+**Critical Pattern - Stale Closure Problem**:
+
+- WebSocket event handlers defined in `useEffect` with dependencies become stale over time
+- **Solution**: Handle ALL events inline within the subscription callback, NOT in separate functions
+- Use functional state updates `setState((prev) => ...)` to access latest state
+- Example:
+
+```typescript
+client.subscribe(channel, (message) => {
+  const event = JSON.parse(message.body);
+
+  // Handle inline - DO NOT call external function
+  if (event.type === "NEW_BID") {
+    setBids((prev) => {
+      // Use prev to access latest state
+      return [event.bid, ...prev];
+    });
+  }
+});
+```
+
+**Critical Pattern - Optimistic UI Updates**:
+
+- When user places bid via API, add to UI immediately with `addBidOptimistically()`
+- Mark bid ID as ignored in `ignoredBidIdsRef` to prevent duplicate from WebSocket
+- Don't delete from ignored set - just skip if seen again
+- WebSocket will broadcast to other users, API response updates current user
+
+**Critical Pattern - Real-time State Sync**:
+
+- `useProductBids` returns `currentPrice` and `highestBidder` from WebSocket
+- Product detail page syncs these to local state when changed:
+
+```typescript
+useEffect(() => {
+  if (realtimePrice !== null && realtimePrice !== product.currentPrice) {
+    setProduct((prev) =>
+      prev ? { ...prev, currentPrice: realtimePrice } : prev,
+    );
+  }
+  if (
+    realtimeHighestBidder !== null &&
+    realtimeHighestBidder !== product.highestBidderName
+  ) {
+    setProduct((prev) =>
+      prev ? { ...prev, highestBidderName: realtimeHighestBidder } : prev,
+    );
+  }
+}, [realtimePrice, realtimeHighestBidder]);
+```
+
+**BID_REJECTED Event Handling**:
+
+- Backend sends `BID_REJECTED` when seller rejects a bidder
+- Extract bidderId with fallback: `const rejectedBidderId = event.bidderId || event.bid?.bidderId`
+- Filter out all bids from rejected bidder
+- Recalculate trophy: Clear all `isHighestBidder` flags, mark first bid as highest
+- Update price and highest bidder from event
+- Show toast if rejected bidder is current user
+
+**Backend requirements**:
+
+- Backend must set `isHighestBidder: true` ONLY for the actual highest bidder
+- Broadcast to BOTH channels after bid operations (NEW_BID, BID_REJECTED)
+- Include updated `currentPrice` and `highestBidder` in events
+- BID_REJECTED must include either `event.bidderId` or `event.bid.bidderId`
+
 ## Development Workflow
 
 ### Commands
