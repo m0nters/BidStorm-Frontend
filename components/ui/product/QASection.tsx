@@ -47,7 +47,7 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
   // Handle scroll to comment from query param
   useEffect(() => {
     const commentId = searchParams.get("comment_id");
-    if (!commentId || loading || comments.length === 0) {
+    if (!commentId || loading) {
       return;
     }
 
@@ -55,6 +55,9 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
 
     // Skip if we've already processed this comment ID
     if (processedCommentIdRef.current === id) return;
+
+    // Mark as processed immediately to prevent duplicate toasts
+    processedCommentIdRef.current = id;
 
     const scrollToElement = () => {
       // Check if comment exists
@@ -67,7 +70,6 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
       if (!commentExists(comments)) {
         toast.error("Bình luận đã bị xóa hoặc không tồn tại");
         router.replace(pathname);
-        processedCommentIdRef.current = id;
         return;
       }
 
@@ -75,8 +77,6 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
 
       const element = document.getElementById(`comment-${id}`);
       if (element) {
-        processedCommentIdRef.current = id;
-
         // Get element position
         const elementRect = element.getBoundingClientRect();
         const absoluteElementTop = elementRect.top + window.pageYOffset;
