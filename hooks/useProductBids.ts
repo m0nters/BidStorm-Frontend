@@ -29,6 +29,8 @@ export const useProductBids = (
   const [highestBidder, setHighestBidder] = useState<string | null>(null);
   const clientRef = useRef<Client | null>(null);
   const ignoredBidIdsRef = useRef<Set<number>>(new Set());
+  const lastRejectionTimestampRef = useRef<number>(0);
+  const rejectionToastShownRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Don't run if productId is invalid
@@ -126,15 +128,25 @@ export const useProductBids = (
               return;
             }
 
-            // Remove all bids from rejected bidder and update state
+            // Prevent duplicate toast using timestamp (events within 100ms are considered duplicates)
+            const now = Date.now();
+            if (now - lastRejectionTimestampRef.current < 100) {
+              return;
+            }
+            lastRejectionTimestampRef.current = now;
+            rejectionToastShownRef.current = false; // Reset flag for new rejection event
+
+            // Check if rejected bidder is current user BEFORE updating state
+            // Use functional state access to get latest state
             setBids((prev) => {
-              // Check if rejected bidder's bid belongs to current user
+              // Check if rejected bidder is current user
               const wasYourBid = prev.some(
                 (b) => b.bidderId === rejectedBidderId && b.isYourself,
               );
 
-              // Show notification if it's your bid that was rejected
-              if (wasYourBid) {
+              // Show toast inside callback to ensure it has correct value
+              if (wasYourBid && !rejectionToastShownRef.current) {
+                rejectionToastShownRef.current = true;
                 toast.error("Bạn đã bị loại khỏi phiên đấu giá này");
               }
 
@@ -207,9 +219,10 @@ export const useProductBids = (
       return [bid, ...updatedPreviousBids];
     });
 
-    // Update current price and highest bidder
+    // Update current price and highest bidder from backend response
     setCurrentPrice(newPrice);
-    if (bid.isYourself) {
+    // Only update highest bidder if this bid is actually the highest (backend determines this)
+    if (bid.isHighestBidder) {
       setHighestBidder(bid.bidderName);
     }
   };

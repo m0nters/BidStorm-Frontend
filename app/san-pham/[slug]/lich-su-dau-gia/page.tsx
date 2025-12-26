@@ -1,17 +1,17 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/ui";
+import { BiddingHistoryTable, ConfirmDialog } from "@/components/ui";
 import { useProductBids } from "@/hooks/useProductBids";
 import { removeBidder } from "@/services/bids";
 import { getProductDetailBySlug } from "@/services/products";
 import { useAuthStore } from "@/store/authStore";
 import { ProductDetailResponse } from "@/types/product";
-import { formatDateForFeed, formatFullDateTime, formatPrice } from "@/utils";
+import { formatPrice } from "@/utils";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiArrowLeft, FiTrash2 } from "react-icons/fi";
-import { RiAuctionFill } from "react-icons/ri";
+import { FiArrowLeft } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 export default function BiddingHistoryPage() {
@@ -29,9 +29,24 @@ export default function BiddingHistoryPage() {
   } | null>(null);
 
   const isSeller = user?.id === product?.seller?.id;
-  const { bids, loading: bidsLoading } = useProductBids(product?.id || 0, {
+  const {
+    bids,
+    loading: bidsLoading,
+    currentPrice: realtimePrice,
+  } = useProductBids(product?.id || 0, {
     isSeller,
   });
+
+  // Sync real-time price from WebSocket to product state
+  useEffect(() => {
+    if (!product || realtimePrice === null) return;
+
+    if (realtimePrice !== product.currentPrice) {
+      setProduct((prev) =>
+        prev ? { ...prev, currentPrice: realtimePrice } : prev,
+      );
+    }
+  }, [realtimePrice, product?.currentPrice]);
 
   useEffect(() => {
     if (isInitializing) return;
@@ -124,96 +139,25 @@ export default function BiddingHistoryPage() {
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
             </div>
           ) : bids.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                      Người đấu giá
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                      Giá đặt
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                      Giá tối đa
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                      Thời gian
-                    </th>
-                    {isSeller && <th className="px-4 py-3"></th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {bids.map((bid, _) => (
-                    <tr
-                      key={bid.id}
-                      className={`border-b last:border-b-0 ${
-                        bid.isYourself ? "bg-blue-50" : ""
-                      }`}
-                    >
-                      <td className="px-4 py-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          {bid.isHighestBidder && (
-                            <span
-                              className="text-yellow-500"
-                              title="Người đặt giá cao nhất"
-                            >
-                              🏆
-                            </span>
-                          )}
-                          <span className="font-medium">
-                            {bid.bidderName}
-                            {bid.isYourself && (
-                              <span className="ml-1 text-xs text-blue-600">
-                                (Bạn)
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm font-semibold">
-                        {bid.bidAmount.toLocaleString("vi-VN")}₫
-                      </td>
-                      {(bid.isYourself || isSeller) && bid.maxBidAmount ? (
-                        <td className="px-4 py-3 text-sm text-gray-600">
-                          {bid.maxBidAmount.toLocaleString("vi-VN")}₫
-                        </td>
-                      ) : (
-                        <td className="px-4 py-3 text-sm text-gray-400">
-                          ******
-                        </td>
-                      )}
-                      <td className="px-4 py-3 text-sm text-gray-600">
-                        <span title={formatFullDateTime(bid.createdAt)}>
-                          {formatDateForFeed(bid.createdAt)}
-                        </span>
-                      </td>
-                      {isSeller && !bid.isYourself && (
-                        <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() =>
-                              setRemoveConfirm({
-                                bidderId: bid.bidderId,
-                                bidderName: bid.bidderName,
-                              })
-                            }
-                            className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-3 py-1 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
-                            title="Loại người dùng"
-                          >
-                            <FiTrash2 size={14} />
-                            Loại
-                          </button>
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <BiddingHistoryTable
+              bids={bids}
+              currentUserId={user?.id}
+              sellerId={product.seller?.id}
+              loading={false}
+              showActions={true}
+              onRemoveBidder={(bidderId, bidderName) =>
+                setRemoveConfirm({ bidderId, bidderName })
+              }
+            />
           ) : (
-            <div className="rounded-lg bg-gray-50 py-12 text-center">
-              <RiAuctionFill className="mx-auto mb-3 text-gray-400" size={48} />
-              <p className="text-gray-500">Chưa có người đấu giá</p>
+            <div className="flex flex-col items-center rounded-lg bg-gray-50 py-12">
+              <Image
+                src="/no-bid.png"
+                alt="Chưa có người đấu giá"
+                width={150}
+                height={150}
+              />
+              <p className="mt-4 text-gray-500">Chưa có người đấu giá</p>
               <p className="font-semibold">
                 Hãy là người đầu tiên đặt giá cho sản phẩm này!
               </p>

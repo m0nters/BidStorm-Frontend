@@ -2,13 +2,15 @@
 
 import {
   BidDialog,
+  BiddingHistoryTable,
+  ConfirmDialog,
   ImageGallery,
   ProductCard,
   QASection,
 } from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
 import { useProductBids } from "@/hooks/useProductBids";
-import { placeBid } from "@/services/bids";
+import { placeBid, removeBidder } from "@/services/bids";
 import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
   getProductDetailBySlug,
@@ -16,12 +18,7 @@ import {
 } from "@/services/products";
 import { useAuthStore } from "@/store/authStore";
 import { ProductDetailResponse, ProductListResponse } from "@/types/product";
-import {
-  formatDateForFeed,
-  formatFullDateTime,
-  formatPrice,
-  formatTimeRemaining,
-} from "@/utils";
+import { formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams, usePathname } from "next/navigation";
@@ -55,6 +52,10 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showBidDialog, setShowBidDialog] = useState(false);
+  const [removeConfirm, setRemoveConfirm] = useState<{
+    bidderId: number;
+    bidderName: string;
+  } | null>(null);
 
   // Get real-time bid data (only after product is loaded)
   const {
@@ -90,7 +91,12 @@ export default function ProductDetailPage() {
     if (needsUpdate) {
       setProduct((prev) => (prev ? { ...prev, ...updates } : prev));
     }
-  }, [realtimePrice, realtimeHighestBidder, product]);
+  }, [
+    realtimePrice,
+    realtimeHighestBidder,
+    product?.currentPrice,
+    product?.highestBidderName,
+  ]);
 
   useEffect(() => {
     // Wait for auth initialization to complete before fetching
@@ -169,6 +175,20 @@ export default function ProductDetailPage() {
       const errorMessage = error?.message || "Không thể đặt giá";
       toast.error(errorMessage);
       throw error;
+    }
+  };
+
+  const handleRemoveBidder = async (bidderId: number) => {
+    if (!product) return;
+
+    try {
+      await removeBidder(product.id, bidderId);
+      setRemoveConfirm(null);
+      toast.success("Đã loại người dùng khỏi phiên đấu giá");
+      // WebSocket will handle removing the bids automatically
+    } catch (error) {
+      console.error("Error removing bidder:", error);
+      toast.error("Không thể loại người dùng");
     }
   };
 
@@ -534,9 +554,9 @@ export default function ProductDetailPage() {
 
         {/* Bidding History Section */}
         <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">
-              Lịch sử đấu giá (gần đây)
+              Lịch sử đấu giá
             </h2>
             {bids.length > 0 && (
               <Link
@@ -547,102 +567,29 @@ export default function ProductDetailPage() {
               </Link>
             )}
           </div>
+          {bids.length > 0 && (
+            <p className="text-sm text-gray-600">(10 lượt gần nhất)</p>
+          )}
 
           {bidsLoading ? (
-            <div className="flex items-center justify-center py-8">
+            <div className="mt-6 flex items-center justify-center py-8">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
             </div>
           ) : bids.length > 0 ? (
-            <div>
-              <div className="relative overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Người đấu giá
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Giá đặt
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Giá tối đa
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
-                        Thời điểm
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {bids.slice(0, 10).map((bid, index) => {
-                      return (
-                        <tr
-                          key={bid.id}
-                          className={`border-b last:border-b-0 ${
-                            bid.isYourself ? "bg-blue-50" : ""
-                          }`}
-                        >
-                          <td className="px-4 py-3 text-sm">
-                            <div className="flex items-center gap-2">
-                              {bid.isHighestBidder && (
-                                <span
-                                  className="text-yellow-500"
-                                  title="Người đặt giá cao nhất"
-                                >
-                                  🏆
-                                </span>
-                              )}
-                              <span className="font-medium">
-                                {bid.bidderName}
-                                {bid.isYourself && (
-                                  <span className="ml-1 text-xs text-blue-600">
-                                    (Bạn)
-                                  </span>
-                                )}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-sm font-semibold">
-                            {bid.bidAmount.toLocaleString("vi-VN")}₫
-                          </td>
-                          {(bid.isYourself ||
-                            user?.id === product.seller?.id) &&
-                          bid.maxBidAmount ? (
-                            <td className="px-4 py-3 text-sm text-gray-600">
-                              {bid.maxBidAmount.toLocaleString("vi-VN")}₫
-                            </td>
-                          ) : (
-                            <td className="px-4 py-3 text-sm text-gray-400">
-                              ******
-                            </td>
-                          )}
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            <span title={formatFullDateTime(bid.createdAt)}>
-                              {formatDateForFeed(bid.createdAt)}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-
-                {/* Fade effect at bottom of table only */}
-                {bids.length > 10 && (
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent"></div>
-                )}
-              </div>
-
-              {/* "Xem thêm" button - outside fade effect */}
-              {bids.length > 10 && (
-                <div className="mt-6 flex justify-center">
-                  <Link
-                    href={`/san-pham/${slug}/lich-su-dau-gia`}
-                    className="inline-flex items-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
-                  >
-                    Xem thêm ({bids.length - 10} lượt đấu giá)
-                  </Link>
-                </div>
-              )}
+            <div className="mt-6">
+              <BiddingHistoryTable
+                bids={bids}
+                currentUserId={user?.id}
+                sellerId={product.seller?.id}
+                loading={false}
+                showActions={true}
+                maxRows={10}
+                showFadeEffect={true}
+                viewMoreLink={`/san-pham/${slug}/lich-su-dau-gia`}
+                onRemoveBidder={(bidderId, bidderName) =>
+                  setRemoveConfirm({ bidderId, bidderName })
+                }
+              />
             </div>
           ) : (
             <div className="flex flex-col items-center rounded-lg py-12">
@@ -699,6 +646,21 @@ export default function ProductDetailPage() {
         minimumBid={minimumBid}
         priceStep={product.priceStep}
       />
+
+      {/* Remove Bidder Confirmation Dialog */}
+      {removeConfirm !== null && (
+        <ConfirmDialog
+          isOpen={removeConfirm !== null}
+          title="Loại người dùng"
+          message={`Bạn có chắc chắn muốn loại ${removeConfirm.bidderName} khỏi phiên đấu giá này? Tất cả giá đặt của họ sẽ bị xóa.`}
+          confirmText="Loại"
+          cancelText="Hủy"
+          onConfirm={() =>
+            removeConfirm && handleRemoveBidder(removeConfirm.bidderId)
+          }
+          onCancel={() => setRemoveConfirm(null)}
+        />
+      )}
     </div>
   );
 }
