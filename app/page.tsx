@@ -26,7 +26,6 @@ export default async function Home() {
         description="Đừng bỏ lỡ những phiên đấu giá sắp đóng trong vài giờ tới"
         products={endingSoonProducts}
         icon={<FiClock className="h-8 w-8" />}
-        viewAllLink="/products?sort=ending-soon"
       />
 
       {/* Divider */}
@@ -40,7 +39,6 @@ export default async function Home() {
         description="Sản phẩm có số lượt đấu giá cao nhất"
         products={mostBidsProducts}
         icon={<FiTrendingUp className="h-8 w-8" />}
-        viewAllLink="/products?sort=most-bids"
       />
 
       {/* Divider */}
@@ -54,7 +52,6 @@ export default async function Home() {
         description="Sản phẩm có giá trị cao thu hút người đấu giá hàng đầu"
         products={highestPriceProducts}
         icon={<FiDollarSign className="h-8 w-8" />}
-        viewAllLink="/products?sort=highest-price"
       />
     </div>
   );

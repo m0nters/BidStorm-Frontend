@@ -11,36 +11,25 @@ interface ProductSectionProps {
   description: string;
   products: ProductListResponse[];
   icon?: React.ReactNode;
-  viewAllLink?: string;
 }
 export function ProductSection({
   title,
   description,
   products,
   icon,
-  viewAllLink = "/products",
 }: ProductSectionProps) {
   return (
     <section className="py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="mb-8 flex items-start justify-between">
-          <div className="flex-1">
-            <div className="mb-2 flex items-center space-x-3">
-              {icon && <div className="text-black">{icon}</div>}
-              <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-                {title}
-              </h2>
-            </div>
-            <p className="max-w-2xl text-gray-600">{description}</p>
+        <div className="mb-8">
+          <div className="mb-2 flex items-center space-x-3">
+            {icon && <div className="text-black">{icon}</div>}
+            <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
+              {title}
+            </h2>
           </div>
-          <Link
-            href={viewAllLink}
-            className="group hidden items-center space-x-2 rounded-lg border-2 border-gray-300 px-6 py-3 text-gray-700 transition-all duration-300 hover:border-black hover:text-black md:flex"
-          >
-            <span className="font-semibold">Xem tất cả</span>
-            <FiArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-          </Link>
+          <p className="max-w-2xl text-gray-600">{description}</p>
         </div>
 
         {/* Products Grid */}
@@ -50,17 +39,6 @@ export function ProductSection({
               {products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
-            </div>
-
-            {/* Mobile View All Button */}
-            <div className="mt-8 md:hidden">
-              <Link
-                href={viewAllLink}
-                className="flex w-full items-center justify-center space-x-2 rounded-lg border-2 border-gray-300 px-6 py-3 text-gray-700 transition-all duration-300 hover:border-black hover:text-black"
-              >
-                <span className="font-semibold">Xem tất cả</span>
-                <FiArrowRight className="h-5 w-5" />
-              </Link>
             </div>
           </>
         ) : (
