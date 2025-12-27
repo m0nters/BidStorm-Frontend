@@ -219,3 +219,21 @@ export const createProduct = async (
   );
   return response.data;
 };
+
+/**
+ * Update product description (append only)
+ * PUT /products/{id}/description
+ */
+export const updateProductDescription = async (
+  productId: number,
+  additionalDescription: string,
+) => {
+  await api.put(
+    `/products/${productId}/description`,
+    { additionalDescription },
+    {
+      auth: true,
+      cache: "no-store",
+    },
+  );
+};

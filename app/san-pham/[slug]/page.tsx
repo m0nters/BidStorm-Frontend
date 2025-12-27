@@ -7,6 +7,7 @@ import {
   ImageGallery,
   ProductCard,
   QASection,
+  UpdateDescriptionDialog,
 } from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
 import { useProductBids } from "@/hooks/useProductBids";
@@ -15,10 +16,11 @@ import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
   getProductDetailBySlug,
   getRelatedProducts,
+  updateProductDescription,
 } from "@/services/products";
 import { useAuthStore } from "@/store/authStore";
 import { ProductDetailResponse, ProductListResponse } from "@/types/product";
-import { formatPrice, formatTimeRemaining } from "@/utils";
+import { decodeHTMLEntities, formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
@@ -53,6 +55,8 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showBidDialog, setShowBidDialog] = useState(false);
+  const [showUpdateDescriptionDialog, setShowUpdateDescriptionDialog] =
+    useState(false);
   const [removeConfirm, setRemoveConfirm] = useState<{
     bidderId: number;
     bidderName: string;
@@ -190,6 +194,24 @@ export default function ProductDetailPage() {
     } catch (error) {
       console.error("Error removing bidder:", error);
       toast.error("Không thể loại người dùng");
+    }
+  };
+
+  const handleUpdateDescription = async (description: string) => {
+    if (!product) return;
+
+    try {
+      await updateProductDescription(product.id, description);
+      toast.success("Cập nhật mô tả thành công!");
+
+      // Reload product to get updated description and logs
+      const updatedProduct = await getProductDetailBySlug(slug);
+      setProduct(updatedProduct);
+    } catch (error: any) {
+      console.error("Error updating description:", error);
+      const errorMessage = error?.message || "Không thể cập nhật mô tả";
+      toast.error(errorMessage);
+      throw error;
     }
   };
 
@@ -512,40 +534,28 @@ export default function ProductDetailPage() {
 
         {/* Description Section */}
         <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
-          <h2 className="mb-6 text-2xl font-bold text-gray-900">
-            Mô tả sản phẩm
-          </h2>
+          <div className="mb-6 flex items-end justify-between border-b border-gray-200 pb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Mô tả sản phẩm</h2>
+            {user?.id === product.seller?.id && !product.isEnded && (
+              <button
+                onClick={() => setShowUpdateDescriptionDialog(true)}
+                className="cursor-pointer rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
+              >
+                Chỉnh sửa
+              </button>
+            )}
+          </div>
           <div
-            className="prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: product.description }}
+            className="prose prose-slate max-w-none wrap-break-word"
+            style={{
+              overflowWrap: "anywhere",
+              wordBreak: "break-word",
+              whiteSpace: "pre-line",
+            }}
+            dangerouslySetInnerHTML={{
+              __html: decodeHTMLEntities(product.description),
+            }}
           />
-
-          {/* Description Logs */}
-          {product.descriptionLogs.length > 0 && (
-            <div className="mt-8 border-t border-gray-200 pt-8">
-              <h3 className="mb-6 text-xl font-bold text-gray-900">
-                Lịch sử cập nhật mô tả
-              </h3>
-              <div className="space-y-4">
-                {product.descriptionLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="rounded-lg border-l-4 border-black bg-gray-50 py-3 pr-4 pl-4"
-                  >
-                    <p className="mb-1 text-sm text-gray-600">
-                      ✏️{" "}
-                      {new Date(log.updatedAt).toLocaleDateString("vi-VN", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
-                    </p>
-                    <p className="text-gray-900">{log.updatedContent}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Q&A Section */}
@@ -664,6 +674,13 @@ export default function ProductDetailPage() {
           onCancel={() => setRemoveConfirm(null)}
         />
       )}
+
+      {/* Update Description Dialog */}
+      <UpdateDescriptionDialog
+        isOpen={showUpdateDescriptionDialog}
+        onClose={() => setShowUpdateDescriptionDialog(false)}
+        onSubmit={handleUpdateDescription}
+      />
     </div>
   );
 }

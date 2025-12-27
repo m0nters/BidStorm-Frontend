@@ -7,4 +7,5 @@ export * from "./FavoriteProductCard";
 export * from "./ProductCard";
 export * from "./ProductSection";
 export * from "./QASection";
+export * from "./UpdateDescriptionDialog";
 export * from "./WonProductCard";
