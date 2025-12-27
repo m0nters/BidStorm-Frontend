@@ -190,7 +190,23 @@ import { ProductCard, CategoryTree } from "@/components/ui";
 
 - Vietnamese currency format (₫)
 
-### 9. Real-time WebSocket
+**Role hierarchy** (`utils/roleHierarchy.ts`):
+
+- `hasRolePermission(userRole, requiredRole)` - Check role hierarchy (BIDDER < SELLER < ADMIN)
+- `hasAnyRolePermission(userRole, allowedRoles)` - Check against multiple roles
+- Higher roles automatically have all lower role permissions
+
+### 9. Rich Text Editing
+
+**TinyMCE with Tailwind Typography**:
+
+- Use `@tailwindcss/typography` plugin for rich text content
+- Editor wrapper: `<div className="prose prose-sm max-w-none">`
+- Display content: `<div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />`
+- Custom `content_style` in TinyMCE config preserves default HTML styles (headings, lists, etc.)
+- This prevents Tailwind CSS reset from overriding semantic HTML styling
+
+### 10. Real-time WebSocket
 
 **Location**: `hooks/useProductComments.ts`
 
@@ -374,9 +390,20 @@ npm run clean-start  # Clear cache + dev
 - **Zustand** for global state (currently only `authStore.ts`)
 - **Server state** fetched directly in Server Components (no React Query yet)
 
-## Project-Specific Conventions
+## Component Conventions
 
-1. **Vietnamese naming**: Use Vietnamese for user-facing routes/text, English for code
+- **No React.FC**: Use plain function component syntax with explicit prop types
+
+  ```typescript
+  // Good
+  export const MyComponent = ({ prop1, prop2 }: MyComponentProps) => {
+
+  // Bad
+  export const MyComponent: React.FC<MyComponentProps> = ({ prop1, prop2 }) => {
+  ```
+
+- **Vietnamese naming**: Use Vietnamese for user-facing routes/text, English for code
+
 2. **Path aliases**: Use `@/*` for imports (configured in `tsconfig.json`)
 3. **No generic placeholders**: Use real API responses (see `types/api.ts`)
 4. **Protected pages**: Wrap with `<AuthGuard>` or redirect via `useAuthStore`

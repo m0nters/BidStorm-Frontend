@@ -1,5 +1,6 @@
 "use client";
 
+import { NumberInput } from "@/components/ui/form";
 import { formatPrice } from "@/utils";
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
@@ -21,40 +22,20 @@ export const BidDialog = ({
   minimumBid,
   priceStep,
 }: BidDialogProps) => {
-  const [displayValue, setDisplayValue] = useState("");
+  const [bidAmount, setBidAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const formatNumberWithDots = (value: string): string => {
-    // Remove all non-digit characters
-    const numbers = value.replace(/\D/g, "");
-    if (!numbers) return "";
-
-    // Add thousand separators (dots)
-    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
-  const parseFormattedNumber = (value: string): number => {
-    // Remove dots and parse as number
-    return parseFloat(value.replace(/\./g, "")) || 0;
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    const formatted = formatNumberWithDots(rawValue);
-    setDisplayValue(formatted);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const bidValue = parseFormattedNumber(displayValue);
+    const bidValue = parseFloat(bidAmount) || 0;
 
     try {
       setSubmitting(true);
       await onSubmit(bidValue);
-      setDisplayValue("");
+      setBidAmount("");
       onClose();
     } catch (error) {
       // Error handling is done in parent component
@@ -65,7 +46,7 @@ export const BidDialog = ({
 
   const handleClose = () => {
     if (!submitting) {
-      setDisplayValue("");
+      setBidAmount("");
       onClose();
     }
   };
@@ -114,13 +95,11 @@ export const BidDialog = ({
               </span>
             </label>
             <div className="relative">
-              <input
-                type="text"
+              <NumberInput
                 id="maxBidAmount"
-                value={displayValue}
-                onChange={handleInputChange}
+                value={bidAmount}
+                onChange={setBidAmount}
                 placeholder={`Tối thiểu ${minimumBid.toLocaleString("vi-VN")}`}
-                className="w-full rounded-lg border border-gray-300 py-4 pr-4 pl-4 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
                 disabled={submitting}
                 autoFocus
               />
@@ -145,7 +124,7 @@ export const BidDialog = ({
             </button>
             <button
               type="submit"
-              disabled={submitting || !displayValue.trim()}
+              disabled={submitting || !bidAmount.trim()}
               className="flex-1 cursor-pointer rounded-lg bg-black py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
             >
               {submitting ? "Đang đặt giá..." : "Xác nhận"}

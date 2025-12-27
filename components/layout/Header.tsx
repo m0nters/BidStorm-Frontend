@@ -3,6 +3,7 @@
 import { logout } from "@/api";
 import { useAuthStore } from "@/store/authStore";
 import { CategoryResponse } from "@/types/category";
+import { hasRolePermission } from "@/utils/roleHierarchy";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +18,7 @@ import {
   FiUser,
   FiX,
 } from "react-icons/fi";
+import { IoIosAddCircleOutline } from "react-icons/io";
 
 interface HeaderProps {
   categories: CategoryResponse[];
@@ -137,6 +139,15 @@ export function Header({ categories }: HeaderProps) {
                       <FiTrendingUp className="h-4 w-4" />
                       <span>Đấu giá</span>
                     </Link>
+                    {user?.role && hasRolePermission(user.role, "SELLER") && (
+                      <Link
+                        href="/dang-san-pham"
+                        className="flex items-center space-x-2 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                      >
+                        <IoIosAddCircleOutline className="h-5 w-5 -translate-x-0.5" />
+                        <span>Đăng sản phẩm</span>
+                      </Link>
+                    )}
                   </div>
 
                   <div className="border-t border-gray-100 py-1">
@@ -261,13 +272,24 @@ export function Header({ categories }: HeaderProps) {
 
             {/* Mobile Auth Buttons */}
             {isAuthenticated ? (
-              <Link
-                href="/tai-khoan"
-                className="flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 px-4 py-2.5 text-gray-700 hover:bg-gray-50"
-              >
-                <FiUser className="h-5 w-5" />
-                <span>{user?.fullName}</span>
-              </Link>
+              <div className="space-y-2">
+                <Link
+                  href="/tai-khoan"
+                  className="flex w-full items-center justify-center space-x-2 rounded-lg border border-gray-300 px-4 py-2.5 text-gray-700 hover:bg-gray-50"
+                >
+                  <FiUser className="h-5 w-5" />
+                  <span>{user?.fullName}</span>
+                </Link>
+                {user?.role && hasRolePermission(user.role, "SELLER") && (
+                  <Link
+                    href="/dang-san-pham"
+                    className="flex w-full items-center justify-center space-x-2 rounded-lg bg-black px-4 py-2.5 font-semibold text-white hover:bg-gray-800"
+                  >
+                    <FiTrendingUp className="h-5 w-5" />
+                    <span>Đăng sản phẩm</span>
+                  </Link>
+                )}
+              </div>
             ) : (
               <Link
                 href="/dang-nhap"

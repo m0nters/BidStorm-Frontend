@@ -2,6 +2,8 @@ import { PaginatedResponse } from "@/types/api";
 import {
   CommentResponse,
   CreateCommentRequest,
+  CreateProductRequest,
+  CreateProductResponse,
   ProductDetailResponse,
   ProductListResponse,
 } from "@/types/product";
@@ -186,4 +188,34 @@ export const deleteComment = async (commentId: number) => {
   await api.delete(`/comments/${commentId}`, {
     auth: true,
   });
+};
+
+/**
+ * Create a new product for sale
+ * For seller product creation page
+ * Handles multipart form data with product JSON and images
+ */
+export const createProduct = async (
+  productData: CreateProductRequest,
+  images: File[],
+) => {
+  const formData = new FormData();
+
+  // Add product data as plain JSON string (not Blob)
+  formData.append("productData", JSON.stringify(productData));
+
+  // Add images
+  images.forEach((image) => {
+    formData.append("images", image);
+  });
+
+  const response = await api.upload<CreateProductResponse>(
+    "/products/upload",
+    formData,
+    {
+      auth: true,
+      cache: "no-store",
+    },
+  );
+  return response.data;
 };

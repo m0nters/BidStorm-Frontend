@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "drive.google.com",
+        hostname: "bidstorm.s3.ap-southeast-2.amazonaws.com",
       },
     ],
   },

@@ -37,8 +37,11 @@ async function request<T>(
 ): Promise<ApiSuccessResponse<T>> {
   const { auth = false, cache, next, ...fetchOptions } = options;
 
+  // Don't set Content-Type for FormData - let browser set it with boundary
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
+    ...(fetchOptions.body instanceof FormData
+      ? {}
+      : { "Content-Type": "application/json" }),
     ...fetchOptions.headers,
   };
 

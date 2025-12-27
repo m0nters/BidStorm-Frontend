@@ -17,6 +17,7 @@ interface DropdownMenuProps {
   canSearch?: boolean;
   isSorted?: boolean;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function DropdownMenu({
@@ -28,6 +29,7 @@ export function DropdownMenu({
   canSearch = false,
   isSorted = true,
   placeholder = "Chọn...",
+  disabled = false,
 }: DropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -182,7 +184,8 @@ export function DropdownMenu({
       <button
         type="button"
         onClick={toggleDropdown}
-        className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 text-left text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 focus:border-black focus:ring-2 focus:ring-black focus:outline-none"
+        disabled={disabled}
+        className="w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 text-left text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 focus:border-black focus:ring-2 focus:ring-black focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
       >
         <div className="flex items-center justify-between">
           <span className="truncate" title={selectedOption?.label}>

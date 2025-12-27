@@ -21,7 +21,7 @@ import { ProductDetailResponse, ProductListResponse } from "@/types/product";
 import { formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useParams, usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   FiClock,
@@ -35,6 +35,7 @@ import {
 import { HiOutlineBell } from "react-icons/hi2";
 import { RiAuctionFill } from "react-icons/ri";
 import { toast } from "react-toastify";
+import NoProduct from "./NoProduct";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -143,7 +144,7 @@ export default function ProductDetailPage() {
   }
 
   if (error || !product) {
-    notFound();
+    return NoProduct();
   }
 
   // Calculate time remaining and minimum bid
@@ -299,7 +300,9 @@ export default function ProductDetailPage() {
               <div className="mb-6 flex items-center gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-1">
                   <RiAuctionFill className="h-4 w-4" />
-                  <span>{product.bidCount} lượt đấu giá</span>
+                  <span>
+                    {bidsLoading ? product.bidCount : bids.length} lượt đấu giá
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <FiEye className="h-4 w-4" />

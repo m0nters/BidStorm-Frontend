@@ -94,3 +94,34 @@ export interface CreateCommentRequest {
   parentId?: number;
   content: string;
 }
+
+export interface CreateProductRequest {
+  categoryId: number;
+  title: string;
+  description: string;
+  startingPrice: number;
+  priceStep: number;
+  buyNowPrice?: number;
+  endTime: string; // ISO 8601 format
+  autoExtend: boolean;
+  allowUnratedBidders: boolean;
+}
+
+export interface CreateProductResponse {
+  id: number;
+  title: string;
+  slug: string;
+  categoryId: number;
+  categoryName: string;
+  sellerId: number;
+  sellerName: string;
+  startingPrice: number;
+  currentPrice: number;
+  buyNowPrice?: number;
+  priceStep: number;
+  isAutoExtend: boolean;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  imageCount: number;
+}
