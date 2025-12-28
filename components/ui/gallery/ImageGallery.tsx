@@ -118,53 +118,56 @@ export function ImageGallery({
 
         {/* Main Image */}
         <div className="relative flex flex-1 items-center justify-center overflow-visible">
-          <img
-            src={images[selectedImage]?.imageUrl || "/placeholder.jpg"}
-            alt={title}
-            onMouseEnter={() => setShowMagnifier(true)}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => setShowMagnifier(false)}
-          />
-
-          {/* Magnifier Rectangle - positioned follow the mouse, bounded by the image */}
-          {showMagnifier && !isEnded && (
-            <div
-              className="pointer-events-none absolute border-2 border-white bg-white/30 shadow-lg"
-              style={{
-                width: `${magnifierRectWidth}px`,
-                height: `${magnifierRectHeight}px`,
-                left: `${magnifierRectPosition.x}px`,
-                top: `${magnifierRectPosition.y}px`,
-                transform: "translate(-50%, -50%)",
-              }}
+          <div className="relative inline-block">
+            <img
+              src={images[selectedImage]?.imageUrl || "/placeholder.jpg"}
+              alt={title}
+              className="max-h-[600px] max-w-full object-contain"
+              onMouseEnter={() => setShowMagnifier(true)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={() => setShowMagnifier(false)}
             />
-          )}
 
-          {/* Magnified View - positioned relative to magnifier rectangle, bounded by the image */}
-          {showMagnifier && !isEnded && (
-            <div
-              className="pointer-events-none absolute hidden overflow-hidden rounded-lg border-2 border-gray-300 bg-white shadow-2xl lg:block"
-              style={{
-                left: `${magnifierViewPosition.left}px`,
-                top: `${magnifierViewPosition.top}px`,
-                width: `${magnifierViewWidth}px`,
-                height: `${magnifierViewHeight}px`,
-                backgroundImage: `url(${images[selectedImage]?.imageUrl})`,
-                backgroundSize: "800%",
-                backgroundPosition: `${magnifierPosition.x}% ${magnifierPosition.y}%`,
-                backgroundRepeat: "no-repeat",
-              }}
-            />
-          )}
+            {/* Magnifier Rectangle - positioned follow the mouse, bounded by the image */}
+            {showMagnifier && !isEnded && (
+              <div
+                className="pointer-events-none absolute border-2 border-white bg-white/30 shadow-lg"
+                style={{
+                  width: `${magnifierRectWidth}px`,
+                  height: `${magnifierRectHeight}px`,
+                  left: `${magnifierRectPosition.x}px`,
+                  top: `${magnifierRectPosition.y}px`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              />
+            )}
 
-          {/* Badges - positioned relative to image wrapper */}
-          {isNew && (
-            <div className="pointer-events-none absolute top-0 left-0 h-32 w-32 overflow-hidden">
-              <div className="absolute top-7 -left-9 w-40 -rotate-45 transform bg-linear-to-r from-red-600 to-red-400 py-2 text-center text-xs font-bold tracking-wider text-white uppercase shadow-lg">
-                Mới
+            {/* Magnified View - positioned relative to magnifier rectangle, bounded by the image */}
+            {showMagnifier && !isEnded && (
+              <div
+                className="pointer-events-none absolute hidden overflow-hidden rounded-lg border-2 border-gray-300 bg-white shadow-2xl lg:block"
+                style={{
+                  left: `${magnifierViewPosition.left}px`,
+                  top: `${magnifierViewPosition.top}px`,
+                  width: `${magnifierViewWidth}px`,
+                  height: `${magnifierViewHeight}px`,
+                  backgroundImage: `url(${images[selectedImage]?.imageUrl})`,
+                  backgroundSize: "800%",
+                  backgroundPosition: `${magnifierPosition.x}% ${magnifierPosition.y}%`,
+                  backgroundRepeat: "no-repeat",
+                }}
+              />
+            )}
+
+            {/* Badges - positioned relative to image wrapper */}
+            {isNew && (
+              <div className="pointer-events-none absolute top-0 left-0 h-32 w-32 overflow-hidden">
+                <div className="absolute top-7 -left-9 w-40 -rotate-45 transform bg-linear-to-r from-red-600 to-red-400 py-2 text-center text-xs font-bold tracking-wider text-white uppercase shadow-lg">
+                  Mới
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
         {isEnded && (
           <div className="absolute inset-0 z-30 flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-sm">
