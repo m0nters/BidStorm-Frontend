@@ -73,7 +73,6 @@ export interface ProductDetailResponse {
   updatedAt: string;
   isEnded: boolean;
   isNew: boolean;
-  descriptionLogs: DescriptionLogResponse[];
 }
 
 export interface CommentResponse {

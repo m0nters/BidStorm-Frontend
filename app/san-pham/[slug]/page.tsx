@@ -8,12 +8,15 @@ import {
   ProductCard,
   QASection,
   UpdateDescriptionDialog,
+  ViewDescriptionHistoryDialog,
 } from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
 import { useProductBids } from "@/hooks/useProductBids";
 import { placeBid, removeBidder } from "@/services/bids";
 import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
+  getDescriptionHistory,
+  getDescriptionHistoryCount,
   getProductDetailBySlug,
   getRelatedProducts,
   updateProductDescription,
@@ -52,11 +55,14 @@ export default function ProductDetailPage() {
   );
   const [autoExtendTriggerMin, setAutoExtendTriggerMin] = useState<number>(0);
   const [autoExtendDurationMin, setAutoExtendDurationMin] = useState<number>(0);
+  const [descriptionHistoryCount, setDescriptionHistoryCount] =
+    useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [showBidDialog, setShowBidDialog] = useState(false);
   const [showUpdateDescriptionDialog, setShowUpdateDescriptionDialog] =
     useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [removeConfirm, setRemoveConfirm] = useState<{
     bidderId: number;
     bidderName: string;
@@ -113,10 +119,12 @@ export default function ProductDetailPage() {
         const productData = await getProductDetailBySlug(slug);
         const configTrigger = await getAutoExtendTriggerMin();
         const configDuration = await getAutoExtendByMin();
+        const historyCount = await getDescriptionHistoryCount(productData.id);
 
         setProduct(productData);
         setAutoExtendTriggerMin(configTrigger);
         setAutoExtendDurationMin(configDuration);
+        setDescriptionHistoryCount(historyCount);
 
         // Fetch related products after we have the product ID
         const related = await getRelatedProducts(productData.id);
@@ -204,9 +212,11 @@ export default function ProductDetailPage() {
       await updateProductDescription(product.id, description);
       toast.success("Cập nhật mô tả thành công!");
 
-      // Reload product to get updated description and logs
+      // Reload product and history count
       const updatedProduct = await getProductDetailBySlug(slug);
+      const historyCount = await getDescriptionHistoryCount(product.id);
       setProduct(updatedProduct);
+      setDescriptionHistoryCount(historyCount);
     } catch (error: any) {
       console.error("Error updating description:", error);
       const errorMessage = error?.message || "Không thể cập nhật mô tả";
@@ -536,14 +546,24 @@ export default function ProductDetailPage() {
         <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
           <div className="mb-6 flex items-end justify-between border-b border-gray-200 pb-6">
             <h2 className="text-2xl font-bold text-gray-900">Mô tả sản phẩm</h2>
-            {user?.id === product.seller?.id && !product.isEnded && (
-              <button
-                onClick={() => setShowUpdateDescriptionDialog(true)}
-                className="cursor-pointer rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
-              >
-                Chỉnh sửa
-              </button>
-            )}
+            <div className="flex items-center gap-3">
+              {descriptionHistoryCount > 0 && (
+                <button
+                  onClick={() => setShowHistoryDialog(true)}
+                  className="cursor-pointer rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
+                >
+                  Xem lịch sử chỉnh sửa
+                </button>
+              )}
+              {user?.id === product.seller?.id && !product.isEnded && (
+                <button
+                  onClick={() => setShowUpdateDescriptionDialog(true)}
+                  className="cursor-pointer rounded-lg border-2 border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 transition-all hover:border-black hover:bg-gray-50"
+                >
+                  Chỉnh sửa
+                </button>
+              )}
+            </div>
           </div>
           <div
             className="prose prose-slate max-w-none wrap-break-word"
@@ -680,6 +700,14 @@ export default function ProductDetailPage() {
         isOpen={showUpdateDescriptionDialog}
         onClose={() => setShowUpdateDescriptionDialog(false)}
         onSubmit={handleUpdateDescription}
+      />
+
+      {/* View Description History Dialog */}
+      <ViewDescriptionHistoryDialog
+        isOpen={showHistoryDialog}
+        onClose={() => setShowHistoryDialog(false)}
+        productId={product.id}
+        fetchHistory={getDescriptionHistory}
       />
     </div>
   );

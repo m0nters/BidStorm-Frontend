@@ -4,6 +4,7 @@ import {
   CreateCommentRequest,
   CreateProductRequest,
   CreateProductResponse,
+  DescriptionLogResponse,
   ProductDetailResponse,
   ProductListResponse,
 } from "@/types/product";
@@ -236,4 +237,32 @@ export const updateProductDescription = async (
       cache: "no-store",
     },
   );
+};
+
+/**
+ * Get description edit history for a product
+ * GET /products/{id}/description-history
+ */
+export const getDescriptionHistory = async (productId: number) => {
+  const response = await api.get<DescriptionLogResponse[]>(
+    `/products/${productId}/description-history`,
+    {
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Get description edit count for a product
+ * GET /products/{id}/description-history/count
+ */
+export const getDescriptionHistoryCount = async (productId: number) => {
+  const response = await api.get<number>(
+    `/products/${productId}/description-history/count`,
+    {
+      cache: "no-store",
+    },
+  );
+  return response.data;
 };

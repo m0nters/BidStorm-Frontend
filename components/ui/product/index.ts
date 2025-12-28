@@ -8,4 +8,5 @@ export * from "./ProductCard";
 export * from "./ProductSection";
 export * from "./QASection";
 export * from "./UpdateDescriptionDialog";
+export * from "./ViewDescriptionHistoryDialog";
 export * from "./WonProductCard";
