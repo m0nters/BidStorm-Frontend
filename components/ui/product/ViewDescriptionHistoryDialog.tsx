@@ -1,5 +1,6 @@
 "use client";
 
+import { useScrollLock } from "@/hooks";
 import { DescriptionLogResponse } from "@/types/product";
 import { decodeHTMLEntities } from "@/utils";
 import { useEffect, useState } from "react";
@@ -21,6 +22,8 @@ export const ViewDescriptionHistoryDialog = ({
   const [history, setHistory] = useState<DescriptionLogResponse[]>([]);
   const [loading, setLoading] = useState(false);
 
+  useScrollLock(isOpen);
+
   useEffect(() => {
     if (isOpen && productId) {
       const loadHistory = async () => {
@@ -41,18 +44,28 @@ export const ViewDescriptionHistoryDialog = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="relative max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900">
             Lịch sử chỉnh sửa mô tả
           </h2>
           <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-500 transition-colors hover:bg-gray-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="flex cursor-pointer items-center justify-center rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100"
           >
-            <FiX className="h-5 w-5" />
+            <FiX className="h-6 w-6" />
           </button>
         </div>
 

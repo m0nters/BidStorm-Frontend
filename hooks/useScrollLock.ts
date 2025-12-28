@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 
-export function useScrollLock() {
+export function useScrollLock(enabled: boolean = true) {
   useEffect(() => {
+    if (!enabled) return;
     // Get the current scroll position
     const scrollY = window.scrollY;
 
@@ -21,5 +22,5 @@ export function useScrollLock() {
       // Restore scroll position
       window.scrollTo(0, scrollY);
     };
-  }, []);
+  }, [enabled]);
 }

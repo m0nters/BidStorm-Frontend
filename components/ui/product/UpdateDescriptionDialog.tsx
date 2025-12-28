@@ -1,6 +1,7 @@
 "use client";
 
 import { RichTextEditor } from "@/components/ui/form";
+import { useScrollLock } from "@/hooks";
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
 
@@ -19,6 +20,7 @@ export const UpdateDescriptionDialog = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  useScrollLock(isOpen);
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,15 +56,25 @@ export const UpdateDescriptionDialog = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          handleClose();
+        }
+      }}
+    >
       <div className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between border-b border-gray-200 pb-2">
           <h2 className="text-2xl font-bold text-gray-900">
             Bổ sung mô tả sản phẩm
           </h2>
           <button
-            onClick={handleClose}
-            className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClose();
+            }}
+            className="flex cursor-pointer items-center justify-center rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100"
             disabled={submitting}
           >
             <FiX className="h-6 w-6" />
@@ -95,7 +107,10 @@ export const UpdateDescriptionDialog = ({
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={handleClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClose();
+              }}
               className="flex-1 cursor-pointer rounded-lg border-2 border-gray-300 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-50"
               disabled={submitting}
             >
