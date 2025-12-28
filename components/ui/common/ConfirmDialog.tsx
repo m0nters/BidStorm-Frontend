@@ -1,11 +1,12 @@
 "use client";
 
 import { useScrollLock } from "@/hooks";
+import { ReactNode } from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
   title: string;
-  message: string;
+  message: ReactNode;
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
@@ -27,11 +28,15 @@ export const ConfirmDialog = ({
   return (
     <div
       className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-      onClick={onCancel}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onCancel();
+        }
+      }}
     >
       <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-xl">
         <h3 className="mb-3 text-xl font-bold text-gray-900">{title}</h3>
-        <p className="mb-6 text-gray-700">{message}</p>
+        <div className="mb-6 text-gray-700">{message}</div>
 
         <div className="flex gap-3">
           <button

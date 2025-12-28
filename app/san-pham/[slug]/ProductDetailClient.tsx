@@ -697,7 +697,15 @@ export default function ProductDetailClient({
         <ConfirmDialog
           isOpen={removeConfirm !== null}
           title="Loại người dùng"
-          message={`Bạn có chắc chắn muốn loại ${removeConfirm.bidderName} khỏi phiên đấu giá này? Tất cả giá đặt của họ sẽ bị xóa.`}
+          message={
+            <>
+              Bạn có chắc chắn muốn loại{" "}
+              <span className="font-bold text-black">
+                {removeConfirm.bidderName}
+              </span>{" "}
+              khỏi phiên đấu giá này? Tất cả giá đặt của họ sẽ bị xóa.
+            </>
+          }
           confirmText="Loại"
           cancelText="Hủy"
           onConfirm={() =>
