@@ -33,20 +33,32 @@ export default function BiddingHistoryPage() {
     bids,
     loading: bidsLoading,
     currentPrice: realtimePrice,
+    endTime: realtimeEndTime,
   } = useProductBids(product?.id || 0, {
     isSeller,
   });
 
-  // Sync real-time price from WebSocket to product state
+  // Sync real-time price and end time from WebSocket to product state
   useEffect(() => {
-    if (!product || realtimePrice === null) return;
+    if (!product) return;
 
-    if (realtimePrice !== product.currentPrice) {
-      setProduct((prev) =>
-        prev ? { ...prev, currentPrice: realtimePrice } : prev,
-      );
+    let needsUpdate = false;
+    const updates: Partial<ProductDetailResponse> = {};
+
+    if (realtimePrice !== null && realtimePrice !== product.currentPrice) {
+      updates.currentPrice = realtimePrice;
+      needsUpdate = true;
     }
-  }, [realtimePrice, product?.currentPrice]);
+
+    if (realtimeEndTime !== null && realtimeEndTime !== product.endTime) {
+      updates.endTime = realtimeEndTime;
+      needsUpdate = true;
+    }
+
+    if (needsUpdate) {
+      setProduct((prev) => (prev ? { ...prev, ...updates } : prev));
+    }
+  }, [realtimePrice, realtimeEndTime, product?.currentPrice, product?.endTime]);
 
   useEffect(() => {
     if (isInitializing) return;

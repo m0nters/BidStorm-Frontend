@@ -79,11 +79,12 @@ export default function ProductDetailClient({
     addBidOptimistically,
     currentPrice: realtimePrice,
     highestBidder: realtimeHighestBidder,
+    endTime: realtimeEndTime,
   } = useProductBids(product?.id || 0, {
     isSeller: user?.id === product?.seller?.id,
   });
 
-  // Sync real-time price and highest bidder from WebSocket to product state
+  // Sync real-time price, highest bidder, and end time from WebSocket to product state
   useEffect(() => {
     if (!product) return;
 
@@ -103,14 +104,21 @@ export default function ProductDetailClient({
       needsUpdate = true;
     }
 
+    if (realtimeEndTime !== null && realtimeEndTime !== product.endTime) {
+      updates.endTime = realtimeEndTime;
+      needsUpdate = true;
+    }
+
     if (needsUpdate) {
       setProduct((prev) => (prev ? { ...prev, ...updates } : prev));
     }
   }, [
     realtimePrice,
     realtimeHighestBidder,
+    realtimeEndTime,
     product?.currentPrice,
     product?.highestBidderName,
+    product?.endTime,
   ]);
 
   useEffect(() => {

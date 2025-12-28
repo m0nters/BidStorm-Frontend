@@ -20,5 +20,6 @@ export interface BidEvent {
   bid?: BidResponse; // For NEW_BID
   currentPrice?: number; // Current product price after bid
   highestBidder?: string; // Name of current highest bidder
+  endTime?: string; // Product end time (ISO 8601) - updated when auto-extend is triggered
   bidderId?: number; // For BID_REJECTED
 }

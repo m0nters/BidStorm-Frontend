@@ -15,6 +15,7 @@ interface UseProductBidsReturn {
   loading: boolean;
   currentPrice: number | null;
   highestBidder: string | null;
+  endTime: string | null;
   addBidOptimistically: (bid: BidResponse, newPrice: number) => void;
 }
 
@@ -27,6 +28,7 @@ export const useProductBids = (
   const [loading, setLoading] = useState(true);
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [highestBidder, setHighestBidder] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
   const clientRef = useRef<Client | null>(null);
   const ignoredBidIdsRef = useRef<Set<number>>(new Set());
   const lastRejectionTimestampRef = useRef<number>(0);
@@ -105,12 +107,15 @@ export const useProductBids = (
               return [event.bid!, ...updatedPreviousBids];
             });
 
-            // Update current price and highest bidder
+            // Update current price, highest bidder, and end time
             if (event.currentPrice !== undefined) {
               setCurrentPrice(event.currentPrice);
             }
             if (event.highestBidder !== undefined) {
               setHighestBidder(event.highestBidder);
+            }
+            if (event.endTime !== undefined) {
+              setEndTime(event.endTime);
             }
 
             // Show notification if not your own bid
@@ -232,6 +237,7 @@ export const useProductBids = (
     loading,
     currentPrice,
     highestBidder,
+    endTime,
     addBidOptimistically,
   };
 };
