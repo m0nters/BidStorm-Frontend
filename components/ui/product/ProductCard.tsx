@@ -214,12 +214,12 @@ export function ProductCard({ product }: ProductCardProps) {
                 e.preventDefault();
                 // TODO: Handle buy now
               }}
-              className="group w-full cursor-pointer rounded-lg bg-black py-2 text-white transition-all duration-200 hover:scale-105"
+              className="group/buy w-full cursor-pointer rounded-lg bg-black py-2 text-white transition-all duration-200 hover:scale-105"
             >
               <p>Mua ngay</p>
               <span className="flex items-center justify-center gap-4">
-                <FiShoppingCart className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <p className="transition-transform group-hover:translate-x-0.5">
+                <FiShoppingCart className="h-4 w-4 transition-transform group-hover/buy:-translate-x-1" />
+                <p className="transition-transform group-hover/buy:translate-x-0.5">
                   {formatPrice(product.buyNowPrice)}
                 </p>
               </span>

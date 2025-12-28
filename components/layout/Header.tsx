@@ -48,7 +48,7 @@ export function Header({ categories }: HeaderProps) {
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <a href="/" className="flex items-center space-x-2">
             <div className="flex items-center gap-2 text-2xl font-bold">
               <Image
                 src="/logo.png"
@@ -61,7 +61,7 @@ export function Header({ categories }: HeaderProps) {
                 <span className="text-gray-400">Storm</span>
               </div>
             </div>
-          </Link>
+          </a>
 
           {/* Search Bar - Desktop */}
           <form

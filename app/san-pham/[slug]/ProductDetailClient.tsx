@@ -365,8 +365,8 @@ export default function ProductDetailClient({
                     <p className="mb-2 text-2xl font-bold text-black">
                       {formatPrice(product.buyNowPrice)}
                     </p>
-                    <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
-                      <FiShoppingCart className="h-5 w-5" />
+                    <button className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
+                      <FiShoppingCart className="group-hover:animate-shake h-5 w-5" />
                       Mua ngay
                     </button>
                   </div>
