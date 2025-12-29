@@ -37,7 +37,7 @@ export const BiddingHistoryTable = ({
   const isSeller = currentUserId === sellerId;
   const displayBids = maxRows ? bids.slice(0, maxRows) : bids;
   const hasMore = maxRows && bids.length > maxRows;
-  
+
   const [removeConfirm, setRemoveConfirm] = useState<{
     bidderId: number;
     bidderName: string;
@@ -45,7 +45,7 @@ export const BiddingHistoryTable = ({
 
   const handleRemoveBidder = async () => {
     if (!removeConfirm || !onRemoveBidder) return;
-    
+
     try {
       await onRemoveBidder(removeConfirm.bidderId);
       setRemoveConfirm(null);

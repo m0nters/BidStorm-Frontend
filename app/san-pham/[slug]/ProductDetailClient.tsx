@@ -218,9 +218,9 @@ export default function ProductDetailClient({
       await removeBidder(product.id, bidderId);
       toast.success("Đã loại người dùng khỏi phiên đấu giá");
       // WebSocket will handle removing the bids automatically
-    } catch (error) {
-      console.error("Error removing bidder:", error);
-      toast.error("Không thể loại người dùng");
+    } catch (error: any) {
+      const errorMessage = error.message || "Không thể loại người dùng";
+      toast.error(errorMessage);
       throw error;
     }
   };
