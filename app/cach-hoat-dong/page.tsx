@@ -29,13 +29,10 @@ export default function HowItWorksPage() {
           <div className="mb-16 text-center">
             <SectionHeading
               id="buoc-bat-dau"
+              title="Bước bắt đầu"
+              description="Tham gia đấu giá chỉ trong vài phút"
               className="text-4xl font-bold text-gray-900"
-            >
-              4 bước đơn giản để bắt đầu
-            </SectionHeading>
-            <p className="mt-4 text-lg text-gray-600">
-              Tham gia đấu giá chỉ trong vài phút
-            </p>
+            />
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -125,12 +122,9 @@ export default function HowItWorksPage() {
             <SectionHeading
               id="tinh-nang-noi-bat"
               className="text-4xl font-bold text-gray-900"
-            >
-              Tính năng nổi bật
-            </SectionHeading>
-            <p className="mt-4 text-lg text-gray-600">
-              Những gì làm cho BidStorm khác biệt
-            </p>
+              title="Tính năng nổi bật"
+              description="Những gì làm cho BidStorm khác biệt"
+            />
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -210,12 +204,9 @@ export default function HowItWorksPage() {
             <SectionHeading
               id="tinh-nang"
               className="text-4xl font-bold text-gray-900"
-            >
-              Tính năng
-            </SectionHeading>
-            <p className="mt-4 text-lg text-gray-600">
-              Các tính năng cốt lõi của hệ thống
-            </p>
+              title="Tính năng"
+              description="Các tính năng cốt lõi của hệ thống"
+            />
           </div>
 
           <div className="grid gap-8 lg:grid-cols-3">
@@ -331,13 +322,10 @@ export default function HowItWorksPage() {
           <div className="mb-16 text-center">
             <SectionHeading
               id="dau-gia-tu-dong"
+              title="Đấu giá tự động hoạt động như thế nào?"
+              description="Hiểu rõ cơ chế để tận dụng tối đa lợi thế của bạn"
               className="text-4xl font-bold text-gray-900"
-            >
-              Đấu giá tự động hoạt động như thế nào?
-            </SectionHeading>
-            <p className="mt-4 text-lg text-gray-600">
-              Hiểu rõ cơ chế để tận dụng tối đa lợi thế của bạn
-            </p>
+            />
           </div>
 
           {/* Key Concept */}
