@@ -52,12 +52,12 @@ export async function generateMetadata({
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
-  // Validate product exists (for 404 handling)
+  // Fetch product server-side for both metadata and initial render
+  // This prevents duplicate API calls that increment view count
   try {
-    await getProductDetailBySlug(slug);
+    const product = await getProductDetailBySlug(slug);
+    return <ProductDetailClient slug={slug} initialProduct={product} />;
   } catch {
-    NoProduct();
+    return NoProduct();
   }
-
-  return <ProductDetailClient slug={slug} />;
 }

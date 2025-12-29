@@ -63,7 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="absolute right-3 bottom-3 flex flex-col gap-2">
             <div className="flex flex-col items-end justify-center gap-2">
               {product.isNew && (
-                <span className="w-fit rounded-lg bg-black px-3 py-1 text-xs font-semibold text-white shadow-lg">
+                <span className="w-fit rounded-lg border border-white bg-black px-3 py-1 text-xs font-semibold text-white shadow-lg">
                   MỚI
                 </span>
               )}

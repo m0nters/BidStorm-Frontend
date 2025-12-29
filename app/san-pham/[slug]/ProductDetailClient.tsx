@@ -45,10 +45,12 @@ import NoProduct from "./NoProduct";
 
 interface ProductDetailClientProps {
   slug: string;
+  initialProduct: ProductDetailResponse;
 }
 
 export default function ProductDetailClient({
   slug,
+  initialProduct,
 }: ProductDetailClientProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -58,7 +60,9 @@ export default function ProductDetailClient({
   const highlightTriggeredRef = useRef(false);
   const [showHighlight, setShowHighlight] = useState(false);
 
-  const [product, setProduct] = useState<ProductDetailResponse | null>(null);
+  const [product, setProduct] = useState<ProductDetailResponse | null>(
+    initialProduct,
+  );
   const [relatedProducts, setRelatedProducts] = useState<ProductListResponse[]>(
     [],
   );
@@ -141,21 +145,22 @@ export default function ProductDetailClient({
     const fetchData = async () => {
       try {
         setLoading(true);
-        const productData = await getProductDetailBySlug(slug);
+        // Product data already fetched server-side, only fetch related data
         const configTrigger = await getAutoExtendTriggerMin();
         const configDuration = await getAutoExtendByMin();
-        const historyCount = await getDescriptionHistoryCount(productData.id);
+        const historyCount = await getDescriptionHistoryCount(
+          initialProduct.id,
+        );
 
-        setProduct(productData);
         setAutoExtendTriggerMin(configTrigger);
         setAutoExtendDurationMin(configDuration);
         setDescriptionHistoryCount(historyCount);
 
-        // Fetch related products after we have the product ID
-        const related = await getRelatedProducts(productData.id);
+        // Fetch related products
+        const related = await getRelatedProducts(initialProduct.id);
         setRelatedProducts(related);
       } catch (err) {
-        console.error("Error loading product:", err);
+        console.error("Error loading product data:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -163,7 +168,7 @@ export default function ProductDetailClient({
     };
 
     fetchData();
-  }, [slug, isInitializing]);
+  }, [initialProduct.id, isInitializing]);
 
   // Handle highlight effect from query parameter
   // This effect runs on every render and waits for the ref to be available
