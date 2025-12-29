@@ -9,6 +9,7 @@ import {
 } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiClock, FiShoppingCart } from "react-icons/fi";
 import { RiAuctionFill } from "react-icons/ri";
@@ -19,6 +20,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isUrgent, setIsUrgent] = useState(false);
 
@@ -35,6 +37,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
     return () => clearInterval(timer);
   }, [product.endTime]);
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    // Navigate to product detail page with highlight parameter
+    router.push(`/san-pham/${product.slug}?highlight=buyNow`);
+  };
 
   return (
     <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-100">
@@ -210,10 +218,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Buy Now Button */}
           {product.buyNowPrice && new Date(product.endTime) > new Date() && (
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                // TODO: Handle buy now
-              }}
+              onClick={handleBuyNow}
               className="group/buy w-full cursor-pointer rounded-lg bg-black py-2 text-white transition-all duration-200 hover:scale-105"
             >
               <p>Mua ngay</p>

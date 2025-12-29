@@ -1,7 +1,7 @@
 import { getProductDetailBySlug } from "@/services/products";
 import { decode } from "he";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import NoProduct from "./NoProduct";
 import ProductDetailClient from "./ProductDetailClient";
 
 interface ProductPageProps {
@@ -56,7 +56,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   try {
     await getProductDetailBySlug(slug);
   } catch {
-    notFound();
+    NoProduct();
   }
 
   return <ProductDetailClient slug={slug} />;

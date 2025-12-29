@@ -200,6 +200,10 @@ export const useProductBids = (
               if (wasYourBid && !rejectionToastShownRef.current) {
                 rejectionToastShownRef.current = true;
                 toast.error("Bạn đã bị loại khỏi phiên đấu giá này");
+              } else {
+                toast.info(
+                  `Một người đấu giá đã bị loại khỏi phiên đấu giá này`,
+                );
               }
 
               const remainingBids = prev.filter(

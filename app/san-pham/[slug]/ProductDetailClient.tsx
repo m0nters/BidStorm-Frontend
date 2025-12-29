@@ -7,6 +7,7 @@ import {
   ImageGallery,
   ProductCard,
   QASection,
+  SpotlightOverlay,
   UpdateDescriptionDialog,
   ViewDescriptionHistoryDialog,
 } from "@/components/ui";
@@ -26,8 +27,8 @@ import { ProductDetailResponse, ProductListResponse } from "@/types/product";
 import { decodeHTMLEntities, formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import {
   FiClock,
   FiEye,
@@ -50,8 +51,12 @@ export default function ProductDetailClient({
   slug,
 }: ProductDetailClientProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isInitializing = useAuthStore((state) => state.isInitializing);
   const user = useAuthStore((state) => state.user);
+  const buyNowRef = useRef<HTMLDivElement>(null);
+  const highlightTriggeredRef = useRef(false);
+  const [showHighlight, setShowHighlight] = useState(false);
 
   const [product, setProduct] = useState<ProductDetailResponse | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<ProductListResponse[]>(
@@ -159,6 +164,29 @@ export default function ProductDetailClient({
 
     fetchData();
   }, [slug, isInitializing]);
+
+  // Handle highlight effect from query parameter
+  // This effect runs on every render and waits for the ref to be available
+  useEffect(() => {
+    const highlight = searchParams.get("highlight");
+
+    if (
+      highlight === "buyNow" &&
+      product &&
+      !product.isEnded &&
+      product.buyNowPrice &&
+      !highlightTriggeredRef.current &&
+      buyNowRef.current
+    ) {
+      setShowHighlight(true);
+      buyNowRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      setTimeout(() => setShowHighlight(false), 3000);
+      highlightTriggeredRef.current = true;
+    }
+  });
 
   if (isInitializing || loading) {
     return (
@@ -404,7 +432,10 @@ export default function ProductDetailClient({
                 </div>
 
                 {!product.isEnded && product.buyNowPrice && (
-                  <div className="rounded-lg border-2 border-black bg-white p-4">
+                  <div
+                    ref={buyNowRef}
+                    className="rounded-lg border-2 border-black bg-white p-4"
+                  >
                     <p className="mb-2 text-sm font-medium text-gray-600">
                       Giá mua ngay
                     </p>
@@ -777,6 +808,13 @@ export default function ProductDetailClient({
         onClose={() => setShowHistoryDialog(false)}
         productId={product.id}
         fetchHistory={getDescriptionHistory}
+      />
+
+      {/* Spotlight Overlay */}
+      <SpotlightOverlay
+        targetRef={buyNowRef}
+        isVisible={showHighlight}
+        onDismiss={() => setShowHighlight(false)}
       />
     </div>
   );
