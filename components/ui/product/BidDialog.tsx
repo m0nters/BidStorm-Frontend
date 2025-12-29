@@ -4,6 +4,7 @@ import { ConfirmDialog } from "@/components/ui/common";
 import { NumberInput } from "@/components/ui/form";
 import { useScrollLock } from "@/hooks";
 import { formatPrice } from "@/utils";
+import Link from "next/link";
 import { useState } from "react";
 import { FiX } from "react-icons/fi";
 
@@ -140,8 +141,14 @@ export const BidDialog = ({
                 </span>
               </div>
               <p className="mt-2 text-xs text-gray-500">
-                💡 Hệ thống sẽ tự động đấu giá tăng dần cho bạn cho đến khi đạt
-                mức giá tối đa này
+                Cách hoạt động:{" "}
+                <Link
+                  href="/cach-hoat-dong#dau-gia-tu-dong"
+                  className="text-blue-600 underline hover:text-blue-800"
+                  target="_blank"
+                >
+                  Xem tại đây
+                </Link>
               </p>
             </div>
 

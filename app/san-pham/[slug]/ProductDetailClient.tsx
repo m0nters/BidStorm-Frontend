@@ -679,7 +679,7 @@ export default function ProductDetailClient({
               />
             </div>
           ) : (
-            <div className="flex flex-col items-center rounded-lg py-12">
+            <div className="flex flex-col items-center rounded-lg pt-12">
               <Image
                 src="/no-bid.png"
                 alt="Chưa có người đấu giá"
@@ -690,6 +690,15 @@ export default function ProductDetailClient({
               <p className="font-semibold">
                 Hãy là người đầu tiên đặt giá cho sản phẩm này!
               </p>
+              {!product.isEnded && user && (
+                <button
+                  onClick={() => setShowBidDialog(true)}
+                  className="mt-4 flex w-fit cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-4 py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-gray-800"
+                >
+                  <HiOutlineBell className="h-5 w-5" />
+                  Đặt giá ngay
+                </button>
+              )}
             </div>
           )}
         </div>

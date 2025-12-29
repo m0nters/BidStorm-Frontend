@@ -1,9 +1,13 @@
+"use client";
+
 import { PageHero } from "@/components/layout/";
+import { SectionHeading } from "@/components/ui/common";
 import Link from "next/link";
 import {
   FiAward,
   FiCheckCircle,
   FiClock,
+  FiDisc,
   FiDollarSign,
   FiSearch,
   FiShield,
@@ -23,9 +27,12 @@ export default function HowItWorksPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="text-4xl font-bold text-gray-900">
+            <SectionHeading
+              id="buoc-bat-dau"
+              className="text-4xl font-bold text-gray-900"
+            >
               4 bước đơn giản để bắt đầu
-            </h2>
+            </SectionHeading>
             <p className="mt-4 text-lg text-gray-600">
               Tham gia đấu giá chỉ trong vài phút
             </p>
@@ -115,9 +122,12 @@ export default function HowItWorksPage() {
       <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="text-4xl font-bold text-gray-900">
+            <SectionHeading
+              id="tinh-nang-noi-bat"
+              className="text-4xl font-bold text-gray-900"
+            >
               Tính năng nổi bật
-            </h2>
+            </SectionHeading>
             <p className="mt-4 text-lg text-gray-600">
               Những gì làm cho BidStorm khác biệt
             </p>
@@ -197,7 +207,12 @@ export default function HowItWorksPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <h2 className="text-4xl font-bold text-gray-900">Tính năng</h2>
+            <SectionHeading
+              id="tinh-nang"
+              className="text-4xl font-bold text-gray-900"
+            >
+              Tính năng
+            </SectionHeading>
             <p className="mt-4 text-lg text-gray-600">
               Các tính năng cốt lõi của hệ thống
             </p>
@@ -233,16 +248,6 @@ export default function HowItWorksPage() {
                   <span className="text-gray-600">Thắng với giá tối ưu</span>
                 </li>
               </ul>
-              <div className="mt-6 rounded-lg bg-blue-50 p-4">
-                <p className="mb-2 text-sm font-semibold text-blue-900">
-                  Cách hoạt động:
-                </p>
-                <p className="text-sm text-blue-800">
-                  Bạn đặt giá tối đa là 11 triệu. Nếu người khác đặt 10.8 triệu,
-                  hệ thống tự động đấu 10.9 triệu thay bạn (nếu bước giá là
-                  100k). Bạn chỉ trả vừa đủ để thắng!
-                </p>
-              </div>
             </div>
 
             <div className="rounded-2xl border-2 border-gray-200 p-8 transition-colors hover:border-purple-500">
@@ -315,6 +320,231 @@ export default function HowItWorksPage() {
                   hạn. Đảm bảo mọi người có thời gian đấu giá công bằng.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Auto Bidding Detailed Explanation */}
+      <section className="bg-linear-to-b from-white to-gray-50 py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <SectionHeading
+              id="dau-gia-tu-dong"
+              className="text-4xl font-bold text-gray-900"
+            >
+              Đấu giá tự động hoạt động như thế nào?
+            </SectionHeading>
+            <p className="mt-4 text-lg text-gray-600">
+              Hiểu rõ cơ chế để tận dụng tối đa lợi thế của bạn
+            </p>
+          </div>
+
+          {/* Key Concept */}
+          <div className="mb-12 rounded-2xl bg-linear-to-br from-slate-700 to-slate-800 p-8 text-white shadow-xl">
+            <h3 className="mb-4 text-2xl font-bold">Nguyên tắc cơ bản</h3>
+            <p className="text-lg leading-relaxed">
+              Bạn đặt <span className="font-bold underline">giá tối đa</span>{" "}
+              bạn sẵn sàng trả cho sản phẩm. Hệ thống sẽ tự động đấu giá thay
+              bạn, bắt đầu từ giá hiện tại và tăng dần theo bước giá cho đến
+              khi:
+            </p>
+            <ul className="mt-4 space-y-2 text-lg">
+              <li className="flex items-start gap-3">
+                <span className="mt-1 text-2xl">✓</span>
+                <span>Bạn trở thành người đấu giá cao nhất</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-1 text-2xl">✓</span>
+                <span>Hoặc đã đạt đến giá tối đa của bạn</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Step by Step Example */}
+          <div className="mb-12">
+            <h3 className="mb-8 text-center text-3xl font-bold text-gray-900">
+              Ví dụ thực tế
+            </h3>
+            <div className="rounded-2xl border-2 border-gray-200 bg-white p-8">
+              <div className="mb-6 flex items-center gap-4 rounded-lg bg-gray-100 p-4">
+                <div className="text-sm text-gray-600">
+                  <p className="font-semibold">Thông tin sản phẩm:</p>
+                  <p>
+                    Giá khởi điểm:{" "}
+                    <span className="font-bold">10.000.000đ</span>
+                  </p>
+                  <p>
+                    Bước giá: <span className="font-bold">100.000đ</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Scenario 1 */}
+                <div className="rounded-lg border-l-4 border-green-500 bg-green-50 p-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="rounded-full bg-green-500 px-3 py-1 text-sm font-bold text-white">
+                      Bước 1
+                    </span>
+                    <h4 className="text-lg font-bold text-gray-900">
+                      Bạn đặt giá tối đa: 11.000.000đ
+                    </h4>
+                  </div>
+                  <p className="text-gray-700">
+                    Hệ thống sẽ đấu giá cho bạn với giá{" "}
+                    <span className="font-bold">10.000.000đ</span> (giá khởi
+                    điểm). Giá tối đa 11 triệu của bạn được{" "}
+                    <span className="font-bold text-green-700">giữ bí mật</span>
+                    .
+                  </p>
+                </div>
+
+                {/* Scenario 2 */}
+                <div className="rounded-lg border-l-4 border-blue-500 bg-blue-50 p-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="rounded-full bg-blue-500 px-3 py-1 text-sm font-bold text-white">
+                      Bước 2
+                    </span>
+                    <h4 className="text-lg font-bold text-gray-900">
+                      Người khác đấu: 10.500.000đ
+                    </h4>
+                  </div>
+                  <p className="text-gray-700">
+                    Hệ thống tự động đấu{" "}
+                    <span className="font-bold">10.600.000đ</span> cho bạn (giá
+                    của người kia + 1 bước giá). Bạn vẫn đang thắng!
+                  </p>
+                </div>
+
+                {/* Scenario 3 */}
+                <div className="rounded-lg border-l-4 border-purple-500 bg-purple-50 p-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="rounded-full bg-purple-500 px-3 py-1 text-sm font-bold text-white">
+                      Bước 3
+                    </span>
+                    <h4 className="text-lg font-bold text-gray-900">
+                      Người khác đấu: 10.800.000đ
+                    </h4>
+                  </div>
+                  <p className="text-gray-700">
+                    Hệ thống tự động đấu{" "}
+                    <span className="font-bold">10.900.000đ</span> cho bạn. Bạn
+                    vẫn chưa đạt giá tối đa nên vẫn đang thắng!
+                  </p>
+                </div>
+
+                {/* Scenario 4 */}
+                <div className="rounded-lg border-l-4 border-red-500 bg-red-50 p-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <span className="rounded-full bg-red-500 px-3 py-1 text-sm font-bold text-white">
+                      Bước 4
+                    </span>
+                    <h4 className="text-lg font-bold text-gray-900">
+                      Người khác đấu giá tối đa: 12.000.000đ
+                    </h4>
+                  </div>
+                  <p className="text-gray-700">
+                    Hệ thống cố gắng đấu cho bạn nhưng giá tối đa của bạn chỉ là
+                    11 triệu. Giá hiện tại sẽ là{" "}
+                    <span className="font-bold">11.000.000đ</span> (giá tối đa
+                    của bạn), nhưng{" "}
+                    <span className="font-bold text-red-700">
+                      người kia đang thắng
+                    </span>{" "}
+                    vì có giá tối đa cao hơn.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tie Breaking Rule */}
+          <div className="mb-12 overflow-hidden rounded-xl bg-slate-200 shadow-lg">
+            <div className="p-8">
+              <h3 className="mb-6 flex items-center gap-4 text-2xl font-semibold text-slate-900">
+                <FiClock className="h-10 w-10 text-slate-600" />
+                Quy tắc phá vỡ hòa
+              </h3>
+
+              <p className="mb-6 text-lg leading-relaxed text-slate-700">
+                Nếu hai người đặt{" "}
+                <span className="font-semibold">cùng giá tối đa</span>, ai đặt
+                trước sẽ thắng:
+              </p>
+
+              <div className="rounded-lg border border-slate-200 bg-slate-50 p-6">
+                <p className="mb-3 text-slate-700">
+                  <span className="font-semibold">Ví dụ:</span> Bạn đặt 11 triệu
+                  lúc 14:00. Người khác đặt 11 triệu lúc 14:05.
+                </p>
+
+                <p className="flex items-center gap-2 text-lg font-semibold text-green-700">
+                  <FiCheckCircle className="h-6 w-6 shrink-0 text-green-700" />
+                  Bạn thắng vì đặt trước!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Benefits Grid */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-xl border-2 border-gray-200 bg-white p-6">
+              <h4 className="mb-3 flex items-center gap-2 text-xl font-bold text-gray-900">
+                <FiCheckCircle className="text-green-600" />
+                Lợi ích cho bạn
+              </h4>
+              <ul className="space-y-3 text-slate-700">
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-slate-500" />
+                  <span>Không cần theo dõi liên tục 24/7</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-slate-500" />
+                  <span>
+                    Giá tối đa của bạn được giữ bí mật đối với người mua khác
+                  </span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-slate-500" />
+                  <span>Chỉ trả vừa đủ để thắng, không hơn</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-slate-500" />
+                  <span>Tiết kiệm thời gian và công sức</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border-2 border-gray-200 bg-white p-6">
+              <h4 className="mb-3 flex items-center gap-2 text-xl font-bold text-gray-900">
+                <FiShield className="h-5 w-5 text-blue-600" />{" "}
+                {/* Slightly smaller icon for balance */}
+                Lưu ý quan trọng
+              </h4>
+              <ul className="space-y-3 text-gray-700">
+                {" "}
+                {/* Increased space-y for better breathing room */}
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-gray-500" />{" "}
+                  {/* Solid dot, gray for subtlety */}
+                  <span>Chỉ đặt giá tối đa bạn thực sự sẵn sàng trả</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-gray-500" />
+                  <span>Bạn có thể tăng giá tối đa bất cứ lúc nào</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-gray-500" />
+                  <span>Không thể giảm hoặc hủy sau khi đặt</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <FiDisc className="h-4 w-4 shrink-0 text-gray-500" />
+                  <span>
+                    Chỉ người bán hoặc bạn mới có thể xem giá tối đa của mình
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
