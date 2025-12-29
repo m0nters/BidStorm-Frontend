@@ -16,6 +16,7 @@ interface UseProductBidsReturn {
   currentPrice: number | null;
   highestBidder: string | null;
   endTime: string | null;
+  isEnded: boolean | null;
   addBidOptimistically: (bid: BidResponse, newPrice: number) => void;
 }
 
@@ -29,6 +30,7 @@ export const useProductBids = (
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const [highestBidder, setHighestBidder] = useState<string | null>(null);
   const [endTime, setEndTime] = useState<string | null>(null);
+  const [isEnded, setIsEnded] = useState<boolean | null>(null);
   const clientRef = useRef<Client | null>(null);
   const ignoredBidIdsRef = useRef<Set<number>>(new Set());
   const lastRejectionTimestampRef = useRef<number>(0);
@@ -107,7 +109,7 @@ export const useProductBids = (
               return [event.bid!, ...updatedPreviousBids];
             });
 
-            // Update current price, highest bidder, and end time
+            // Update current price, highest bidder, end time, and isEnded
             if (event.currentPrice !== undefined) {
               setCurrentPrice(event.currentPrice);
             }
@@ -117,11 +119,56 @@ export const useProductBids = (
             if (event.endTime !== undefined) {
               setEndTime(event.endTime);
             }
+            if (event.isEnded !== undefined) {
+              setIsEnded(event.isEnded);
+            }
 
             // Show notification if not your own bid
             if (!event.bid.isYourself) {
               toast.info(
                 `${event.bid.bidderName} đã đặt giá ${event.bid.bidAmount.toLocaleString("vi-VN")}₫`,
+              );
+            }
+          } else if (event.type === "PRODUCT_BOUGHT_NOW" && event.bid) {
+            // Product was bought via Buy Now - add the buy-now bid
+            // Skip if this bid was just added via API (prevent duplicate)
+            if (ignoredBidIdsRef.current.has(event.bid.id)) {
+              return; // Don't delete from set, just skip
+            }
+
+            setBids((prev) => {
+              // Check if bid already exists (prevent duplicates)
+              const bidExists = prev.some((b) => b.id === event.bid!.id);
+
+              if (bidExists) {
+                return prev; // Don't add duplicate
+              }
+
+              // Clear isHighestBidder from all previous bids
+              const updatedPreviousBids = prev.map((b) => ({
+                ...b,
+                isHighestBidder: false,
+              }));
+
+              // Add buy-now bid to the beginning (most recent)
+              return [event.bid!, ...updatedPreviousBids];
+            });
+
+            // Update current price, highest bidder, and isEnded
+            if (event.currentPrice !== undefined) {
+              setCurrentPrice(event.currentPrice);
+            }
+            if (event.highestBidder !== undefined) {
+              setHighestBidder(event.highestBidder);
+            }
+            if (event.isEnded !== undefined) {
+              setIsEnded(event.isEnded);
+            }
+
+            // Show notification if not your own purchase
+            if (!event.bid.isYourself) {
+              toast.info(
+                `Sản phẩm đã được mua với giá ${event.currentPrice?.toLocaleString("vi-VN")}₫`,
               );
             }
           } else if (event.type === "BID_REJECTED") {
@@ -238,6 +285,7 @@ export const useProductBids = (
     currentPrice,
     highestBidder,
     endTime,
+    isEnded,
     addBidOptimistically,
   };
 };

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
 import { useProductBids } from "@/hooks/useProductBids";
-import { placeBid, removeBidder } from "@/services/bids";
+import { buyNow, placeBid, removeBidder } from "@/services/bids";
 import { getAutoExtendByMin, getAutoExtendTriggerMin } from "@/services/config";
 import {
   getDescriptionHistory,
@@ -67,10 +67,7 @@ export default function ProductDetailClient({
   const [showUpdateDescriptionDialog, setShowUpdateDescriptionDialog] =
     useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
-  const [removeConfirm, setRemoveConfirm] = useState<{
-    bidderId: number;
-    bidderName: string;
-  } | null>(null);
+  const [showBuyNowConfirm, setShowBuyNowConfirm] = useState(false);
 
   // Get real-time bid data (only after product is loaded)
   const {
@@ -80,11 +77,12 @@ export default function ProductDetailClient({
     currentPrice: realtimePrice,
     highestBidder: realtimeHighestBidder,
     endTime: realtimeEndTime,
+    isEnded: realtimeIsEnded,
   } = useProductBids(product?.id || 0, {
     isSeller: user?.id === product?.seller?.id,
   });
 
-  // Sync real-time price, highest bidder, and end time from WebSocket to product state
+  // Sync necessary real-time fields from WebSocket to product state
   useEffect(() => {
     if (!product) return;
 
@@ -109,6 +107,14 @@ export default function ProductDetailClient({
       needsUpdate = true;
     }
 
+    if (realtimeIsEnded !== null && realtimeIsEnded !== product.isEnded) {
+      updates.isEnded = realtimeIsEnded;
+      if (realtimeIsEnded) {
+        updates.winnerName = realtimeHighestBidder || undefined;
+      }
+      needsUpdate = true;
+    }
+
     if (needsUpdate) {
       setProduct((prev) => (prev ? { ...prev, ...updates } : prev));
     }
@@ -116,9 +122,11 @@ export default function ProductDetailClient({
     realtimePrice,
     realtimeHighestBidder,
     realtimeEndTime,
+    realtimeIsEnded,
     product?.currentPrice,
     product?.highestBidderName,
     product?.endTime,
+    product?.isEnded,
   ]);
 
   useEffect(() => {
@@ -208,12 +216,42 @@ export default function ProductDetailClient({
 
     try {
       await removeBidder(product.id, bidderId);
-      setRemoveConfirm(null);
       toast.success("Đã loại người dùng khỏi phiên đấu giá");
       // WebSocket will handle removing the bids automatically
     } catch (error) {
       console.error("Error removing bidder:", error);
       toast.error("Không thể loại người dùng");
+      throw error;
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+
+    try {
+      setShowBuyNowConfirm(false);
+      const bidResponse = await buyNow(product.id);
+      toast.success("Mua sản phẩm thành công!");
+
+      // Add bid optimistically to UI immediately (same as regular bid)
+      // Real-time updates will come via WebSocket for other users
+      addBidOptimistically(bidResponse, bidResponse.bidAmount);
+
+      // Update product state immediately
+      setProduct((prev) =>
+        prev
+          ? {
+              ...prev,
+              currentPrice: bidResponse.bidAmount,
+              isEnded: true,
+              winnerName: bidResponse.bidderName,
+              highestBidderName: bidResponse.bidderName,
+            }
+          : prev,
+      );
+    } catch (error: any) {
+      const errorMessage = error?.message || "Không thể mua sản phẩm";
+      toast.error(errorMessage);
     }
   };
 
@@ -373,7 +411,10 @@ export default function ProductDetailClient({
                     <p className="mb-2 text-2xl font-bold text-black">
                       {formatPrice(product.buyNowPrice)}
                     </p>
-                    <button className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white">
+                    <button
+                      onClick={() => setShowBuyNowConfirm(true)}
+                      className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white"
+                    >
                       <FiShoppingCart className="group-hover:animate-shake h-5 w-5" />
                       Mua ngay
                     </button>
@@ -471,11 +512,12 @@ export default function ProductDetailClient({
                         <p className="font-semibold text-gray-900">
                           {product.winnerName}
                         </p>
-                        {product.winnerRating !== undefined && (
-                          <span className="text-sm font-medium text-gray-900">
-                            ({product.winnerRating.toFixed(1)}%)
-                          </span>
-                        )}
+                        {product.winnerRating !== undefined &&
+                          product.winnerRating !== null && (
+                            <span className="text-sm font-medium text-gray-900">
+                              ({product.winnerRating.toFixed(1)}%)
+                            </span>
+                          )}
                       </div>
                     </div>
                   </div>
@@ -631,9 +673,9 @@ export default function ProductDetailClient({
                 maxRows={10}
                 showFadeEffect={true}
                 viewMoreLink={`/san-pham/${slug}/lich-su-dau-gia`}
-                onRemoveBidder={(bidderId, bidderName) =>
-                  setRemoveConfirm({ bidderId, bidderName })
-                }
+                isProductEnded={product.isEnded}
+                highestBidderName={product.highestBidderName}
+                onRemoveBidder={handleRemoveBidder}
               />
             </div>
           ) : (
@@ -689,29 +731,27 @@ export default function ProductDetailClient({
         onSubmit={handleBidSubmit}
         currentPrice={product.currentPrice}
         minimumBid={minimumBid}
-        priceStep={product.priceStep}
+        buyNowPrice={product.buyNowPrice}
       />
 
-      {/* Remove Bidder Confirmation Dialog */}
-      {removeConfirm !== null && (
+      {/* Buy Now Confirmation Dialog */}
+      {showBuyNowConfirm && product && (
         <ConfirmDialog
-          isOpen={removeConfirm !== null}
-          title="Loại người dùng"
+          isOpen={showBuyNowConfirm}
+          title="Xác nhận mua ngay"
           message={
             <>
-              Bạn có chắc chắn muốn loại{" "}
+              Bạn có chắc chắn muốn mua sản phẩm này với giá{" "}
               <span className="font-bold text-black">
-                {removeConfirm.bidderName}
-              </span>{" "}
-              khỏi phiên đấu giá này? Tất cả giá đặt của họ sẽ bị xóa.
+                {formatPrice(product.buyNowPrice!)}
+              </span>
+              ? Bạn sẽ không thể hủy sau khi xác nhận.
             </>
           }
-          confirmText="Loại"
+          confirmText="Mua ngay"
           cancelText="Hủy"
-          onConfirm={() =>
-            removeConfirm && handleRemoveBidder(removeConfirm.bidderId)
-          }
-          onCancel={() => setRemoveConfirm(null)}
+          onConfirm={handleBuyNow}
+          onCancel={() => setShowBuyNowConfirm(false)}
         />
       )}
 

@@ -43,3 +43,18 @@ export const removeBidder = async (
     auth: true,
   });
 };
+
+/**
+ * Buy a product immediately at buy now price
+ */
+export const buyNow = async (productId: number): Promise<BidResponse> => {
+  const response = await api.post<BidResponse>(
+    `/products/${productId}/buy-now`,
+    {},
+    {
+      cache: "no-store",
+      auth: true,
+    },
+  );
+  return response.data;
+};

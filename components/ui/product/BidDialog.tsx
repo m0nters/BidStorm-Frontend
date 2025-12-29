@@ -13,7 +13,7 @@ interface BidDialogProps {
   onSubmit: (amount: number) => Promise<void>;
   currentPrice: number;
   minimumBid: number;
-  priceStep: number;
+  buyNowPrice?: number;
 }
 
 export const BidDialog = ({
@@ -22,19 +22,26 @@ export const BidDialog = ({
   onSubmit,
   currentPrice,
   minimumBid,
-  priceStep,
+  buyNowPrice,
 }: BidDialogProps) => {
   const [bidAmount, setBidAmount] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showBuyNowWarning, setShowBuyNowWarning] = useState(false);
 
   useScrollLock(isOpen);
   if (!isOpen) return null;
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Show confirmation dialog instead of submitting immediately
-    setShowConfirm(true);
+    const bidValue = parseFloat(bidAmount) || 0;
+
+    // Check if bid is >= buy now price
+    if (buyNowPrice && bidValue >= buyNowPrice) {
+      setShowBuyNowWarning(true);
+    } else {
+      setShowConfirm(true);
+    }
   };
 
   const handleConfirmBid = async () => {
@@ -180,6 +187,28 @@ export const BidDialog = ({
         cancelText="Hủy"
         onConfirm={handleConfirmBid}
         onCancel={() => setShowConfirm(false)}
+      />
+
+      {/* Buy Now Warning Dialog */}
+      <ConfirmDialog
+        isOpen={showBuyNowWarning}
+        title="Cảnh báo: Mua ngay"
+        message={
+          <>
+            Số tiền bạn đặt đang lớn hơn hoặc bằng giá mua ngay. Hệ thống sẽ xử
+            lý cho bạn mua sản phẩm ngay lập tức với giá mua ngay là{" "}
+            <span className="font-bold text-black">
+              {buyNowPrice?.toLocaleString("vi-VN")}₫
+            </span>{" "}
+            và <span className="font-bold text-black">không thể hủy</span>.{" "}
+            <br />
+            Bạn có chắc chắn muốn tiếp tục?
+          </>
+        }
+        confirmText="Đồng ý, mua ngay"
+        cancelText="Hủy"
+        onConfirm={handleConfirmBid}
+        onCancel={() => setShowBuyNowWarning(false)}
       />
     </>
   );

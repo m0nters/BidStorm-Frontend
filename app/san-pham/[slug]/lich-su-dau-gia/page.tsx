@@ -1,6 +1,6 @@
 "use client";
 
-import { BiddingHistoryTable, ConfirmDialog } from "@/components/ui";
+import { BiddingHistoryTable } from "@/components/ui";
 import { useProductBids } from "@/hooks/useProductBids";
 import { removeBidder } from "@/services/bids";
 import { getProductDetailBySlug } from "@/services/products";
@@ -23,10 +23,6 @@ export default function BiddingHistoryPage() {
   const [product, setProduct] = useState<ProductDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [removeConfirm, setRemoveConfirm] = useState<{
-    bidderId: number;
-    bidderName: string;
-  } | null>(null);
 
   const isSeller = user?.id === product?.seller?.id;
   const {
@@ -34,11 +30,12 @@ export default function BiddingHistoryPage() {
     loading: bidsLoading,
     currentPrice: realtimePrice,
     endTime: realtimeEndTime,
+    isEnded: realtimeIsEnded,
   } = useProductBids(product?.id || 0, {
     isSeller,
   });
 
-  // Sync real-time price and end time from WebSocket to product state
+  // Sync necessary real-time fields from WebSocket to product state
   useEffect(() => {
     if (!product) return;
 
@@ -55,10 +52,22 @@ export default function BiddingHistoryPage() {
       needsUpdate = true;
     }
 
+    if (realtimeIsEnded !== null && realtimeIsEnded !== product.isEnded) {
+      updates.isEnded = realtimeIsEnded;
+      needsUpdate = true;
+    }
+
     if (needsUpdate) {
       setProduct((prev) => (prev ? { ...prev, ...updates } : prev));
     }
-  }, [realtimePrice, realtimeEndTime, product?.currentPrice, product?.endTime]);
+  }, [
+    realtimePrice,
+    realtimeEndTime,
+    realtimeIsEnded,
+    product?.currentPrice,
+    product?.endTime,
+    product?.isEnded,
+  ]);
 
   useEffect(() => {
     if (isInitializing) return;
@@ -84,12 +93,12 @@ export default function BiddingHistoryPage() {
 
     try {
       await removeBidder(product.id, bidderId);
-      setRemoveConfirm(null);
       toast.success("Đã loại người dùng khỏi phiên đấu giá");
       // WebSocket will handle removing the bids automatically
     } catch (error) {
       console.error("Error removing bidder:", error);
       toast.error("Không thể loại người dùng");
+      throw error;
     }
   };
 
@@ -157,9 +166,9 @@ export default function BiddingHistoryPage() {
               sellerId={product.seller?.id}
               loading={false}
               showActions={true}
-              onRemoveBidder={(bidderId, bidderName) =>
-                setRemoveConfirm({ bidderId, bidderName })
-              }
+              isProductEnded={product.isEnded}
+              highestBidderName={product.highestBidderName}
+              onRemoveBidder={handleRemoveBidder}
             />
           ) : (
             <div className="flex flex-col items-center rounded-lg bg-gray-50 py-12">
@@ -176,29 +185,6 @@ export default function BiddingHistoryPage() {
             </div>
           )}
         </div>
-
-        {/* Remove Bidder Confirmation Dialog */}
-        {removeConfirm !== null && (
-          <ConfirmDialog
-            isOpen={removeConfirm !== null}
-            title="Loại người dùng"
-            message={
-              <>
-                Bạn có chắc chắn muốn loại{" "}
-                <span className="font-bold text-black">
-                  {removeConfirm.bidderName}
-                </span>{" "}
-                khỏi phiên đấu giá này? Tất cả giá đặt của họ sẽ bị xóa.
-              </>
-            }
-            confirmText="Loại"
-            cancelText="Hủy"
-            onConfirm={() =>
-              removeConfirm && handleRemoveBidder(removeConfirm.bidderId)
-            }
-            onCancel={() => setRemoveConfirm(null)}
-          />
-        )}
       </div>
     </div>
   );
