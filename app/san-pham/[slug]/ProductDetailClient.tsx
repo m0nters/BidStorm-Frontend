@@ -145,7 +145,23 @@ export default function ProductDetailClient({
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Product data already fetched server-side, only fetch related data
+
+        // If user is logged in, refetch product with auth to get unmasked names
+        // This ensures seller and winner see correct names after page refresh
+        if (user) {
+          try {
+            const authenticatedProduct = await getProductDetailBySlug(
+              slug,
+              true,
+            );
+            setProduct(authenticatedProduct);
+          } catch (err) {
+            console.error("Error fetching authenticated product:", err);
+            // Keep using initialProduct if refetch fails
+          }
+        }
+
+        // Fetch configuration and related data
         const configTrigger = await getAutoExtendTriggerMin();
         const configDuration = await getAutoExtendByMin();
         const historyCount = await getDescriptionHistoryCount(
@@ -168,7 +184,7 @@ export default function ProductDetailClient({
     };
 
     fetchData();
-  }, [initialProduct.id, isInitializing]);
+  }, [initialProduct.id, isInitializing, user, slug]);
 
   // Handle highlight effect from query parameter
   // This effect runs on every render and waits for the ref to be available
@@ -448,7 +464,10 @@ export default function ProductDetailClient({
                       {formatPrice(product.buyNowPrice)}
                     </p>
                     <button
-                      onClick={() => setShowBuyNowConfirm(true)}
+                      onClick={() => {
+                        setShowBuyNowConfirm(true);
+                        setShowHighlight(false);
+                      }}
                       className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-black bg-white py-3 font-semibold text-black transition-all hover:scale-105 hover:bg-black hover:text-white"
                     >
                       <FiShoppingCart className="group-hover:animate-shake h-5 w-5" />
@@ -546,7 +565,9 @@ export default function ProductDetailClient({
                     <div className="rounded-lg bg-gray-50 p-3">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">
-                          {product.winnerName}
+                          {product.winnerName.includes("*")
+                            ? product.winnerName
+                            : `${product.winnerName} ${product.winnerName === user?.fullName ? "(Bạn)" : ""}`}
                         </p>
                         {product.winnerRating !== undefined &&
                           product.winnerRating !== null && (
@@ -579,6 +600,22 @@ export default function ProductDetailClient({
                   Đăng nhập để đấu giá
                 </Link>
               )}
+
+              {/* Order Completion Button - Show when auction ended */}
+              {product.isEnded &&
+                user &&
+                (user.id === product.seller.id ||
+                  (product.winnerName &&
+                    (product.winnerName === user.fullName ||
+                      product.winnerName.includes("Bạn")))) && (
+                  <Link
+                    href={`/san-pham/${slug}/hoan-tat-don-hang`}
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 py-3 font-semibold text-white transition-all hover:scale-105 hover:bg-green-700"
+                  >
+                    <FiShoppingCart className="h-5 w-5" />
+                    Hoàn tất đơn hàng
+                  </Link>
+                )}
             </div>
 
             {/* Additional Info */}

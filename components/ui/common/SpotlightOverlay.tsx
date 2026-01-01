@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 
 interface SpotlightOverlayProps {
-  targetRef: React.RefObject<HTMLElement>;
+  targetRef: RefObject<HTMLElement>;
   isVisible: boolean;
   onDismiss: () => void;
   padding?: number;

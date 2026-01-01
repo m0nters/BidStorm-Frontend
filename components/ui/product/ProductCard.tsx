@@ -38,15 +38,20 @@ export function ProductCard({ product }: ProductCardProps) {
     return () => clearInterval(timer);
   }, [product.endTime]);
 
-  const handleBuyNow = (e: React.MouseEvent) => {
-    e.preventDefault();
-    // Navigate to product detail page with highlight parameter
+  const handleCardClick = () => {
+    router.push(`/san-pham/${product.slug}`);
+  };
+
+  const handleBuyNow = () => {
     router.push(`/san-pham/${product.slug}?highlight=buyNow`);
   };
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-100">
-      <Link href={`/san-pham/${product.slug}`} className="relative block">
+    <div
+      className="group cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl active:scale-100"
+      onClick={handleCardClick} // Makes the whole card navigate to product detail
+    >
+      <div className="relative block">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           {/* Product Image */}
           <Image
@@ -218,7 +223,10 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Buy Now Button */}
           {product.buyNowPrice && new Date(product.endTime) > new Date() && (
             <button
-              onClick={handleBuyNow}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBuyNow();
+              }}
               className="group/buy w-full cursor-pointer rounded-lg bg-black py-2 text-white transition-all duration-200 hover:scale-105"
             >
               <p>Mua ngay</p>
@@ -231,7 +239,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </button>
           )}
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 
 interface AuthenticatedLayoutProps {
   children: ReactNode;
@@ -20,22 +20,19 @@ export function AuthenticatedLayout({
   redirectTo = "/dang-nhap",
 }: AuthenticatedLayoutProps) {
   const router = useRouter();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const [isChecking, setIsChecking] = useState(true);
+  const { isAuthenticated, isInitializing } = useAuthStore();
 
   useEffect(() => {
-    // Small delay to check auth state
-    const timer = setTimeout(() => {
-      setIsChecking(false);
-      if (!isAuthenticated) {
-        router.push(redirectTo);
-      }
-    }, 100);
+    // Wait for auth to initialize before redirecting
+    if (isInitializing) return;
 
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, redirectTo, router]);
+    if (!isAuthenticated) {
+      router.push(redirectTo);
+    }
+  }, [isAuthenticated, isInitializing, redirectTo, router]);
 
-  if (isChecking || !isAuthenticated) {
+  // Show loading while initializing or not authenticated
+  if (isInitializing || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">

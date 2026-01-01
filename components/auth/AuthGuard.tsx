@@ -21,13 +21,28 @@ export function AuthGuard({
   requireAuth = true,
 }: AuthGuardProps) {
   const router = useRouter();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { isAuthenticated, isInitializing } = useAuthStore();
 
   useEffect(() => {
+    // Wait for auth to initialize before redirecting
+    if (isInitializing) return;
+
     if (requireAuth && !isAuthenticated) {
       router.push(redirectTo);
     }
-  }, [isAuthenticated, requireAuth, redirectTo, router]);
+  }, [isAuthenticated, isInitializing, requireAuth, redirectTo, router]);
+
+  // Show loading while initializing
+  if (isInitializing) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-300 border-t-black"></div>
+          <p className="text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Don't render children if authentication is required but user is not authenticated
   if (requireAuth && !isAuthenticated) {

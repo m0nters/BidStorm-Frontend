@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { FiHash } from "react-icons/fi";
 
 interface SectionHeadingProps {
@@ -15,16 +16,22 @@ export const SectionHeading = ({
   description,
   className = "",
 }: SectionHeadingProps) => {
+  const titleRef = useRef<HTMLDivElement>(null);
+
+  const jumpToTitle = () => {
+    if (titleRef.current) {
+      titleRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
   return (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-start" ref={titleRef}>
       <div className="group flex w-full items-center justify-start">
         <h2 id={id} className={className}>
           {title}
         </h2>
         <button
-          onClick={() => {
-            window.location.hash = id;
-          }}
+          onClick={jumpToTitle}
           className="ml-2 cursor-pointer opacity-0 transition-opacity group-hover:opacity-100"
           aria-label="Copy link to section"
         >

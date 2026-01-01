@@ -78,6 +78,24 @@ export const login = async (credentials: LoginRequest) => {
 - Auto-redirects to `/dang-nhap` on 401 (except guest pages)
 - Adds `Authorization: Bearer {token}` when `auth: true` option is set
 - All endpoints are **relative** to `API_FULL_URL` from `api/config.ts`
+- **Error messages from backend**: When API calls fail, the error message from the backend is available in the thrown error object directly (already extracted by the wrapper)
+
+**Critical Error Handling Pattern**:
+
+```typescript
+// CORRECT - Backend error message is already in error object
+try {
+  await someApiCall();
+} catch (error: any) {
+  const errorMessage = error?.message || "Default fallback message";
+  toast.error(errorMessage);
+}
+
+// WRONG - Don't try to access error.response.data.message
+// The api wrapper already extracts it for you
+```
+
+**Never use** `error.response.data.message` or similar - the custom API wrapper in `api/fetch.ts` already extracts the backend error message and throws it directly in `error.message`.
 
 ### 2. Authentication Flow
 

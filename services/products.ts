@@ -64,9 +64,12 @@ export const getTopEndingSoonProducts = async () => {
  * Get product detail by slug
  * For product detail page
  */
-export const getProductDetailBySlug = async (slug: string) => {
+export const getProductDetailBySlug = async (
+  slug: string,
+  incrementViewCount: boolean = false,
+) => {
   const response = await api.get<ProductDetailResponse>(
-    `/products/slug/${slug}`,
+    `/products/slug/${slug}?incrementViewCount=${incrementViewCount}`,
     {
       auth: true,
       cache: "no-store", // Don't cache - data changes frequently with bids

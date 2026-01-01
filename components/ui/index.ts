@@ -4,4 +4,5 @@ export * from "./common";
 export * from "./form";
 export * from "./gallery";
 export * from "./home";
+export * from "./order";
 export * from "./product";

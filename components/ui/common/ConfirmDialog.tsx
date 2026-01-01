@@ -22,8 +22,8 @@ export const ConfirmDialog = ({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) => {
-  if (!isOpen) return null;
   useScrollLock(isOpen);
+  if (!isOpen) return null;
 
   return (
     <div

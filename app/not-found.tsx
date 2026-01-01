@@ -30,17 +30,15 @@ export default function NotFound() {
         </div>
 
         {/* Action Button */}
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Link
-            href="/"
-            className="group inline-flex items-center gap-2 rounded-full bg-black px-8 py-4 text-lg font-semibold text-white hover:bg-gray-800 hover:shadow-lg"
-          >
-            <FiHome className="h-5 w-5 transition-all duration-200 group-hover:-translate-x-1" />
-            <p className="transition-all duration-200 group-hover:translate-x-1">
-              Về trang chủ
-            </p>
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="group inline-flex items-center gap-2 rounded-full bg-black px-8 py-4 text-lg font-semibold text-white hover:bg-gray-800 hover:shadow-lg"
+        >
+          <FiHome className="h-5 w-5 transition-all duration-200 group-hover:-translate-x-1" />
+          <p className="transition-all duration-200 group-hover:translate-x-1">
+            Về trang chủ
+          </p>
+        </Link>
       </div>
     </div>
   );

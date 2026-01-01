@@ -132,7 +132,6 @@ export const useProductComments = (
 
     let socket: any = null;
     let stompClient: Client | null = null;
-    let mounted = true;
 
     const connect = () => {
       socket = new SockJS(WS_BASE_URL);
@@ -152,8 +151,6 @@ export const useProductComments = (
         heartbeatOutgoing: 4000,
         connectHeaders, // Send JWT in CONNECT frame
         onConnect: () => {
-          if (!mounted) return;
-
           isConnectedRef.current = true;
 
           // Subscribe to appropriate channel based on user role
@@ -197,7 +194,6 @@ export const useProductComments = (
     const timeoutId = setTimeout(connect, 100);
 
     return () => {
-      mounted = false;
       clearTimeout(timeoutId);
       if (stompClientRef.current?.active) {
         stompClientRef.current.deactivate();
