@@ -1,0 +1,24 @@
+export interface ReviewResponse {
+  id: number;
+  productId: number;
+  productTitle: string;
+  productUrl: string;
+  thumbnailUrl: string;
+  isYourProduct?: boolean;
+  reviewerId: number;
+  reviewerName: string;
+  rating: number; // 1 for positive, -1 for negative
+  comment: string;
+  createdAt: string;
+}
+
+export interface CreateReviewRequest {
+  productId: number;
+  rating: number; // 1 for positive, -1 for negative
+  comment?: string;
+}
+
+export interface UpdateReviewRequest {
+  rating: number; // 1 for positive, -1 for negative
+  comment?: string;
+}

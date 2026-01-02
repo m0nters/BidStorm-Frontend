@@ -137,7 +137,7 @@ export function Header({ categories }: HeaderProps) {
                       className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
                     >
                       <FiTrendingUp className="h-4 w-4" />
-                      <span>Đấu giá</span>
+                      <span>Sản phẩm đấu giá</span>
                     </Link>
                     {user?.role && hasRolePermission(user.role, "SELLER") && (
                       <Link

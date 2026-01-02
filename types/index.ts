@@ -6,3 +6,5 @@ export * from "./order";
 export * from "./otp";
 export * from "./product";
 export * from "./profile";
+export * from "./review";
+export * from "./reviewee";

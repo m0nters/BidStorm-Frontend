@@ -1,6 +1,8 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/ui/common";
+import { getUserReviewForProduct } from "@/services/reviews";
+import { ReviewResponse } from "@/types";
 import {
   InitiatePaymentRequest,
   OrderStatus,
@@ -19,8 +21,16 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FaChevronLeft } from "react-icons/fa6";
-import { FiCheck, FiMapPin, FiPackage, FiPhone, FiTruck } from "react-icons/fi";
+import {
+  FiCheck,
+  FiMapPin,
+  FiPackage,
+  FiPhone,
+  FiStar,
+  FiTruck,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
+import { ReviewDialog } from "./ReviewDialog";
 
 // Initialize Stripe (you should get this from env or config)
 const stripePromise = loadStripe(
@@ -31,6 +41,8 @@ interface PaymentPanelProps {
   order: OrderStatusResponse;
   productThumbnailUrl: string;
   productUrl: string;
+  productTitle: string;
+  productId: number;
   isBuyer: boolean;
   onInitiatePayment: (data: InitiatePaymentRequest) => Promise<string>; // Returns clientSecret
   onMarkShipped: (trackingNumber: string) => Promise<void>;
@@ -43,6 +55,8 @@ export const PaymentPanel = ({
   order,
   productThumbnailUrl,
   productUrl,
+  productTitle,
+  productId,
   isBuyer,
   onInitiatePayment,
   onMarkShipped,
@@ -60,6 +74,11 @@ export const PaymentPanel = ({
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showShippingForm, setShowShippingForm] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [existingReview, setExistingReview] = useState<ReviewResponse | null>(
+    null,
+  );
+  const [loadingReviewStatus, setLoadingReviewStatus] = useState(true);
 
   // Update form fields when order changes (e.g., from WebSocket)
   useEffect(() => {
@@ -73,6 +92,22 @@ export const PaymentPanel = ({
       setClientSecret(null);
     }
   }, [order.status, clientSecret]);
+
+  // Fetch review status
+  useEffect(() => {
+    const fetchReviewStatus = async () => {
+      try {
+        setLoadingReviewStatus(true);
+        const review = await getUserReviewForProduct(productId);
+        setExistingReview(review);
+      } catch (error) {
+        console.error("Failed to fetch review status:", error);
+      } finally {
+        setLoadingReviewStatus(false);
+      }
+    };
+    fetchReviewStatus();
+  }, [productId]);
 
   // Auto-initiate payment if shipping info already exists (unless user wants to edit)
   useEffect(() => {
@@ -491,6 +526,33 @@ export const PaymentPanel = ({
             </div>
           )}
         </div>
+
+        {/* Independent Review Section - Always visible except when cancelled */}
+        {order.status !== "CANCELLED" && (
+          <div className="mt-6 border-t border-gray-200 pt-6">
+            <button
+              onClick={() => setShowReviewDialog(true)}
+              disabled={loadingReviewStatus}
+              className={
+                `flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 font-semibold transition-colors ` +
+                (existingReview
+                  ? "border-black bg-black text-white hover:bg-gray-800 disabled:bg-gray-800/50"
+                  : "border-black bg-white text-black hover:bg-gray-50 disabled:border-gray-300 disabled:text-gray-400")
+              }
+            >
+              <FiStar
+                className={`h-5 w-5 ${existingReview ? "text-white" : "text-black"}`}
+              />
+              {existingReview
+                ? isBuyer
+                  ? "Đánh giá lại người bán"
+                  : "Đánh giá lại người mua"
+                : isBuyer
+                  ? "Đánh giá người bán"
+                  : "Đánh giá người mua"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Confirm Dialog */}
@@ -520,6 +582,31 @@ export const PaymentPanel = ({
         cancelText="Không"
         onConfirm={handleCancelOrder}
         onCancel={() => setShowCancelDialog(false)}
+      />
+
+      {/* Review Dialog */}
+      <ReviewDialog
+        isOpen={showReviewDialog}
+        onClose={() => setShowReviewDialog(false)}
+        productId={productId}
+        productTitle={productTitle}
+        title={
+          existingReview
+            ? isBuyer
+              ? "Đánh giá lại người bán"
+              : "Đánh giá lại người mua"
+            : isBuyer
+              ? "Đánh giá người bán"
+              : "Đánh giá người mua"
+        }
+        hasReviewed={existingReview !== null}
+        existingReview={existingReview}
+        onReviewSubmitted={async () => {
+          // Refetch the review to update the UI
+          const review = await getUserReviewForProduct(productId);
+          setExistingReview(review);
+          onRefreshOrder();
+        }}
       />
     </div>
   );
