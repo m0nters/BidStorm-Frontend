@@ -1,12 +1,13 @@
 "use client";
 
-import { AuthenticatedLayout } from "@/components/auth";
+import { AuthenticatedLayout, RoleGuard } from "@/components/auth";
 import {
   BiddingSection,
   ChangePasswordSection,
   FavoritesSection,
   ProfileInfoSection,
   ReviewsSection,
+  SellerProductsSection,
 } from "@/components/profile/";
 import { logout } from "@/services/auth";
 import { getProfile } from "@/services/profile";
@@ -19,6 +20,7 @@ import {
   FiHeart,
   FiLock,
   FiLogOut,
+  FiPackage,
   FiStar,
   FiTrendingUp,
   FiUser,
@@ -30,7 +32,8 @@ type TabType =
   | "doi-mat-khau"
   | "yeu-thich"
   | "san-pham-dau-gia"
-  | "danh-gia";
+  | "danh-gia"
+  | "san-pham-cua-toi";
 
 export default function ProfilePage() {
   return (
@@ -59,6 +62,7 @@ function ProfilePageContent() {
         "yeu-thich",
         "san-pham-dau-gia",
         "danh-gia",
+        "san-pham-cua-toi",
       ].includes(tabParam)
     ) {
       setActiveTab(tabParam);
@@ -111,6 +115,9 @@ function ProfilePageContent() {
     { id: "yeu-thich", label: "Sản phẩm yêu thích", icon: FiHeart },
     { id: "san-pham-dau-gia", label: "Sản phẩm đấu giá", icon: FiTrendingUp },
     { id: "danh-gia", label: "Đánh giá của tôi", icon: FiStar },
+    ...(profile?.role === "SELLER" || profile?.role === "ADMIN"
+      ? [{ id: "san-pham-cua-toi", label: "Sản phẩm của tôi", icon: FiPackage }]
+      : []),
   ];
 
   const handleTabChange = (tabId: TabType) => {
@@ -228,6 +235,11 @@ function ProfilePageContent() {
               {activeTab === "yeu-thich" && <FavoritesSection />}
               {activeTab === "san-pham-dau-gia" && <BiddingSection />}
               {activeTab === "danh-gia" && <ReviewsSection />}
+              {activeTab === "san-pham-cua-toi" && (
+                <RoleGuard allowedRoles={["SELLER"]}>
+                  <SellerProductsSection />
+                </RoleGuard>
+              )}
             </div>
           </div>
         </div>

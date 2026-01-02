@@ -124,3 +124,35 @@ export interface CreateProductResponse {
   createdAt: string;
   imageCount: number;
 }
+
+export interface SellerActiveProductResponse {
+  id: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string;
+  startingPrice: number;
+  currentPrice: number;
+  buyNowPrice?: number;
+  bidCount: number;
+  endTime: string;
+  createdAt: string;
+  categoryName: string;
+  categorySlug: string;
+}
+
+export interface SellerEndedProductResponse {
+  productId: number;
+  title: string;
+  slug: string;
+  thumbnailUrl: string;
+  startingPrice: number;
+  finalPrice: number;
+  endTime: string;
+  winnerId?: number;
+  winnerName?: string;
+  winnerPositiveRating?: number;
+  winnerNegativeRating?: number;
+  hasReviewed: boolean;
+  orderStatus?: string;
+  orderId?: number; // Order ID if order exists
+}

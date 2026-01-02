@@ -7,6 +7,8 @@ import {
   DescriptionLogResponse,
   ProductDetailResponse,
   ProductListResponse,
+  SellerActiveProductResponse,
+  SellerEndedProductResponse,
 } from "@/types/product";
 import { api } from "../api/fetch";
 
@@ -264,6 +266,53 @@ export const getDescriptionHistoryCount = async (productId: number) => {
   const response = await api.get<number>(
     `/products/${productId}/description-history/count`,
     {
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Get seller's active products
+ * GET /profile/seller/products/active
+ */
+export const getSellerActiveProducts = async (params: {
+  page?: number;
+  size?: number;
+}) => {
+  const searchParams = new URLSearchParams();
+  if (params.page !== undefined)
+    searchParams.set("page", params.page.toString());
+  if (params.size !== undefined)
+    searchParams.set("size", params.size.toString());
+
+  const response = await api.get<
+    PaginatedResponse<SellerActiveProductResponse>
+  >(`/profile/seller/products/active?${searchParams.toString()}`, {
+    auth: true,
+    cache: "no-store",
+  });
+  return response.data;
+};
+
+/**
+ * Get seller's ended products
+ * GET /profile/seller/products/ended
+ */
+export const getSellerEndedProducts = async (params: {
+  page?: number;
+  size?: number;
+}) => {
+  const searchParams = new URLSearchParams();
+  if (params.page !== undefined)
+    searchParams.set("page", params.page.toString());
+  if (params.size !== undefined)
+    searchParams.set("size", params.size.toString());
+
+  const response = await api.get<PaginatedResponse<SellerEndedProductResponse>>(
+    `/profile/seller/products/ended?${searchParams.toString()}`,
+    {
+      auth: true,
       cache: "no-store",
     },
   );

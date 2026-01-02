@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { Pagination } from "../../ui/common";
-import { ReviewCard } from "../ReviewCard";
+import { ReviewCard } from "./ReviewCard";
 
 export function ReviewsReceivedTab() {
   const [reviews, setReviews] = useState<ReviewResponse[]>([]);

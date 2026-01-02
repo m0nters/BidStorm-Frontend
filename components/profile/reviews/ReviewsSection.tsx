@@ -28,33 +28,30 @@ export function ReviewsSection() {
   return (
     <div>
       {/* Tabs */}
-      <div className="mb-6 flex items-center gap-4 border-b border-gray-200">
+      <div className="relative mb-6 flex items-center gap-4 border-b border-gray-200">
         <button
           onClick={() => handleTabChange("cua-ban")}
-          className={`relative cursor-pointer px-4 py-3 text-sm font-semibold transition-colors ${
+          className={`cursor-pointer px-4 py-3 text-sm font-semibold transition-colors ${
             activeTab === "cua-ban"
               ? "text-black"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
           Đánh giá của bạn
-          {activeTab === "cua-ban" && (
-            <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-black"></div>
-          )}
         </button>
         <button
           onClick={() => handleTabChange("nhan-duoc")}
-          className={`relative cursor-pointer px-4 py-3 text-sm font-semibold transition-colors ${
+          className={`cursor-pointer px-4 py-3 text-sm font-semibold transition-colors ${
             activeTab === "nhan-duoc"
               ? "text-black"
               : "text-gray-500 hover:text-gray-700"
           }`}
         >
           Đánh giá nhận được
-          {activeTab === "nhan-duoc" && (
-            <div className="absolute right-0 bottom-0 left-0 h-0.5 bg-black"></div>
-          )}
         </button>
+        <div
+          className={`absolute bottom-0 h-0.5 bg-black transition-all duration-200 ${activeTab === "cua-ban" ? "left-0 w-[158px]" : "left-44 w-44"}`}
+        />
       </div>
 
       {/* Tab Content */}
