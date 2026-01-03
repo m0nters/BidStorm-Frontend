@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SellerActiveTab } from "./SellerActiveTab";
 import { SellerEndedTab } from "./SellerEndedTab";
@@ -9,6 +9,7 @@ type SellerProductTabType = "dang-dang" | "da-ket-thuc";
 
 export function SellerProductsSection() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<SellerProductTabType>("dang-dang");
 
@@ -22,8 +23,14 @@ export function SellerProductsSection() {
 
   const handleTabChange = (tab: SellerProductTabType) => {
     setActiveTab(tab);
-    router.push(`/tai-khoan?tab=san-pham-cua-toi&sub=${tab}`);
+    router.push(`/tai-khoan?tab=san-pham-dang-ban&sub=${tab}`);
   };
+
+  useEffect(() => {
+    if (!searchParams.has("sub")) {
+      router.replace(`${pathname}?tab=san-pham-dang-ban&sub=dang-dang`);
+    }
+  }, [searchParams, router, pathname]);
 
   return (
     <div>

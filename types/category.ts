@@ -8,3 +8,8 @@ export interface CategoryResponse {
   isParent: boolean;
   childrenCount: number;
 }
+
+export interface CreateCategoryRequest {
+  name: string;
+  parentId: number | null;
+}

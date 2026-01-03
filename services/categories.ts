@@ -7,10 +7,11 @@ import { api } from "../api/fetch";
  */
 export const getAllCategories = async () => {
   const response = await api.get<CategoryResponse[]>("/categories", {
-    next: {
-      revalidate: 3600, // Cache for 1 hour (categories don't change often)
-      tags: ["categories"],
-    },
+    // next: {
+    //   revalidate: 3600, // Cache for 1 hour (categories don't change often)
+    //   tags: ["categories"],
+    // },
+    cache: "no-store",
   });
   return response.data;
 };
@@ -22,10 +23,11 @@ export const getCategoryBySlug = async (slug: string) => {
   const response = await api.get<CategoryResponse>(
     `/categories/slug?slug=${slug}`,
     {
-      next: {
-        revalidate: 3600,
-        tags: [`category-slug-${slug}`, "categories"],
-      },
+      // next: {
+      //   revalidate: 3600,
+      //   tags: [`category-slug-${slug}`, "categories"],
+      // },
+      cache: "no-store",
     },
   );
   return response.data;
@@ -38,10 +40,11 @@ export const getParentCategoryByCategoryId = async (categoryId: number) => {
   const response = await api.get<CategoryResponse>(
     `/categories/${categoryId}/parent`,
     {
-      next: {
-        revalidate: 3600,
-        tags: [`category-${categoryId}-parent`, "categories"],
-      },
+      // next: {
+      //   revalidate: 3600,
+      //   tags: [`category-${categoryId}-parent`, "categories"],
+      // },
+      cache: "no-store",
     },
   );
   return response.data;
@@ -54,10 +57,11 @@ export const getSubCategories = async (parentId: number) => {
   const response = await api.get<CategoryResponse[]>(
     `/categories/${parentId}/sub-categories`,
     {
-      next: {
-        revalidate: 3600,
-        tags: [`category-${parentId}-sub-categories`, "categories"],
-      },
+      // next: {
+      //   revalidate: 3600,
+      //   tags: [`category-${parentId}-sub-categories`, "categories"],
+      // },
+      cache: "no-store",
     },
   );
   return response.data;
@@ -69,10 +73,11 @@ export const getSubCategories = async (parentId: number) => {
  */
 export const getParentCategories = async () => {
   const response = await api.get<CategoryResponse[]>("/categories/parents", {
-    next: {
-      revalidate: 3600,
-      tags: ["parent-categories", "categories"],
-    },
+    // next: {
+    //   revalidate: 3600,
+    //   tags: ["parent-categories", "categories"],
+    // },
+    cache: "no-store",
   });
   return response.data;
 };

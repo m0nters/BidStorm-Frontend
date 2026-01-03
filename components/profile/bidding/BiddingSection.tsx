@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BiddingActiveTab } from "./BiddingActiveTab";
 import { BiddingWonTab } from "./BiddingWonTab";
@@ -9,6 +9,7 @@ type BiddingTabType = "dang-dau-gia" | "da-thang";
 
 export function BiddingSection() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<BiddingTabType>("dang-dau-gia");
 
@@ -24,6 +25,12 @@ export function BiddingSection() {
     setActiveTab(tab);
     router.push(`/tai-khoan?tab=san-pham-dau-gia&sub=${tab}`);
   };
+
+  useEffect(() => {
+    if (!searchParams.has("sub")) {
+      router.replace(`${pathname}?tab=san-pham-dau-gia&sub=dang-dau-gia`);
+    }
+  }, [searchParams, router, pathname]);
 
   return (
     <div>

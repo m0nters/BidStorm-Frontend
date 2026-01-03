@@ -6,3 +6,4 @@ export * from "./ProfileInfoSection";
 export * from "./reviews";
 export * from "./reviews/ReviewCard";
 export * from "./seller";
+export * from "./UpgradeRequestSection";

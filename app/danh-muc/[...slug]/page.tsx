@@ -4,7 +4,7 @@ import {
   getProductsByCategory,
 } from "@/api";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import CategoryNotFound from "./CategoryNotFound";
 import CategoryPageClient from "./CategoryPageClient";
 
 interface CategoryPageProps {
@@ -77,6 +77,6 @@ export default async function CategoryPage({
     );
   } catch (error) {
     console.error("Error loading category page:", error);
-    notFound();
+    return <CategoryNotFound />;
   }
 }

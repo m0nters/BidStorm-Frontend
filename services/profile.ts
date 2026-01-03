@@ -1,3 +1,7 @@
+import {
+  MyUpgradeRequestResponse,
+  SubmitUpgradeRequestRequest,
+} from "@/types/admin";
 import { PaginatedResponse } from "@/types/api";
 import {
   BiddingProductResponse,
@@ -121,6 +125,34 @@ export const getBiddingProducts = async (
 export const getWonProducts = async (page: number = 0, size: number = 10) => {
   const response = await api.get<PaginatedResponse<WonProductResponse>>(
     `/profile/won?page=${page}&size=${size}`,
+    {
+      auth: true,
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Submit upgrade request to become a seller
+ * POST /api/v1/profile/upgrade-request
+ */
+export const submitUpgradeRequest = async (
+  data: SubmitUpgradeRequestRequest,
+) => {
+  const response = await api.post<void>("/profile/upgrade-request", data, {
+    auth: true,
+  });
+  return response.data;
+};
+
+/**
+ * Get my upgrade request status
+ * GET /api/v1/profile/upgrade-request
+ */
+export const getMyUpgradeRequestStatus = async () => {
+  const response = await api.get<MyUpgradeRequestResponse | null>(
+    "/profile/upgrade-request",
     {
       auth: true,
       cache: "no-store",

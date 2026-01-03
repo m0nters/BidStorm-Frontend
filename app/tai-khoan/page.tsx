@@ -8,12 +8,13 @@ import {
   ProfileInfoSection,
   ReviewsSection,
   SellerProductsSection,
+  UpgradeRequestSection,
 } from "@/components/profile/";
 import { logout } from "@/services/auth";
 import { getProfile } from "@/services/profile";
 import { useAuthStore } from "@/store/authStore";
 import { UserProfileResponse } from "@/types/profile";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   FiCheckCircle,
@@ -33,7 +34,8 @@ type TabType =
   | "yeu-thich"
   | "san-pham-dau-gia"
   | "danh-gia"
-  | "san-pham-cua-toi";
+  | "san-pham-dang-ban"
+  | "nang-cap-tai-khoan";
 
 export default function ProfilePage() {
   return (
@@ -45,6 +47,7 @@ export default function ProfilePage() {
 
 function ProfilePageContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const [activeTab, setActiveTab] = useState<TabType>("thong-tin");
@@ -62,7 +65,8 @@ function ProfilePageContent() {
         "yeu-thich",
         "san-pham-dau-gia",
         "danh-gia",
-        "san-pham-cua-toi",
+        "san-pham-dang-ban",
+        "nang-cap-tai-khoan",
       ].includes(tabParam)
     ) {
       setActiveTab(tabParam);
@@ -73,6 +77,12 @@ function ProfilePageContent() {
   useEffect(() => {
     loadProfile();
   }, []);
+
+  useEffect(() => {
+    if (!searchParams.has("tab")) {
+      router.replace(`${pathname}?tab=thong-tin`);
+    }
+  }, [searchParams, router, pathname]);
 
   const loadProfile = async () => {
     try {
@@ -114,9 +124,24 @@ function ProfilePageContent() {
     { id: "doi-mat-khau", label: "Đổi mật khẩu", icon: FiLock },
     { id: "yeu-thich", label: "Sản phẩm yêu thích", icon: FiHeart },
     { id: "san-pham-dau-gia", label: "Sản phẩm đấu giá", icon: FiTrendingUp },
-    { id: "danh-gia", label: "Đánh giá của tôi", icon: FiStar },
     ...(profile?.role === "SELLER" || profile?.role === "ADMIN"
-      ? [{ id: "san-pham-cua-toi", label: "Sản phẩm của tôi", icon: FiPackage }]
+      ? [
+          {
+            id: "san-pham-dang-ban",
+            label: "Sản phẩm đăng bán",
+            icon: FiPackage,
+          },
+        ]
+      : []),
+    { id: "danh-gia", label: "Đánh giá của tôi", icon: FiStar },
+    ...(profile?.role === "BIDDER"
+      ? [
+          {
+            id: "nang-cap-tai-khoan",
+            label: "Nâng cấp tài khoản",
+            icon: FiTrendingUp,
+          },
+        ]
       : []),
   ];
 
@@ -234,10 +259,15 @@ function ProfilePageContent() {
               {activeTab === "doi-mat-khau" && <ChangePasswordSection />}
               {activeTab === "yeu-thich" && <FavoritesSection />}
               {activeTab === "san-pham-dau-gia" && <BiddingSection />}
-              {activeTab === "danh-gia" && <ReviewsSection />}
-              {activeTab === "san-pham-cua-toi" && (
+              {activeTab === "san-pham-dang-ban" && (
                 <RoleGuard allowedRoles={["SELLER"]}>
                   <SellerProductsSection />
+                </RoleGuard>
+              )}
+              {activeTab === "danh-gia" && <ReviewsSection />}
+              {activeTab === "nang-cap-tai-khoan" && (
+                <RoleGuard allowedRoles={["BIDDER"]}>
+                  <UpgradeRequestSection />
                 </RoleGuard>
               )}
             </div>

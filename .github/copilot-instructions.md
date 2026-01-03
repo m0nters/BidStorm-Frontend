@@ -428,6 +428,9 @@ npm run clean-start  # Clear cache + dev
 5. **Pagination**: Spring Boot format (`number`, `size`, `totalElements`, `totalPages`)
 6. **Error handling**: Toast notifications via `react-toastify`
 7. **reCAPTCHA**: Required for registration (`react-google-recaptcha`)
+8. **Confirmation dialogs**: ALWAYS use the custom `ConfirmDialog` component (`components/ui/common/ConfirmDialog.tsx`) instead of native browser `confirm()`. Import from `@/components/ui/common` or `@/components/ui`. Manage state with `useState` for `isOpen` and pass handlers for `onConfirm` and `onCancel`.
+9. **Dropdown menus**: ALWAYS use the custom `DropdownMenu` component (`components/ui/common/DropdownMenu.tsx`) instead of native HTML `<select>` elements. Import from `@/components/ui/common/DropdownMenu`. Pass `value`, `options` (array of `{value, label}`), `onChange`, and optional `className`.
+10. **Pagination**: ALWAYS use the custom `Pagination` component (`components/ui/common/Pagination.tsx`) for paginated lists instead of custom pagination UI. Import from `@/components/ui/common`. Pass `currentPage` (1-indexed), `totalPages`, `onPageChange` callback, `isFirst`, and `isLast` boolean flags. Note: Component uses 1-indexed pages but backend typically uses 0-indexed, so convert with `currentPage + 1` for display and `page - 1` for state.
 
 ## Key Files to Reference
 

@@ -225,7 +225,7 @@ export function DropdownMenu({
           </div>
         )}
 
-        <div className="max-h-60 overflow-y-auto">
+        <div className="flex max-h-60 flex-col overflow-y-auto">
           {filteredOptions.length === 0 ? (
             <div className="px-3 py-2.5 text-sm text-gray-500">
               Không tìm thấy kết quả
@@ -239,7 +239,7 @@ export function DropdownMenu({
                 }}
                 type="button"
                 onClick={() => handleOptionClick(option.value)}
-                className={`w-full truncate px-3 py-2.5 text-left text-sm transition-colors focus:outline-none ${
+                className={`z-50 flex w-full cursor-pointer items-center truncate px-3 py-2.5 text-left text-sm transition-colors focus:outline-none ${
                   option.value === value
                     ? "bg-black font-medium text-white"
                     : index === focusedIndex
@@ -248,7 +248,7 @@ export function DropdownMenu({
                 }`}
                 title={option.label}
               >
-                {option.label}
+                <span className="truncate">{option.label}</span>{" "}
               </button>
             ))
           )}

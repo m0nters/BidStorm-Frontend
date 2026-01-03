@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ReviewsGivenTab } from "./ReviewsGivenTab";
 import { ReviewsReceivedTab } from "./ReviewsReceivedTab";
@@ -9,6 +9,7 @@ type ReviewsTabType = "cua-ban" | "nhan-duoc";
 
 export function ReviewsSection() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<ReviewsTabType>("cua-ban");
 
@@ -24,6 +25,12 @@ export function ReviewsSection() {
     setActiveTab(tab);
     router.push(`/tai-khoan?tab=danh-gia&sub=${tab}`);
   };
+
+  useEffect(() => {
+    if (!searchParams.has("sub")) {
+      router.replace(`${pathname}?tab=danh-gia&sub=cua-ban`);
+    }
+  }, [searchParams, router, pathname]);
 
   return (
     <div>
