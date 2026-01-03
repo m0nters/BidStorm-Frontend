@@ -144,9 +144,22 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Seller Info */}
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+              {/* <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
                 {product.sellerName.charAt(0).toUpperCase()}
-              </div>
+              </div> */}
+              {product.sellerAvatarUrl ? (
+                <Image
+                  src={product.sellerAvatarUrl}
+                  alt={product.sellerName}
+                  width={32}
+                  height={32}
+                  className="rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+                  {product.sellerName.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="flex flex-col">
                 <span
                   className="text-xs font-medium text-gray-900"

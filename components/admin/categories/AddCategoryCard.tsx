@@ -5,6 +5,7 @@ import { FiCheck, FiPlus, FiX } from "react-icons/fi";
 
 interface AddCategoryCardProps {
   isChild?: boolean;
+  isAlone?: boolean;
   parentId?: number | null;
   onSave: (name: string, parentId: number | null) => Promise<void>;
   onCancel: () => void;
@@ -14,6 +15,7 @@ interface AddCategoryCardProps {
 
 export const AddCategoryCard = ({
   isChild = false,
+  isAlone = false,
   parentId = null,
   onSave,
   onCancel,
@@ -64,14 +66,16 @@ export const AddCategoryCard = ({
 
   return (
     <div className={`relative ${isChild ? "ml-8" : ""} ${className}`}>
-      <div className="absolute -top-3 left-0 z-0 -ml-8 flex h-full">
-        <div className="relative">
-          {/* Vertical line */}
-          <div className="absolute -top-11 left-4 h-[93px] w-px bg-gray-300" />
-          {/* Horizontal line */}
-          <div className="absolute top-12 left-4 h-px w-4 bg-gray-300" />
+      {!isAlone && (
+        <div className="absolute -top-3 left-0 z-0 -ml-8 flex h-full">
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute -top-11 left-4 h-[125px] w-px bg-gray-300" />
+            {/* Horizontal line */}
+            <div className="absolute top-20 left-4 h-px w-4 bg-gray-300" />
+          </div>
         </div>
-      </div>
+      )}
       <div
         className={`relative space-y-3 rounded-lg border-2 border-blue-500 bg-white p-4 shadow-md`}
       >

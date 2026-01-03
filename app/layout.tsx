@@ -3,6 +3,7 @@ import { Footer, Header } from "@/components/layout/";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { headers } from "next/headers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
@@ -25,8 +26,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Fetch categories for header
-  const categories = await getAllCategories();
+  // Check if current route is admin
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+  const isAdminRoute = pathname.startsWith("/admin");
+
+  // Fetch categories for header (only if not admin route)
+  const categories = !isAdminRoute ? await getAllCategories() : [];
 
   return (
     <html lang="vi">
@@ -34,11 +40,17 @@ export default async function RootLayout({
         className={`${montserrat.className} suppressHydrationWarning font-sans antialiased`}
       >
         <AuthProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header categories={categories} />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          {isAdminRoute ? (
+            // Admin layout without header/footer
+            <>{children}</>
+          ) : (
+            // Regular layout with header/footer
+            <div className="flex min-h-screen flex-col">
+              <Header categories={categories} />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          )}
           <ToastContainer
             position="top-right"
             hideProgressBar={false}

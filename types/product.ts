@@ -13,6 +13,7 @@ export interface ProductListResponse {
   categorySlug: string;
   sellerId: number;
   sellerName: string;
+  sellerAvatarUrl?: string;
   sellerRating: number;
   highestBidderId?: number;
   highestBidderName?: string;
@@ -26,6 +27,7 @@ export interface ProductListResponse {
 export interface UserBasicInfo {
   id: number;
   fullName: string;
+  avatarUrl?: string;
   positiveRating: number;
   negativeRating: number;
   ratingPercentage: number;

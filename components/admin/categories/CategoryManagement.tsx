@@ -118,6 +118,7 @@ export const CategoryManagement = () => {
         {showCreateParent ? (
           <AddCategoryCard
             isExpanded
+            isAlone={true}
             parentId={null}
             onSave={handleCreateCategory}
             onCancel={() => setShowCreateParent(false)}
@@ -140,11 +141,11 @@ export const CategoryManagement = () => {
           </div>
         ) : (
           categories.map((category) => (
-            <div key={category.id} className="relative">
+            <div key={category.id} className="flex items-start gap-4">
               {category.childrenCount > 0 && (
                 <button
                   onClick={() => toggleExpand(category.id)}
-                  className="absolute -left-12 mt-4 cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100"
+                  className="mt-4 cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100"
                   title={
                     expandedCategories.has(category.id) ? "Thu gọn" : "Mở rộng"
                   }
@@ -158,44 +159,46 @@ export const CategoryManagement = () => {
                   />
                 </button>
               )}
-              <CategoryCard
-                category={category}
-                parentCategories={getParentCategories()}
-                onClick={() => toggleExpand(category.id)}
-                onEdit={fetchCategories}
-                onDelete={handleDeleteClick}
-                onAddChild={
-                  category.isParent
-                    ? () => setAddingChildToParent(category.id)
-                    : undefined
-                }
-              />
-              {expandedCategories.has(category.id) &&
-                category.children &&
-                category.children.length > 0 &&
-                category.children.map((child, index) => (
-                  <CategoryCard
-                    key={child.id}
-                    category={child}
+              <div className="flex-1">
+                <CategoryCard
+                  category={category}
+                  parentCategories={getParentCategories()}
+                  onClick={() => toggleExpand(category.id)}
+                  onEdit={fetchCategories}
+                  onDelete={handleDeleteClick}
+                  onAddChild={
+                    category.isParent
+                      ? () => setAddingChildToParent(category.id)
+                      : undefined
+                  }
+                />
+                {expandedCategories.has(category.id) &&
+                  category.children &&
+                  category.children.length > 0 &&
+                  category.children.map((child, index) => (
+                    <CategoryCard
+                      key={child.id}
+                      category={child}
+                      isChild
+                      isLastChild={index === category.children!.length - 1}
+                      parentCategories={getParentCategories()}
+                      onEdit={fetchCategories}
+                      onDelete={handleDeleteClick}
+                      className="mt-2"
+                    />
+                  ))}
+                {/* Add Child Category Card */}
+                {addingChildToParent === category.id && (
+                  <AddCategoryCard
                     isChild
-                    isLastChild={index === category.children!.length - 1}
-                    parentCategories={getParentCategories()}
-                    onEdit={fetchCategories}
-                    onDelete={handleDeleteClick}
+                    isExpanded
+                    parentId={category.id}
+                    onSave={handleCreateCategory}
+                    onCancel={() => setAddingChildToParent(null)}
                     className="mt-2"
                   />
-                ))}
-              {/* Add Child Category Card */}
-              {addingChildToParent === category.id && (
-                <AddCategoryCard
-                  isChild
-                  isExpanded
-                  parentId={category.id}
-                  onSave={handleCreateCategory}
-                  onCancel={() => setAddingChildToParent(null)}
-                  className="mt-2"
-                />
-              )}
+                )}
+              </div>
             </div>
           ))
         )}

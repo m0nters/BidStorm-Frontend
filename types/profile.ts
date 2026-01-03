@@ -61,6 +61,7 @@ export interface WonProductResponse {
   winningBid: number;
   sellerId: number;
   sellerName: string;
+  sellerAvatarUrl?: string;
   endTime: string; // ISO datetime string (ZonedDateTime)
   hasReviewed: boolean;
 }

@@ -40,6 +40,19 @@ export function Header({ categories }: HeaderProps) {
     setIsMobileMenuOpen(false);
   };
 
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return "Quản trị viên";
+      case "SELLER":
+        return "Người bán";
+      case "BIDDER":
+        return "Người mua";
+      default:
+        return "Người dùng";
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
       {/* Main Header */}
@@ -99,10 +112,25 @@ export function Header({ categories }: HeaderProps) {
                 href="/tai-khoan"
                 className="flex items-center space-x-2 rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
-                <FaRegCircleUser className="h-6 w-6" />
-                <span className="hidden font-medium md:inline-block">
-                  {user?.fullName}
-                </span>
+                {user?.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt={user.fullName}
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaRegCircleUser className="h-8 w-8 rounded-full text-gray-400" />
+                )}
+                <div className="flex flex-col">
+                  <p className="hidden font-medium md:inline-block">
+                    {user?.fullName}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {getRoleLabel(user!.role)}
+                  </p>
+                </div>
               </Link>
 
               {/* User Dropdown Menu */}

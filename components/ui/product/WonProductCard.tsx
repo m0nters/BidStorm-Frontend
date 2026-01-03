@@ -70,9 +70,19 @@ export function WonProductCard({ product }: WonProductCardProps) {
               {/* Seller Info */}
               <div className="rounded-lg bg-gray-50 p-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs font-bold text-white">
-                    {product.sellerName.charAt(0).toUpperCase()}
-                  </div>
+                  {product.sellerAvatarUrl ? (
+                    <Image
+                      src={product.sellerAvatarUrl}
+                      alt={product.sellerName}
+                      width={32}
+                      height={32}
+                      className="rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-700">
+                      {product.sellerName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs text-gray-500">Người bán</p>
                     <p className="text-sm font-semibold text-gray-900">

@@ -23,7 +23,11 @@ import {
   updateProductDescription,
 } from "@/services/products";
 import { useAuthStore } from "@/store/authStore";
-import { ProductDetailResponse, ProductListResponse } from "@/types/product";
+import {
+  ProductDetailResponse,
+  ProductListResponse,
+  UserBasicInfo,
+} from "@/types/product";
 import { decodeHTMLEntities, formatPrice, formatTimeRemaining } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -325,12 +329,24 @@ export default function ProductDetailClient({
   };
 
   // User rating display helper
-  const UserRating = ({ user }: { user: typeof product.seller }) => {
+  const UserRating = ({ user }: { user: UserBasicInfo }) => {
     const totalRatings = user.positiveRating + user.negativeRating;
     return (
       <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black font-semibold text-white">
-          {user.fullName.charAt(0).toUpperCase()}
+        <div className="h-12 w-12 overflow-hidden rounded-full bg-black">
+          {user.avatarUrl ? (
+            <Image
+              src={user.avatarUrl}
+              alt={user.fullName}
+              width={48}
+              height={48}
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black font-semibold text-white">
+              {user.fullName.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
