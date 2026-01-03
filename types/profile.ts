@@ -5,6 +5,7 @@ export interface UserProfileResponse {
   address?: string;
   birthDate?: string; // ISO date string (LocalDate)
   role: "BIDDER" | "SELLER" | "ADMIN";
+  avatarUrl?: string;
   positiveRating: number;
   negativeRating: number;
   ratingPercentage: number;

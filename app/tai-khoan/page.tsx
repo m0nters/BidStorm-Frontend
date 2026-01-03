@@ -10,8 +10,9 @@ import {
   SellerProductsSection,
   UpgradeRequestSection,
 } from "@/components/profile/";
+import { AvatarUpload } from "@/components/ui/common";
 import { logout } from "@/services/auth";
-import { getProfile } from "@/services/profile";
+import { deleteAvatar, getProfile, uploadAvatar } from "@/services/profile";
 import { useAuthStore } from "@/store/authStore";
 import { UserProfileResponse } from "@/types/profile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -119,6 +120,16 @@ function ProfilePageContent() {
     }
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    const updatedProfile = await uploadAvatar(file);
+    setProfile(updatedProfile);
+  };
+
+  const handleAvatarDelete = async () => {
+    const updatedProfile = await deleteAvatar();
+    setProfile(updatedProfile);
+  };
+
   const tabs = [
     { id: "thong-tin", label: "Thông tin cá nhân", icon: FiUser },
     { id: "doi-mat-khau", label: "Đổi mật khẩu", icon: FiLock },
@@ -167,9 +178,13 @@ function ProfilePageContent() {
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               {/* User Profile */}
               <div className="mb-6 text-center">
-                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-black text-3xl font-bold text-white">
-                  {profile?.fullName.charAt(0).toUpperCase()}
-                </div>
+                <AvatarUpload
+                  avatarUrl={profile?.avatarUrl}
+                  userName={profile?.fullName || "User"}
+                  onUpload={handleAvatarUpload}
+                  onDelete={handleAvatarDelete}
+                  className="mx-auto mb-4"
+                />
                 <h3 className="text-lg font-semibold text-gray-900">
                   {profile?.fullName}
                 </h3>

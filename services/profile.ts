@@ -49,6 +49,37 @@ export const changePassword = async (data: ChangePasswordRequest) => {
 };
 
 /**
+ * Upload avatar
+ * POST /api/v1/profile/avatar
+ */
+export const uploadAvatar = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.upload<UserProfileResponse>(
+    "/profile/avatar",
+    formData,
+    {
+      auth: true,
+      cache: "no-store",
+    },
+  );
+  return response.data;
+};
+
+/**
+ * Delete avatar
+ * DELETE /api/v1/profile/avatar
+ */
+export const deleteAvatar = async () => {
+  const response = await api.delete<UserProfileResponse>("/profile/avatar", {
+    auth: true,
+    cache: "no-store",
+  });
+  return response.data;
+};
+
+/**
  * Get favorite products (paginated)
  * GET /api/v1/favorites
  */
