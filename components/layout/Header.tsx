@@ -8,7 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FaRegCircleUser } from "react-icons/fa6";
 import {
   FiLogOut,
   FiMenu,
@@ -112,17 +111,13 @@ export function Header({ categories }: HeaderProps) {
                 href="/tai-khoan"
                 className="flex items-center space-x-2 rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
-                {user?.avatarUrl ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt={user.fullName}
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <FaRegCircleUser className="h-8 w-8 rounded-full text-gray-400" />
-                )}
+                <Image
+                  src={user.avatarUrl}
+                  alt={user.fullName}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 rounded-full object-cover"
+                />
                 <div className="flex flex-col">
                   <p className="hidden font-medium md:inline-block">
                     {user?.fullName}

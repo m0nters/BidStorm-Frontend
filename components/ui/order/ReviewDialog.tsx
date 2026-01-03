@@ -194,19 +194,13 @@ export const ReviewDialog = ({
                 <div className="flex items-center gap-3">
                   {/* Avatar */}
                   <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-gray-100">
-                    {reviewee.avatarUrl ? (
-                      <Image
-                        src={reviewee.avatarUrl}
-                        alt={reviewee.fullName}
-                        width={64}
-                        height={64}
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black text-lg font-bold text-white">
-                        {reviewee.fullName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                    <Image
+                      src={reviewee.avatarUrl}
+                      alt={reviewee.fullName}
+                      width={64}
+                      height={64}
+                      className="object-cover"
+                    />
                   </div>
 
                   {/* Info */}

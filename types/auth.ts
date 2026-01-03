@@ -15,7 +15,7 @@ export interface UserInfo {
   email: string;
   fullName: string;
   role: "BIDDER" | "SELLER" | "ADMIN";
-  avatarUrl?: string;
+  avatarUrl: string;
   emailVerified: boolean;
   isActive: boolean;
 }
