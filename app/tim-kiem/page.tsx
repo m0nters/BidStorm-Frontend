@@ -4,7 +4,7 @@ import SearchPageClient from "./SearchPageClient";
 
 interface SearchPageProps {
   searchParams: Promise<{
-    q?: string;
+    keyword?: string;
     category?: string;
     page?: string;
     sortBy?: string;
@@ -14,7 +14,7 @@ interface SearchPageProps {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const keyword = params.q || "";
+  const keyword = params.keyword || "";
   const categoryId = params.category ? parseInt(params.category) : undefined;
   const page = params.page ? parseInt(params.page) - 1 : 0;
   const sortBy =

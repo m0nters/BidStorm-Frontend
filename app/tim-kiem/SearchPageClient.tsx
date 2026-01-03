@@ -1,5 +1,6 @@
 "use client";
 
+import CategoryFilter from "@/components/ui/category/CategoryFilter";
 import { DropdownMenu, Pagination } from "@/components/ui/common/";
 import { EmptyState, ProductCard } from "@/components/ui/product/";
 import { searchProducts } from "@/services/products";
@@ -37,7 +38,7 @@ export default function SearchPageClient({
   const [isLoading, setIsLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  const keyword = searchParams.get("q") || initialKeyword;
+  const keyword = searchParams.get("keyword") || initialKeyword;
   const categoryId = searchParams.get("category");
   const currentPage = parseInt(searchParams.get("page") || "1");
   const sortBy = (searchParams.get("sortBy") as SortOption) || "endTime";
@@ -102,7 +103,7 @@ export default function SearchPageClient({
 
   const clearFilters = () => {
     const params = new URLSearchParams();
-    if (keyword) params.set("q", keyword);
+    if (keyword) params.set("keyword", keyword);
     router.push(`/tim-kiem?${params.toString()}`);
   };
 
@@ -113,7 +114,7 @@ export default function SearchPageClient({
     <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          {keyword ? `Kết quả tìm kiếm: "${keyword}"` : "Tìm kiếm sản phẩm"}
+          {keyword ? `Kết quả tìm kiếm: "${keyword}"` : "Tất cả sản phẩm"}
         </h1>
         <p className="mt-2 text-gray-600">
           Tìm thấy {products.totalElements} sản phẩm
@@ -171,68 +172,11 @@ export default function SearchPageClient({
           <div className="sticky top-24 rounded-lg border border-gray-200 bg-white p-6">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">Bộ lọc</h2>
 
-            {/* Category Filter */}
-            <div className="mb-6">
-              <h3 className="mb-3 text-sm font-medium text-gray-900">
-                Danh mục
-              </h3>
-              <div className="space-y-2">
-                <label className="flex cursor-pointer items-center">
-                  <input
-                    type="radio"
-                    name="category"
-                    checked={!categoryId}
-                    onChange={() => handleCategoryChange("")}
-                    className="h-4 w-4 accent-black"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    Tất cả danh mục
-                  </span>
-                </label>
-                {categories.map((category) => (
-                  <div key={category.id}>
-                    <label className="flex cursor-pointer items-center">
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={categoryId === category.id.toString()}
-                        onChange={() =>
-                          handleCategoryChange(category.id.toString())
-                        }
-                        className="h-4 w-4 accent-black"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">
-                        {category.name}
-                      </span>
-                    </label>
-                    {/* Subcategories */}
-                    {category.children && category.children.length > 0 && (
-                      <div className="mt-2 ml-6 space-y-2">
-                        {category.children.map((child) => (
-                          <label
-                            key={child.id}
-                            className="flex cursor-pointer items-center"
-                          >
-                            <input
-                              type="radio"
-                              name="category"
-                              checked={categoryId === child.id.toString()}
-                              onChange={() =>
-                                handleCategoryChange(child.id.toString())
-                              }
-                              className="h-4 w-4 accent-black"
-                            />
-                            <span className="ml-2 text-sm text-gray-600">
-                              {child.name}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <CategoryFilter
+              categories={categories}
+              categoryId={categoryId}
+              onCategoryChange={handleCategoryChange}
+            />
           </div>
         </aside>
 

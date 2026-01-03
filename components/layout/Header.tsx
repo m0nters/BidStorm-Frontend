@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaRegCircleUser } from "react-icons/fa6";
 import {
-  FiHeart,
   FiLogOut,
   FiMenu,
   FiSearch,
@@ -19,6 +18,7 @@ import {
   FiX,
 } from "react-icons/fi";
 import { IoIosAddCircleOutline } from "react-icons/io";
+import { RiAdminLine } from "react-icons/ri";
 
 interface HeaderProps {
   categories: CategoryResponse[];
@@ -36,10 +36,8 @@ export function Header({ categories }: HeaderProps) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/tim-kiem?q=${encodeURIComponent(searchQuery.trim())}`);
-      setIsMobileMenuOpen(false);
-    }
+    router.push(`/tim-kiem?keyword=${encodeURIComponent(searchQuery.trim())}`);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -118,27 +116,23 @@ export function Header({ categories }: HeaderProps) {
                   </div>
 
                   <div className="py-1">
+                    {user?.role === "ADMIN" && (
+                      <Link
+                        href="/admin"
+                        className="flex items-center space-x-3 px-4 py-2.5 text-sm text-purple-700 transition-colors hover:bg-purple-50"
+                      >
+                        <RiAdminLine className="h-4 w-4" />
+                        <span>Bảng điều khiển Admin</span>
+                      </Link>
+                    )}
                     <Link
                       href="/tai-khoan"
                       className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
                     >
                       <FiUser className="h-4 w-4" />
-                      <span>Tài khoản của tôi</span>
+                      <span>Tài khoản</span>
                     </Link>
-                    <Link
-                      href="/tai-khoan?tab=yeu-thich"
-                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                    >
-                      <FiHeart className="h-4 w-4" />
-                      <span>Sản phẩm yêu thích</span>
-                    </Link>
-                    <Link
-                      href="/tai-khoan?tab=dau-gia"
-                      className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-                    >
-                      <FiTrendingUp className="h-4 w-4" />
-                      <span>Sản phẩm đấu giá</span>
-                    </Link>
+
                     {user?.role && hasRolePermission(user.role, "SELLER") && (
                       <Link
                         href="/dang-san-pham"
@@ -280,6 +274,15 @@ export function Header({ categories }: HeaderProps) {
                   <FiUser className="h-5 w-5" />
                   <span>{user?.fullName}</span>
                 </Link>
+                {user?.role === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="flex w-full items-center justify-center space-x-2 rounded-lg bg-purple-600 px-4 py-2.5 font-semibold text-white hover:bg-purple-700"
+                  >
+                    <FiTrendingUp className="h-5 w-5" />
+                    <span>Bảng điều khiển Admin</span>
+                  </Link>
+                )}
                 {user?.role && hasRolePermission(user.role, "SELLER") && (
                   <Link
                     href="/dang-san-pham"
