@@ -1,8 +1,11 @@
 "use client";
 
+import CategoryFilter from "@/components/ui/category/CategoryFilter";
 import { ConfirmDialog, Pagination } from "@/components/ui/common";
 import { DropdownMenu } from "@/components/ui/common/DropdownMenu";
+import { useDebounce } from "@/hooks/useDebounce";
 import { deleteProduct } from "@/services/admin";
+import { getAllCategories } from "@/services/categories";
 import { searchProducts } from "@/services/products";
 import { CategoryResponse, ProductListResponse } from "@/types";
 import { formatPrice } from "@/utils/price";
@@ -18,14 +21,15 @@ export const ProductManagement = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [categoryFilter, setCategoryFilter] = useState<number | undefined>(
-    undefined,
-  );
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string | undefined>(
     undefined,
   );
+  const [searchQuery, setSearchQuery] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
+
+  const debouncedSearchQuery = useDebounce(searchQuery);
 
   const fetchProducts = async () => {
     try {
@@ -33,7 +37,8 @@ export const ProductManagement = () => {
       const data = await searchProducts({
         page: currentPage,
         size: 20,
-        categoryId: categoryFilter,
+        categoryId: categoryFilter ? Number(categoryFilter) : undefined,
+        keyword: debouncedSearchQuery.trim() || undefined,
       });
 
       // Filter by status on frontend
@@ -69,7 +74,7 @@ export const ProductManagement = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [currentPage, categoryFilter, statusFilter]);
+  }, [currentPage, categoryFilter, statusFilter, debouncedSearchQuery]);
 
   useEffect(() => {
     fetchCategories();
@@ -92,17 +97,6 @@ export const ProductManagement = () => {
     } finally {
       setProductToDelete(null);
     }
-  };
-
-  const getAllCategories = () => {
-    const allCategories: CategoryResponse[] = [];
-    categories.forEach((cat) => {
-      allCategories.push(cat);
-      if (cat.children) {
-        allCategories.push(...cat.children);
-      }
-    });
-    return allCategories;
   };
 
   const getStatusBadge = (endTime: string) => {
@@ -130,155 +124,167 @@ export const ProductManagement = () => {
       <h2 className="mb-6 text-2xl font-bold">Quản lý sản phẩm</h2>
 
       {/* Filters */}
-      <div className="mb-6 rounded-lg bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap gap-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium">Danh mục</label>
-            <DropdownMenu
-              value={categoryFilter?.toString() || ""}
-              options={[
-                { value: "", label: "Tất cả" },
-                ...getAllCategories().map((cat) => ({
-                  value: cat.id.toString(),
-                  label: cat.name,
-                })),
-              ]}
-              onChange={(value) =>
-                setCategoryFilter(value ? Number(value) : undefined)
-              }
-              className="w-48"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium">Trạng thái</label>
-            <DropdownMenu
-              value={statusFilter || ""}
-              options={[
-                { value: "", label: "Tất cả" },
-                { value: "active", label: "Đang đấu giá" },
-                { value: "ended", label: "Đã kết thúc" },
-              ]}
-              onChange={(value) => setStatusFilter(value || undefined)}
-              className="w-48"
+      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Category Filter Sidebar */}
+        <div className="lg:col-span-3">
+          <div className="rounded-lg bg-white p-4 shadow-sm">
+            <CategoryFilter
+              categories={categories}
+              categoryId={categoryFilter}
+              onCategoryChange={setCategoryFilter}
             />
           </div>
         </div>
-      </div>
 
-      {/* Products Table */}
-      {loading ? (
-        <div className="py-12 text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-black"></div>
-        </div>
-      ) : products.length === 0 ? (
-        <div className="rounded-lg bg-white py-12 text-center">
-          <p className="text-gray-500">Không tìm thấy sản phẩm nào</p>
-        </div>
-      ) : (
-        <div className="overflow-visible rounded-lg bg-white shadow-sm">
-          <div className="overflow-x-auto overflow-y-visible">
-            <table className="w-full">
-              <thead className="border-b bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                    Sản phẩm
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                    Người bán
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                    Giá hiện tại
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                    Lượt đấu giá
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                    Trạng thái
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-start gap-3">
-                        {product.thumbnailUrl && (
-                          <Link
-                            href={`/san-pham/${product.slug}`}
-                            className="relative h-14 w-14 translate-y-1 overflow-hidden"
-                          >
-                            <Image
-                              src={product.thumbnailUrl}
-                              alt={product.title}
-                              fill // Takes full size of parent relative element
-                              className="rounded object-cover object-center transition-transform duration-300 hover:scale-110"
-                            />
-                          </Link>
-                        )}
-                        <div className="max-w-xs">
-                          <Link
-                            href={`/san-pham/${product.slug}`}
-                            className="font-medium hover:underline"
-                          >
-                            {product.title}
-                          </Link>
-                          <div className="text-sm text-gray-500">
-                            ID: {product.id}
+        {/* Main Content Area */}
+        <div className="lg:col-span-9">
+          {/* Filters */}
+          <div className="mb-6 rounded-lg bg-white p-4 shadow-sm">
+            {/* Status Filter */}
+            <div className="mb-4 flex items-center gap-4">
+              <label className="text-sm font-medium">Trạng thái:</label>
+              <DropdownMenu
+                value={statusFilter || ""}
+                options={[
+                  { value: "", label: "Tất cả" },
+                  { value: "active", label: "Đang đấu giá" },
+                  { value: "ended", label: "Đã kết thúc" },
+                ]}
+                onChange={(value) => setStatusFilter(value || undefined)}
+                className="w-48"
+              />
+            </div>
+
+            {/* Search Bar */}
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium">Tìm kiếm:</label>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo tên sản phẩm hoặc người bán..."
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-black focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Products Table */}
+          {loading ? (
+            <div className="py-12 text-center">
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-black"></div>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="rounded-lg bg-white py-12 text-center">
+              <p className="text-gray-500">Không tìm thấy sản phẩm nào</p>
+            </div>
+          ) : (
+            <div className="overflow-visible rounded-lg bg-white shadow-sm">
+              <div className="overflow-x-auto overflow-y-visible">
+                <table className="w-full">
+                  <thead className="border-b bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        Sản phẩm
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        Người bán
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        Giá hiện tại
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        Lượt đấu giá
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        Trạng thái
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                        Thao tác
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {products.map((product) => (
+                      <tr key={product.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">
+                          <div className="group relative max-w-xs">
+                            <Link
+                              href={`/san-pham/${product.slug}`}
+                              className="font-medium hover:underline"
+                            >
+                              {product.title}
+                            </Link>
+                            <div className="text-sm text-gray-500">
+                              ID: {product.id}
+                            </div>
+
+                            {/* Hover Image Preview */}
+                            {product.thumbnailUrl && (
+                              <div className="pointer-events-none absolute -top-16 left-full z-50 ml-4 hidden w-48 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg group-hover:block">
+                                <Image
+                                  src={product.thumbnailUrl}
+                                  alt={product.title}
+                                  width={192}
+                                  height={192}
+                                  className="h-48 w-full object-cover"
+                                />
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">{product.sellerName}</td>
-                    <td className="px-6 py-4 text-sm font-medium">
-                      {formatPrice(product.currentPrice)}
-                    </td>
-                    <td className="-translate-x-3 px-6 py-4 text-center text-sm">
-                      {product.bidCount}
-                    </td>
-                    <td className="-translate-x-2 px-6 py-4 text-sm">
-                      {getStatusBadge(product.endTime)}
-                    </td>
-                    <td className="translate-x-4 px-6 py-4 text-sm">
-                      <button
-                        onClick={() => handleDeleteClick(product.id)}
-                        className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-red-50"
-                        title="Xóa sản phẩm"
-                      >
-                        <FiTrash2 className="text-red-600" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          {product.sellerName}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium">
+                          {formatPrice(product.currentPrice)}
+                        </td>
+                        <td className="-translate-x-3 px-6 py-4 text-center text-sm">
+                          {product.bidCount}
+                        </td>
+                        <td className="-translate-x-2 px-6 py-4 text-center text-sm">
+                          <div className="flex justify-center">
+                            {getStatusBadge(product.endTime)}
+                          </div>
+                        </td>
+                        <td className="translate-x-4 px-6 py-4 text-sm">
+                          <button
+                            onClick={() => handleDeleteClick(product.id)}
+                            className="-translate-x-4 cursor-pointer rounded-lg p-2 transition-colors hover:bg-red-50"
+                            title="Xóa sản phẩm"
+                          >
+                            <FiTrash2 className="text-red-600" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && products.length > 0 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage + 1}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page - 1)}
+                isFirst={currentPage === 0}
+                isLast={currentPage === totalPages - 1}
+              />
+            </div>
+          )}
+
+          {/* Info Box */}
+          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
+            <p className="text-sm text-red-800">
+              <strong>Cảnh báo:</strong> Xóa sản phẩm sẽ xóa vĩnh viễn sản phẩm,
+              tất cả hình ảnh, lượt đấu giá, bình luận và yêu thích liên quan.
+              Hành động này không thể hoàn tác.
+            </p>
           </div>
         </div>
-      )}
-
-      {/* Pagination */}
-      {!loading && products.length > 0 && (
-        <div className="mt-6">
-          <Pagination
-            currentPage={currentPage + 1}
-            totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page - 1)}
-            isFirst={currentPage === 0}
-            isLast={currentPage === totalPages - 1}
-          />
-        </div>
-      )}
-
-      {/* Info Box */}
-      <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
-        <p className="text-sm text-red-800">
-          <strong>Cảnh báo:</strong> Xóa sản phẩm sẽ xóa vĩnh viễn sản phẩm, tất
-          cả hình ảnh, lượt đấu giá, bình luận và yêu thích liên quan. Hành động
-          này không thể hoàn tác.
-        </p>
       </div>
 
       <ConfirmDialog

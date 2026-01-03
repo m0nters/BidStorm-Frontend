@@ -11,12 +11,15 @@ import {
 } from "@/components/admin";
 import { RoleGuard } from "@/components/auth";
 import { useAuthStore } from "@/store/authStore";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   FiBox,
   FiChevronDown,
+  FiChevronLeft,
+  FiChevronRight,
   FiFolder,
   FiLogOut,
   FiSettings,
@@ -33,6 +36,7 @@ const AdminDashboard = () => {
   const pathname = usePathname();
   const { user, clearAuth } = useAuthStore();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Top-level tabs: users (with sub-tabs), categories, products, statistics, config
@@ -80,20 +84,30 @@ const AdminDashboard = () => {
     <RoleGuard allowedRoles={["ADMIN"]}>
       <div className="flex h-screen overflow-hidden bg-gray-50">
         {/* Left Sidebar - Dark themed and sticky */}
-        <aside className="flex w-64 shrink-0 flex-col bg-gray-900 text-white">
+        <aside
+          className={`flex shrink-0 flex-col bg-gray-900 text-white transition-all duration-300 ${isSidebarCollapsed ? "w-16" : "w-64"}`}
+        >
           {/* Logo/Brand */}
-          <div className="flex h-16 items-center gap-3 border-b border-gray-800 px-6">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
-              <span className="text-xl font-bold">BS</span>
-            </div>
-            <span className="text-lg font-semibold">BidStorm Admin</span>
+          <div
+            className={`flex h-16 items-center border-b border-gray-800 ${isSidebarCollapsed ? "justify-center px-2" : "gap-3 px-6"}`}
+          >
+            <Image src="/logo.png" alt="BidStorm Logo" width={40} height={40} />
+            {!isSidebarCollapsed && (
+              <div className="flex items-center justify-center">
+                <span className="text-white">Bid</span>
+                <span className="text-gray-400">Storm</span>
+                <span className="ml-1 text-lg font-semibold"> Admin</span>
+              </div>
+            )}
           </div>
 
           {/* Navigation Menu */}
           <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-            <div className="mb-2 px-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
-              Menu
-            </div>
+            {!isSidebarCollapsed && (
+              <div className="mb-2 px-3 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+                Menu
+              </div>
+            )}
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -101,18 +115,39 @@ const AdminDashboard = () => {
                 <Link
                   key={tab.id}
                   href={`/admin?tab=${tab.id}${tab.id === "users" ? `&sub=${activeUserSub}` : ""}`}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                  className={`flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                    isSidebarCollapsed ? "justify-center" : "gap-3"
+                  } ${
                     isActive
                       ? "bg-gray-800 font-medium text-white"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   }`}
+                  title={isSidebarCollapsed ? tab.label : undefined}
                 >
                   <Icon className="text-lg" />
-                  <span>{tab.label}</span>
+                  {!isSidebarCollapsed && <span>{tab.label}</span>}
                 </Link>
               );
             })}
           </nav>
+
+          {/* Collapse Button */}
+          <div className="border-t border-gray-800 p-3">
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="flex w-full cursor-pointer items-center justify-center rounded-lg bg-gray-800 px-3 py-2.5 text-gray-300 transition-colors hover:bg-gray-700 hover:text-white"
+              title={isSidebarCollapsed ? "Mở rộng" : "Thu gọn"}
+            >
+              {isSidebarCollapsed ? (
+                <FiChevronRight className="text-lg" />
+              ) : (
+                <div className="flex w-full -translate-x-2 items-center justify-center">
+                  <FiChevronLeft className="text-lg" />
+                  <span className="ml-1 text-sm">Thu gọn</span>
+                </div>
+              )}
+            </button>
+          </div>
         </aside>
 
         {/* Main content area with header */}

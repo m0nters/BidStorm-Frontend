@@ -112,8 +112,8 @@ export function Header({ categories }: HeaderProps) {
                 className="flex items-center space-x-2 rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
                 <Image
-                  src={user.avatarUrl}
-                  alt={user.fullName}
+                  src={user!.avatarUrl}
+                  alt={user!.fullName}
                   width={32}
                   height={32}
                   className="h-8 w-8 rounded-full object-cover"
