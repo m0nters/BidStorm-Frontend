@@ -167,7 +167,7 @@ const AdminDashboard = () => {
                   <p className="text-sm font-medium text-gray-900">
                     {user?.fullName || "Admin"}
                   </p>
-                  <p className="text-xs text-gray-500">Administrator</p>
+                  <p className="text-xs text-gray-500">Quản trị viên</p>
                 </div>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}

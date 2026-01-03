@@ -30,6 +30,7 @@
     "react-i18next": "^16.4.0",
     "react-icons": "^5.5.0",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.6.0",
     "sockjs-client": "^1.6.1",
     "zod": "^4.1.13",
     "zustand": "^5.0.9"
@@ -41,6 +42,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-google-recaptcha": "^2.1.9",
+    "@types/recharts": "^1.8.29",
     "@types/sockjs-client": "^1.5.4",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",

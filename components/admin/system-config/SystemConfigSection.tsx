@@ -68,6 +68,13 @@ export const SystemConfigSection = () => {
           hưởng đến hoạt động của toàn bộ nền tảng. Vui lòng kiểm tra kỹ trước
           khi lưu.
         </p>
+        <br />
+        <p className="text-sm text-yellow-800">
+          Vì lí do an toàn và yêu cầu nghiệp vụ, quản trị viên vẫn{" "}
+          <strong>KHÔNG</strong> có quyền thêm/xóa cấu hình hệ thống. Các thay
+          đổi chỉ có thể được thực hiện thông qua các bản cập nhật bởi lập trình
+          viên tham gia bảo trì hệ thống phần mềm.
+        </p>
       </div>
     </div>
   );

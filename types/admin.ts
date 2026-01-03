@@ -70,6 +70,50 @@ export interface RevenueStatisticsResponse {
   averageOrderValueCents: number;
 }
 
+export interface BasicStatisticsResponse {
+  newAuctionListings: number;
+  newUsers: number;
+  newSellerUpgrades: number;
+  zeroBidProducts: number;
+}
+
+export interface CategoryRevenueItem {
+  categoryId: number;
+  categoryName: string;
+  totalRevenueCents: number;
+  productCount: number;
+}
+
+export interface PendingPaymentsInfo {
+  totalPendingCents: number;
+  orderCount: number;
+  currency: string;
+}
+
+export interface LeaderboardUser {
+  userId: number;
+  fullName: string;
+  email: string;
+  valueCents: number;
+  count: number;
+}
+
+export interface AdminStatisticsOverviewResponse {
+  timePeriod: string;
+  basicStatistics: BasicStatisticsResponse;
+  totalRevenue: RevenueStatisticsResponse;
+  categoryRevenue: CategoryRevenueItem[];
+  pendingPayments: PendingPaymentsInfo;
+  topBidders: LeaderboardUser[];
+  topSellers: LeaderboardUser[];
+}
+
+export type TimePeriod =
+  | "LAST_7_DAYS"
+  | "LAST_30_DAYS"
+  | "LAST_YEAR"
+  | "ALL_TIME";
+
 // System Configuration Types
 export interface SystemConfigResponse {
   key: string;

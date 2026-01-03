@@ -1,8 +1,8 @@
 import { api } from "@/api/fetch";
 import {
+  AdminStatisticsOverviewResponse,
   ChangeUserRoleRequest,
   PaginatedResponse,
-  RevenueStatisticsResponse,
   RoleResponse,
   SystemConfigResponse,
   UpdateSystemConfigRequest,
@@ -95,9 +95,19 @@ export const rejectUpgradeRequest = async (id: number) => {
 };
 
 // Statistics APIs
-export const getRevenueStatistics = async () => {
-  const response = await api.get<RevenueStatisticsResponse>(
-    "/admin/statistics/revenue",
+
+export const getStatisticsOverview = async (params?: {
+  timePeriod?: string;
+  leaderboardLimit?: number;
+}) => {
+  const queryParams = new URLSearchParams();
+  if (params?.timePeriod) queryParams.append("timePeriod", params.timePeriod);
+  if (params?.leaderboardLimit)
+    queryParams.append("leaderboardLimit", params.leaderboardLimit.toString());
+
+  const query = queryParams.toString();
+  const response = await api.get<AdminStatisticsOverviewResponse>(
+    `/admin/statistics/overview${query ? `?${query}` : ""}`,
     { auth: true },
   );
   return response.data;
