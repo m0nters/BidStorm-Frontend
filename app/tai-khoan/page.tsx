@@ -51,6 +51,8 @@ function ProfilePageContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const accessToken = useAuthStore((state) => state.accessToken);
   const [activeTab, setActiveTab] = useState<TabType>("thong-tin");
   const [profile, setProfile] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,11 +125,41 @@ function ProfilePageContent() {
   const handleAvatarUpload = async (file: File) => {
     const updatedProfile = await uploadAvatar(file);
     setProfile(updatedProfile);
+    // Update Zustand store so Header component reflects the change
+    if (accessToken) {
+      setAuth(
+        {
+          id: updatedProfile.id,
+          email: updatedProfile.email,
+          fullName: updatedProfile.fullName,
+          role: updatedProfile.role,
+          avatarUrl: updatedProfile.avatarUrl,
+          emailVerified: updatedProfile.emailVerified,
+          isActive: updatedProfile.isActive,
+        },
+        accessToken,
+      );
+    }
   };
 
   const handleAvatarDelete = async () => {
     const updatedProfile = await deleteAvatar();
     setProfile(updatedProfile);
+    // Update Zustand store so Header component reflects the change
+    if (accessToken) {
+      setAuth(
+        {
+          id: updatedProfile.id,
+          email: updatedProfile.email,
+          fullName: updatedProfile.fullName,
+          role: updatedProfile.role,
+          avatarUrl: updatedProfile.avatarUrl,
+          emailVerified: updatedProfile.emailVerified,
+          isActive: updatedProfile.isActive,
+        },
+        accessToken,
+      );
+    }
   };
 
   const tabs = [
