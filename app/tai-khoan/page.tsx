@@ -178,13 +178,19 @@ function ProfilePageContent() {
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               {/* User Profile */}
               <div className="mb-6 text-center">
-                <AvatarUpload
-                  avatarUrl={profile?.avatarUrl}
-                  userName={profile?.fullName || "User"}
-                  onUpload={handleAvatarUpload}
-                  onDelete={handleAvatarDelete}
-                  className="mx-auto mb-4"
-                />
+                {profile?.avatarUrl ? (
+                  <AvatarUpload
+                    avatarUrl={profile.avatarUrl}
+                    userName={profile.fullName}
+                    onUpload={handleAvatarUpload}
+                    onDelete={handleAvatarDelete}
+                    className="mx-auto mb-4"
+                  />
+                ) : (
+                  <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-black text-5xl font-bold text-white">
+                    {profile?.fullName.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <h3 className="text-lg font-semibold text-gray-900">
                   {profile?.fullName}
                 </h3>

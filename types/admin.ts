@@ -18,7 +18,7 @@ export interface UserDetailResponse {
   id: number;
   email: string;
   fullName: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   address: string;
   birthDate: string;
   roleId: number;

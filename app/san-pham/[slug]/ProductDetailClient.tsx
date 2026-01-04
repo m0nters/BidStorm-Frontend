@@ -334,13 +334,19 @@ export default function ProductDetailClient({
     return (
       <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
         <div className="h-12 w-12 overflow-hidden rounded-full bg-black">
-          <Image
-            src={user.avatarUrl}
-            alt={user.fullName}
-            width={48}
-            height={48}
-            className="object-cover"
-          />
+          {user.avatarUrl ? (
+            <Image
+              src={user.avatarUrl}
+              alt={user.fullName}
+              width={48}
+              height={48}
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-black text-3xl font-bold text-white">
+              {user.fullName.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">

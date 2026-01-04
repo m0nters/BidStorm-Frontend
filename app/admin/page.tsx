@@ -174,18 +174,19 @@ const AdminDashboard = () => {
                   className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-gray-100"
                 >
                   <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200">
-                    <img
-                      src={
-                        user?.avatarUrl ||
-                        "https://bidstorm.s3.ap-southeast-2.amazonaws.com/avatar.png"
-                      }
-                      alt="Admin avatar"
-                      className="h-full w-full object-cover"
-                      onError={(e) =>
-                        ((e.target as HTMLImageElement).src =
-                          "/images/default-avatar.png")
-                      }
-                    />
+                    {user?.avatarUrl ? (
+                      <Image
+                        src={user.avatarUrl}
+                        alt="Admin Avatar"
+                        width={40}
+                        height={40}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center rounded-full bg-black text-3xl font-bold text-white">
+                        {user?.fullName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <FiChevronDown
                     className={`text-gray-400 transition-transform ${

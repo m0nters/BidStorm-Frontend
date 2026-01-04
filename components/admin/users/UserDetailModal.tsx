@@ -49,13 +49,19 @@ export const UserDetailModal = ({
           <div className="flex items-center gap-6">
             {/* Avatar */}
             <div className="shrink-0">
-              <Image
-                src={user.avatarUrl}
-                alt={user.fullName}
-                width={100}
-                height={100}
-                className="h-24 w-24 rounded-full object-cover shadow-lg ring-4 ring-white"
-              />
+              {user.avatarUrl ? (
+                <Image
+                  src={user.avatarUrl}
+                  alt={user.fullName}
+                  width={100}
+                  height={100}
+                  className="h-24 w-24 rounded-full object-cover shadow-lg ring-4 ring-white"
+                />
+              ) : (
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-black text-3xl font-bold text-white">
+                  {user.fullName.charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
 
             {/* User Info */}

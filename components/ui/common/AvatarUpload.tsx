@@ -6,7 +6,7 @@ import { FiCamera, FiTrash, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 
 interface AvatarUploadProps {
-  avatarUrl: string;
+  avatarUrl?: string;
   userName: string;
   onUpload: (file: File) => Promise<void>;
   onDelete?: () => Promise<void>;
@@ -23,6 +23,7 @@ export const AvatarUpload = ({
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,13 +76,19 @@ export const AvatarUpload = ({
           onClick={() => setShowFullScreen(true)}
         >
           {/* Avatar display */}
-          <Image
-            src={avatarUrl}
-            alt={userName}
-            width={80}
-            height={80}
-            className="h-full w-full rounded-full object-cover"
-          />
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt={userName}
+              width={80}
+              height={80}
+              className="h-full w-full rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-300 text-gray-600">
+              {userName.charAt(0).toUpperCase()}
+            </div>
+          )}
 
           {/* Hover overlay */}
           <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
@@ -116,32 +123,53 @@ export const AvatarUpload = ({
       {showFullScreen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-          onClick={() => setShowFullScreen(false)}
+          onClick={() => !imageLoading && setShowFullScreen(false)}
         >
           <div
             className="relative max-h-[90vh] max-w-[90vw]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
-            <button
-              onClick={() => setShowFullScreen(false)}
-              className="absolute -top-6 -right-12 cursor-pointer rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
-            >
-              <FiX className="h-6 w-6" />
-            </button>
+            {/* Close button - hidden while loading */}
+            {!imageLoading && (
+              <button
+                onClick={() => setShowFullScreen(false)}
+                className="absolute -top-6 -right-12 cursor-pointer rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+              >
+                <FiX className="h-6 w-6" />
+              </button>
+            )}
 
             {/* Avatar image */}
             <div className="relative">
-              <Image
-                src={avatarUrl}
-                alt={userName}
-                width={500}
-                height={500}
-                className="max-h-[80vh] w-auto rounded-lg object-contain"
-              />
+              {avatarUrl ? (
+                <>
+                  {/* Skeleton loader */}
+                  {imageLoading && (
+                    <div className="flex h-[500px] w-[500px] animate-pulse items-center justify-center rounded-lg bg-gray-800">
+                      <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-600 border-t-white"></div>
+                    </div>
+                  )}
 
-              {/* Delete button */}
-              {onDelete && (
+                  {/* Image */}
+                  <Image
+                    src={avatarUrl}
+                    alt={userName}
+                    width={500}
+                    height={500}
+                    className={`max-h-[80vh] w-auto rounded-lg object-contain transition-opacity duration-300 ${
+                      imageLoading ? "absolute opacity-0" : "opacity-100"
+                    }`}
+                    onLoad={() => setImageLoading(false)}
+                  />
+                </>
+              ) : (
+                <div className="flex max-h-[80vh] w-auto items-center justify-center rounded-lg bg-gray-300 p-4 text-gray-600">
+                  {userName.charAt(0).toUpperCase()}
+                </div>
+              )}
+
+              {/* Delete button - hidden while loading */}
+              {onDelete && !imageLoading && (
                 <button
                   onClick={handleDelete}
                   disabled={deleting}

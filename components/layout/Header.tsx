@@ -111,13 +111,19 @@ export function Header({ categories }: HeaderProps) {
                 href="/tai-khoan"
                 className="flex items-center space-x-2 rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-50 hover:text-black"
               >
-                <Image
-                  src={user!.avatarUrl}
-                  alt={user!.fullName}
-                  width={32}
-                  height={32}
-                  className="h-8 w-8 rounded-full object-cover"
-                />
+                {user?.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt={user.fullName}
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-sm font-bold text-white">
+                    {user?.fullName.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div className="flex flex-col">
                   <p className="hidden font-medium md:inline-block">
                     {user?.fullName}

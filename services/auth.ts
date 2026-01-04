@@ -56,6 +56,23 @@ export const login = async (credentials: LoginRequest) => {
 };
 
 /**
+ * Google OAuth Login
+ * POST /api/v1/auth/google/callback
+ * Accepts Google credential token and returns login response
+ */
+export const googleLogin = async (credential: string) => {
+  const response = await api.post<LoginResponse>(
+    "/auth/google/callback",
+    { credential },
+    {
+      cache: "no-store",
+      credentials: "include",
+    },
+  );
+  return response.data;
+};
+
+/**
  * Refresh access token using refresh token stored in httpOnly cookie
  * POST /api/v1/auth/refresh
  *

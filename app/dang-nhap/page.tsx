@@ -1,6 +1,6 @@
 "use client";
 
-import { GuestGuard } from "@/components/auth/";
+import { GoogleLoginButton, GuestGuard } from "@/components/auth/";
 import { PasswordInput } from "@/components/ui/form/";
 import { login } from "@/services/auth";
 import { useAuthStore } from "@/store/authStore";
@@ -157,6 +157,19 @@ function LoginPageContent() {
                 )}
               </button>
             </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-4 text-gray-500">Hoặc</span>
+              </div>
+            </div>
+
+            {/* Google Login */}
+            <GoogleLoginButton />
 
             {/* Register link */}
             <div className="mt-8 text-center">
