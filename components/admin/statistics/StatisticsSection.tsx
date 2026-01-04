@@ -9,12 +9,14 @@ import {
 } from "@/types";
 import { formatPrice } from "@/utils/price";
 import { useEffect, useState } from "react";
+import { FaTrophy } from "react-icons/fa";
 import {
   FiPackage,
   FiShoppingBag,
   FiTrendingUp,
   FiUsers,
 } from "react-icons/fi";
+import { ImHammer2 } from "react-icons/im";
 import { toast } from "react-toastify";
 import { CategoryRevenueBarChart } from "./CategoryRevenueBarChart";
 import { CategoryRevenuePieChart } from "./CategoryRevenuePieChart";
@@ -200,13 +202,15 @@ export const StatisticsSection = () => {
       {/* Leaderboards */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <LeaderboardCard
-          title="🏆 Top người mua"
+          title="Top người mua"
+          icon={<ImHammer2 className="text-yellow-500" />}
           data={topBidders}
           countLabel={(count) => `${count} lần đấu`}
         />
 
         <LeaderboardCard
-          title="⭐ Top người bán"
+          title="Top người bán"
+          icon={<FaTrophy className="text-yellow-600" />}
           data={topSellers}
           countLabel={(count) => `${count} sản phẩm`}
         />
@@ -215,11 +219,8 @@ export const StatisticsSection = () => {
       {/* Footer Note */}
       <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
         <p className="text-sm text-blue-800">
-          <strong>Thời kỳ hiển thị:</strong>{" "}
-          {TIME_PERIOD_OPTIONS.find((o) => o.value === timePeriod)?.label}
-          {" • "}
-          <strong>Lưu ý:</strong> Thống kê được cập nhật theo thời gian thực dựa
-          trên dữ liệu hệ thống.
+          <strong>Ghi chú:</strong> Tải lại trang để cập nhật dữ liệu thống kê
+          mới nhất.
         </p>
       </div>
     </div>

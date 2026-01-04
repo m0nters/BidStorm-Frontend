@@ -192,7 +192,7 @@ export function Header({ categories }: HeaderProps) {
           ) : (
             <Link
               href="/dang-nhap"
-              className="flex items-center space-x-2 px-4 py-2 text-gray-700 transition-colors hover:text-black"
+              className="hidden space-x-2 px-4 py-2 text-gray-700 transition-colors hover:text-black md:flex md:items-center"
             >
               <FiUser className="h-5 w-5" />
               <span>Đăng nhập</span>

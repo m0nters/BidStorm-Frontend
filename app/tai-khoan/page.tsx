@@ -17,6 +17,7 @@ import { useAuthStore } from "@/store/authStore";
 import { UserProfileResponse } from "@/types/profile";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BiDollar } from "react-icons/bi";
 import {
   FiCheckCircle,
   FiHeart,
@@ -24,10 +25,10 @@ import {
   FiLogOut,
   FiPackage,
   FiStar,
-  FiTrendingUp,
   FiUser,
   FiXCircle,
 } from "react-icons/fi";
+import { GrUpgrade } from "react-icons/gr";
 
 type TabType =
   | "thong-tin"
@@ -166,7 +167,7 @@ function ProfilePageContent() {
     { id: "thong-tin", label: "Thông tin cá nhân", icon: FiUser },
     { id: "doi-mat-khau", label: "Đổi mật khẩu", icon: FiLock },
     { id: "yeu-thich", label: "Sản phẩm yêu thích", icon: FiHeart },
-    { id: "san-pham-dau-gia", label: "Sản phẩm đấu giá", icon: FiTrendingUp },
+    { id: "san-pham-dau-gia", label: "Sản phẩm đấu giá", icon: BiDollar },
     ...(profile?.role === "SELLER" || profile?.role === "ADMIN"
       ? [
           {
@@ -182,7 +183,7 @@ function ProfilePageContent() {
           {
             id: "nang-cap-tai-khoan",
             label: "Nâng cấp tài khoản",
-            icon: FiTrendingUp,
+            icon: GrUpgrade,
           },
         ]
       : []),
