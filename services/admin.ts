@@ -1,14 +1,14 @@
 import { api } from "@/api/fetch";
 import {
-  AdminStatisticsOverviewResponse,
-  ChangeUserRoleRequest,
-  PaginatedResponse,
-  RoleResponse,
-  SystemConfigResponse,
-  UpdateSystemConfigRequest,
-  UpgradeRequestResponse,
-  UserDetailResponse,
-  UserListResponse,
+    AdminStatisticsOverviewResponse,
+    ChangeUserRoleRequest,
+    PaginatedResponse,
+    RoleResponse,
+    SystemConfigResponse,
+    UpdateSystemConfigRequest,
+    UpgradeRequestResponse,
+    UserDetailResponse,
+    UserListResponse,
 } from "@/types";
 
 // User Management APIs
@@ -54,6 +54,13 @@ export const banUser = async (id: number) => {
 
 export const unbanUser = async (id: number) => {
   const response = await api.patch<void>(`/admin/users/${id}/unban`, null, {
+    auth: true,
+  });
+  return response.data;
+};
+
+export const deleteUser = async (id: number) => {
+  const response = await api.delete<void>(`/admin/users/${id}`, {
     auth: true,
   });
   return response.data;

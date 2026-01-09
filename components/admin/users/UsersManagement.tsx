@@ -5,6 +5,7 @@ import { DropdownMenu } from "@/components/ui/common/DropdownMenu";
 import {
   banUser,
   changeUserRole,
+  deleteUser,
   getAllRoles,
   getUserDetails,
   listUsers,
@@ -14,7 +15,7 @@ import { RoleResponse, UserDetailResponse, UserListResponse } from "@/types";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaBan } from "react-icons/fa6";
-import { FiEye, FiUnlock } from "react-icons/fi";
+import { FiEye, FiTrash2, FiUnlock } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { UserDetailModal } from "./UserDetailModal";
 
@@ -34,6 +35,7 @@ export const UsersManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showBanConfirm, setShowBanConfirm] = useState(false);
   const [showUnbanConfirm, setShowUnbanConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [actionUserId, setActionUserId] = useState<number | null>(null);
   const [roles, setRoles] = useState<RoleResponse[]>([]);
   const [showRoleChangeConfirm, setShowRoleChangeConfirm] = useState(false);
@@ -141,6 +143,25 @@ export const UsersManagement = () => {
     } finally {
       setActionUserId(null);
       setNewRoleId(null);
+    }
+  };
+
+  const handleDeleteUser = (userId: number) => {
+    setActionUserId(userId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!actionUserId) return;
+    setShowDeleteConfirm(false);
+    try {
+      await deleteUser(actionUserId);
+      toast.success("Đã xóa người dùng thành công");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error(error?.message || "Không thể xóa người dùng");
+    } finally {
+      setActionUserId(null);
     }
   };
 
@@ -352,6 +373,13 @@ export const UsersManagement = () => {
                             <FiUnlock className="text-green-600" />
                           </button>
                         )}
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-red-50"
+                          title="Xóa người dùng"
+                        >
+                          <FiTrash2 className="text-red-600" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -419,6 +447,19 @@ export const UsersManagement = () => {
           setShowRoleChangeConfirm(false);
           setActionUserId(null);
           setNewRoleId(null);
+        }}
+      />
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Xác nhận xóa người dùng"
+        message="Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác."
+        confirmText="Xóa người dùng"
+        cancelText="Hủy"
+        onConfirm={confirmDeleteUser}
+        onCancel={() => {
+          setShowDeleteConfirm(false);
+          setActionUserId(null);
         }}
       />
     </div>
