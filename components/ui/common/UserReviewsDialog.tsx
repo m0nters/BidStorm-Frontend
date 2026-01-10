@@ -31,6 +31,10 @@ export const UserReviewsDialog = ({
   const [totalPages, setTotalPages] = useState(0);
   const [isFirst, setIsFirst] = useState(true);
   const [isLast, setIsLast] = useState(true);
+  const [positiveRating, setPositiveRating] = useState(0);
+  const [negativeRating, setNegativeRating] = useState(0);
+  const [ratingPercentage, setRatingPercentage] = useState(0);
+  const [totalRatings, setTotalRatings] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -47,11 +51,15 @@ export const UserReviewsDialog = ({
     try {
       setLoading(true);
       const data = await getUserReviewsByUserId(userId, page, 10);
-      setReviews(data.content);
-      setCurrentPage(data.number);
-      setTotalPages(data.totalPages);
-      setIsFirst(data.first);
-      setIsLast(data.last);
+      setReviews(data.reviews.content);
+      setCurrentPage(data.reviews.number);
+      setTotalPages(data.reviews.totalPages);
+      setIsFirst(data.reviews.first);
+      setIsLast(data.reviews.last);
+      setPositiveRating(data.positiveRating);
+      setNegativeRating(data.negativeRating);
+      setRatingPercentage(data.ratingPercentage);
+      setTotalRatings(data.totalRatings);
     } catch (error: any) {
       const errorMessage = error?.message || "Không thể tải danh sách đánh giá";
       toast.error(errorMessage);
@@ -89,6 +97,42 @@ export const UserReviewsDialog = ({
             <FiX className="h-6 w-6" />
           </button>
         </div>
+
+        {/* Metadata Summary */}
+        {!loading && totalRatings > 0 && (
+          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+            <div className="flex items-center justify-center gap-8">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-gray-900">
+                  {ratingPercentage.toFixed(1)}%
+                </p>
+                <p className="text-sm text-gray-600">Đánh giá tích cực</p>
+              </div>
+              <div className="h-12 w-px bg-gray-300"></div>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <FiThumbsUp className="h-5 w-5 text-green-600" />
+                  <span className="text-lg font-semibold text-gray-900">
+                    {positiveRating}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FiThumbsDown className="h-5 w-5 text-red-600" />
+                  <span className="text-lg font-semibold text-gray-900">
+                    {negativeRating}
+                  </span>
+                </div>
+              </div>
+              <div className="h-12 w-px bg-gray-300"></div>
+              <div className="text-center">
+                <p className="text-3xl font-bold text-gray-900">
+                  {totalRatings}
+                </p>
+                <p className="text-sm text-gray-600">Tổng số đánh giá</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Content */}
         <div className="max-h-[70vh] overflow-y-auto px-6 py-6">

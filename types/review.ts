@@ -1,3 +1,5 @@
+import { PaginatedResponse } from "./api";
+
 export interface ReviewResponse {
   id: number;
   productId: number;
@@ -21,4 +23,12 @@ export interface CreateReviewRequest {
 export interface UpdateReviewRequest {
   rating: number; // 1 for positive, -1 for negative
   comment?: string;
+}
+
+export interface UserReviewsWithMetadataResponse {
+  positiveRating: number;
+  negativeRating: number;
+  ratingPercentage: number;
+  totalRatings: number;
+  reviews: PaginatedResponse<ReviewResponse>;
 }

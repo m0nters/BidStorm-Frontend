@@ -5,6 +5,7 @@ import {
   ReviewResponse,
   RevieweeProfileResponse,
   UpdateReviewRequest,
+  UserReviewsWithMetadataResponse,
 } from "@/types";
 
 /**
@@ -60,7 +61,7 @@ export const getUserReviewsByUserId = async (
   page = 0,
   size = 10,
 ) => {
-  const response = await api.get<PaginatedResponse<ReviewResponse>>(
+  const response = await api.get<UserReviewsWithMetadataResponse>(
     `/profile/reviews/user/${userId}?page=${page}&size=${size}`,
     { auth: true, cache: "no-store" },
   );
