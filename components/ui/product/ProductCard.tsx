@@ -72,12 +72,11 @@ export function ProductCard({ product }: ProductCardProps) {
                   MỚI
                 </span>
               )}
-              {product.buyNowPrice &&
-                new Date(product.endTime) > new Date() && (
-                  <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
-                    CÓ THỂ MUA NGAY
-                  </span>
-                )}
+              {product.buyNowPrice && !product.isEnded && (
+                <span className="w-fit rounded-lg bg-white px-3 py-1 text-xs font-semibold text-black shadow-lg">
+                  CÓ THỂ MUA NGAY
+                </span>
+              )}
             </div>
           </div>
 
@@ -199,12 +198,18 @@ export function ProductCard({ product }: ProductCardProps) {
           {/* Time Left */}
           <div
             className={`mb-3 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold ${
-              isUrgent ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-700"
+              product.isEnded
+                ? "bg-gray-100 text-gray-600"
+                : isUrgent
+                  ? "bg-gray-900 text-white"
+                  : "bg-gray-100 text-gray-700"
             }`}
             title={`Sẽ kết thúc vào ${formatFullDateTime(product.endTime)}`}
           >
             <FiClock className="h-4 w-4" />
-            <span>Còn lại: {timeLeft}</span>
+            <span>
+              {product.isEnded ? "Đã kết thúc" : `Còn lại: ${timeLeft}`}
+            </span>
           </div>
 
           {/* Additional Info */}
@@ -234,7 +239,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {/* Buy Now Button */}
-          {product.buyNowPrice && new Date(product.endTime) > new Date() && (
+          {product.buyNowPrice && !product.isEnded && (
             <button
               onClick={(e) => {
                 e.stopPropagation();

@@ -19,12 +19,19 @@ interface SearchPageClientProps {
 
 type SortOption = "endTime" | "currentPrice" | "createdAt" | "bidCount";
 type SortDirection = "asc" | "desc";
+type StatusFilter = "active" | "ended" | "all";
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "endTime", label: "Thời gian kết thúc" },
   { value: "currentPrice", label: "Giá hiện tại" },
   { value: "createdAt", label: "Mới nhất" },
   { value: "bidCount", label: "Số lượt đấu giá" },
+];
+
+const STATUS_OPTIONS: { value: StatusFilter; label: string }[] = [
+  { value: "all", label: "Tất cả" },
+  { value: "active", label: "Còn hạn" },
+  { value: "ended", label: "Đã kết thúc" },
 ];
 
 export default function SearchPageClient({
@@ -44,6 +51,7 @@ export default function SearchPageClient({
   const sortBy = (searchParams.get("sortBy") as SortOption) || "endTime";
   const sortDirection =
     (searchParams.get("sortDirection") as SortDirection) || "asc";
+  const status = (searchParams.get("status") as StatusFilter) || "active";
 
   // Fetch products when params change
   useEffect(() => {
@@ -53,6 +61,7 @@ export default function SearchPageClient({
         const data = await searchProducts({
           keyword: keyword || undefined,
           categoryId: categoryId ? parseInt(categoryId) : undefined,
+          status: status,
           page: currentPage - 1,
           size: 20,
           sortBy,
@@ -67,7 +76,7 @@ export default function SearchPageClient({
     };
 
     fetchProducts();
-  }, [keyword, categoryId, currentPage, sortBy, sortDirection]);
+  }, [keyword, categoryId, status, currentPage, sortBy, sortDirection]);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -90,6 +99,13 @@ export default function SearchPageClient({
     router.push(`/tim-kiem?${params.toString()}`);
   };
 
+  const handleStatusChange = (newStatus: StatusFilter) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("status", newStatus);
+    params.delete("page");
+    router.push(`/tim-kiem?${params.toString()}`);
+  };
+
   const handleCategoryChange = (id: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (id) {
@@ -108,7 +124,10 @@ export default function SearchPageClient({
   };
 
   const hasActiveFilters =
-    categoryId || sortBy !== "endTime" || sortDirection !== "asc";
+    categoryId ||
+    sortBy !== "endTime" ||
+    sortDirection !== "asc" ||
+    status !== "active";
 
   return (
     <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -133,6 +152,15 @@ export default function SearchPageClient({
 
         {/* Sort Controls */}
         <div className="flex flex-wrap items-center gap-3">
+          {/* Status Filter */}
+          <DropdownMenu
+            value={status}
+            options={STATUS_OPTIONS}
+            isSorted={false}
+            onChange={(value) => handleStatusChange(value as StatusFilter)}
+            className="w-40"
+          />
+
           {/* Sort By Dropdown */}
           <DropdownMenu
             value={sortBy}

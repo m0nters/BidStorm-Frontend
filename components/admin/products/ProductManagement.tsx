@@ -22,8 +22,8 @@ export const ProductManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(
-    undefined,
+  const [statusFilter, setStatusFilter] = useState<"active" | "ended" | "all">(
+    "all",
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -39,22 +39,10 @@ export const ProductManagement = () => {
         size: 20,
         categoryId: categoryFilter ? Number(categoryFilter) : undefined,
         keyword: debouncedSearchQuery.trim() || undefined,
+        status: statusFilter,
       });
 
-      // Filter by status on frontend
-      let filteredContent = data.content;
-      if (statusFilter) {
-        const now = new Date();
-        filteredContent = data.content.filter((product) => {
-          const endTime = new Date(product.endTime);
-          const hasEnded = now >= endTime;
-          if (statusFilter === "active") return !hasEnded;
-          if (statusFilter === "ended") return hasEnded;
-          return true;
-        });
-      }
-
-      setProducts(filteredContent);
+      setProducts(data.content);
       setTotalPages(data.totalPages);
     } catch (error: any) {
       toast.error(error?.message || "Không thể tải danh sách sản phẩm");
@@ -144,13 +132,16 @@ export const ProductManagement = () => {
             <div className="mb-4 flex items-center gap-4">
               <label className="text-sm font-medium">Trạng thái:</label>
               <DropdownMenu
-                value={statusFilter || ""}
+                value={statusFilter}
                 options={[
-                  { value: "", label: "Tất cả" },
-                  { value: "active", label: "Đang đấu giá" },
+                  { value: "all", label: "Tất cả" },
+                  { value: "active", label: "Còn hạn" },
                   { value: "ended", label: "Đã kết thúc" },
                 ]}
-                onChange={(value) => setStatusFilter(value || undefined)}
+                onChange={(value) =>
+                  setStatusFilter(value as "active" | "ended" | "all")
+                }
+                isSorted={false}
                 className="w-48"
               />
             </div>

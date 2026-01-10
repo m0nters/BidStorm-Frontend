@@ -22,6 +22,7 @@ export interface ProductListResponse {
   createdAt: string;
   endTime: string;
   isNew: boolean;
+  isEnded: boolean;
 }
 
 export interface UserBasicInfo {

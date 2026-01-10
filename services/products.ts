@@ -87,6 +87,7 @@ export const getProductDetailBySlug = async (
 export const searchProducts = async (params: {
   keyword?: string;
   categoryId?: number;
+  status?: "active" | "ended" | "all";
   page?: number;
   size?: number;
   sortBy?: "endTime" | "currentPrice" | "createdAt" | "bidCount";
@@ -96,6 +97,7 @@ export const searchProducts = async (params: {
   if (params.keyword) searchParams.set("keyword", params.keyword);
   if (params.categoryId)
     searchParams.set("categoryId", params.categoryId.toString());
+  if (params.status) searchParams.set("status", params.status);
   if (params.page !== undefined)
     searchParams.set("page", params.page.toString());
   if (params.size) searchParams.set("size", params.size.toString());
