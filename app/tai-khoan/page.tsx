@@ -168,7 +168,7 @@ function ProfilePageContent() {
     { id: "doi-mat-khau", label: "Đổi mật khẩu", icon: FiLock },
     { id: "yeu-thich", label: "Sản phẩm yêu thích", icon: FiHeart },
     { id: "san-pham-dau-gia", label: "Sản phẩm đấu giá", icon: BiDollar },
-    ...(profile?.role === "SELLER" || profile?.role === "ADMIN"
+    ...(profile?.hasProductSell
       ? [
           {
             id: "san-pham-dang-ban",

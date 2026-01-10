@@ -12,7 +12,9 @@ export interface UserProfileResponse {
   totalRatings: number;
   emailVerified: boolean;
   isActive: boolean;
+  hasProductSell: boolean;
   createdAt: string; // ISO datetime string (ZonedDateTime)
+  sellerExpiresAt?: string; // ISO datetime string (ZonedDateTime)
 }
 
 export interface UpdateProfileRequest {

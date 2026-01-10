@@ -305,6 +305,30 @@ export function ProfileInfoSection({
                   : ""}
               </p>
             </div>
+
+            {/* Seller Expiry Date - only show if user is a seller */}
+            {profile?.sellerExpiresAt && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                  <FiCalendar className="h-4 w-4" />
+                  Ngày hết hạn người bán
+                </div>
+                <p className="mt-2 text-lg font-semibold text-gray-900">
+                  lúc{" "}
+                  {new Date(profile.sellerExpiresAt).toLocaleDateString(
+                    "vi-VN",
+                    {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    },
+                  )}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
