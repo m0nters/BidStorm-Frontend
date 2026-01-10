@@ -69,12 +69,12 @@ export const CommentItem = ({
                     </span>
                   )}
                 </div>
-                {!comment.isYourself && canViewReviews && (
+                {(comment.isYourself || canViewReviews) && (
                   <button
                     onClick={handleViewReviews}
                     className="cursor-pointer text-left text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
                   >
-                    Xem chi tiết đánh giá
+                    Xem chi tiết đánh giá{comment.isYourself ? " của bạn" : ""}
                   </button>
                 )}
               </div>

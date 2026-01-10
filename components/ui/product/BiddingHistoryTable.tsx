@@ -19,6 +19,7 @@ interface BiddingHistoryTableProps {
   isProductEnded?: boolean;
   highestBidderName?: string;
   onRemoveBidder?: (bidderId: number) => Promise<void>;
+  currentUserName?: string; // Add this to display unmasked name for current user
 }
 
 export const BiddingHistoryTable = ({
@@ -33,6 +34,7 @@ export const BiddingHistoryTable = ({
   viewMoreLink,
   highestBidderName,
   onRemoveBidder,
+  currentUserName,
 }: BiddingHistoryTableProps) => {
   const isSeller = currentUserId === sellerId;
   const displayBids = maxRows ? bids.slice(0, maxRows) : bids;
@@ -112,7 +114,9 @@ export const BiddingHistoryTable = ({
                         </span>
                       )}
                       <span className="font-medium">
-                        {bid.bidderName}
+                        {bid.bidderId === currentUserId && currentUserName
+                          ? currentUserName
+                          : bid.bidderName}
                         {bid.isYourself && (
                           <span className="ml-1 text-xs text-blue-600">
                             (Bạn)
@@ -121,14 +125,16 @@ export const BiddingHistoryTable = ({
                       </span>
                     </div>
                     {/* Show review link: seller can see all bidders' reviews */}
-                    {isSeller && !bid.isYourself && (
+                    {(isSeller ||
+                      bid.isYourself ||
+                      bid.bidderId === currentUserId) && (
                       <button
                         onClick={() =>
                           handleViewReviews(bid.bidderId, bid.bidderName)
                         }
                         className="cursor-pointer text-left text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
                       >
-                        Xem chi tiết đánh giá
+                        Xem chi tiết đánh giá{bid.isYourself ? " của bạn" : ""}
                       </button>
                     )}
                   </div>

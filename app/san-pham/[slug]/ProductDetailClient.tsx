@@ -791,6 +791,7 @@ export default function ProductDetailClient({
                 isProductEnded={product.isEnded}
                 highestBidderName={product.highestBidderName}
                 onRemoveBidder={handleRemoveBidder}
+                currentUserName={user?.fullName}
               />
             </div>
           ) : (
