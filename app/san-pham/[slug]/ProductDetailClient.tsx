@@ -336,9 +336,6 @@ export default function ProductDetailClient({
   const UserRating = ({ user }: { user: UserBasicInfo }) => {
     const totalRatings = user.positiveRating + user.negativeRating;
     const isSeller = user.id === product?.seller?.id;
-    const canViewReviews =
-      user.id === product?.seller?.id || // Can always view seller reviews
-      (user.id && product && user.id === product.seller?.id); // Seller can view bidder reviews
 
     const handleViewReviews = () => {
       setSelectedUserId(user.id);
@@ -585,9 +582,7 @@ export default function ProductDetailClient({
                     <div className="rounded-lg bg-gray-50 p-3">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">
-                          {product.highestBidderName.includes("*")
-                            ? product.highestBidderName
-                            : `${product.highestBidderName} (Bạn)`}
+                          {product.highestBidderName}
                         </p>
                         {product.highestBidderRating !== undefined &&
                           product.highestBidderRating !== null && (
@@ -596,6 +591,19 @@ export default function ProductDetailClient({
                             </span>
                           )}
                       </div>
+                      {(user?.role === "ADMIN" ||
+                        product.highestBidderId === user?.id) && (
+                        <button
+                          onClick={() => {
+                            setSelectedUserId(product.highestBidderId!);
+                            setSelectedUserName(product.highestBidderName!);
+                            setShowReviewsDialog(true);
+                          }}
+                          className="mt-1 cursor-pointer text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+                        >
+                          Xem chi tiết đánh giá
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -606,9 +614,7 @@ export default function ProductDetailClient({
                     <div className="rounded-lg bg-gray-50 p-3">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">
-                          {product.winnerName.includes("*")
-                            ? product.winnerName
-                            : `${product.winnerName} ${product.winnerName === user?.fullName ? "(Bạn)" : ""}`}
+                          {product.winnerName}
                         </p>
                         {product.winnerRating !== undefined &&
                           product.winnerRating !== null && (
@@ -617,6 +623,20 @@ export default function ProductDetailClient({
                             </span>
                           )}
                       </div>
+                      {/* winnder id is literally highest bidder id :D we can reuse this variable */}
+                      {(user?.role === "ADMIN" ||
+                        product.highestBidderId === user?.id) && (
+                        <button
+                          onClick={() => {
+                            setSelectedUserId(product.highestBidderId!);
+                            setSelectedUserName(product.highestBidderName!);
+                            setShowReviewsDialog(true);
+                          }}
+                          className="mt-1 cursor-pointer text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+                        >
+                          Xem chi tiết đánh giá
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}

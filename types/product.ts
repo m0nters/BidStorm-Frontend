@@ -63,6 +63,7 @@ export interface ProductDetailResponse {
   parentCategoryName: string;
   parentCategorySlug: string;
   seller: UserBasicInfo;
+  highestBidderId?: number;
   highestBidderName?: string;
   highestBidderRating?: number;
   winnerName?: string;
