@@ -183,7 +183,12 @@ export const UserReviewsDialog = ({
                           {review.productTitle}
                         </Link>
                         <div className="flex flex-col gap-1 text-sm text-gray-600">
-                          <span>Người đánh giá: {review.reviewerName}</span>
+                          <span>
+                            Người đánh giá: {review.reviewerName}
+                            {review.isUserProduct
+                              ? " (Người mua)"
+                              : " (Người bán)"}
+                          </span>
                           <span>{formatFullDateTime(review.createdAt)}</span>
                         </div>
                       </div>

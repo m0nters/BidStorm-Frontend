@@ -6,7 +6,7 @@ export interface ReviewResponse {
   productTitle: string;
   productUrl: string;
   thumbnailUrl: string;
-  isYourProduct?: boolean;
+  isUserProduct?: boolean;
   reviewerId: number;
   reviewerName: string;
   rating: number; // 1 for positive, -1 for negative

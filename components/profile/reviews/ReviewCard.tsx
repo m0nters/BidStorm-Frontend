@@ -61,13 +61,13 @@ export const ReviewCard = ({
                 href={`san-pham/${review.productUrl}`}
                 className="mb-1 block font-semibold text-gray-900 hover:text-black hover:underline"
               >
-                {`${review.productTitle}${review.isYourProduct ? " (Bạn bán)" : ""}`}
+                {review.productTitle}
               </Link>
               <div className="flex flex-col items-start gap-2 text-sm text-gray-600">
                 <span>
                   {tabType === "given"
-                    ? `Đánh giá: ${review.reviewerName}${review.isYourProduct ? " (Người mua)" : " (Người bán)"}`
-                    : `Người đánh giá: ${review.reviewerName}${review.isYourProduct ? " (Người mua)" : " (Người bán)"}`}
+                    ? `Đánh giá: ${review.reviewerName}${review.isUserProduct ? " (Người mua)" : " (Người bán)"}`
+                    : `Người đánh giá: ${review.reviewerName}${review.isUserProduct ? " (Người mua)" : " (Người bán)"}`}
                 </span>
                 <span>{formatFullDateTime(review.createdAt)}</span>
               </div>
