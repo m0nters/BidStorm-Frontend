@@ -9,6 +9,7 @@ import {
   QASection,
   SpotlightOverlay,
   UpdateDescriptionDialog,
+  UserReviewsDialog,
   ViewDescriptionHistoryDialog,
 } from "@/components/ui";
 import { FavoriteButton } from "@/components/ui/product/FavoriteButton";
@@ -81,6 +82,9 @@ export default function ProductDetailClient({
     useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [showBuyNowConfirm, setShowBuyNowConfirm] = useState(false);
+  const [showReviewsDialog, setShowReviewsDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserName, setSelectedUserName] = useState<string>("");
 
   // Get real-time bid data (only after product is loaded)
   const {
@@ -331,6 +335,17 @@ export default function ProductDetailClient({
   // User rating display helper
   const UserRating = ({ user }: { user: UserBasicInfo }) => {
     const totalRatings = user.positiveRating + user.negativeRating;
+    const isSeller = user.id === product?.seller?.id;
+    const canViewReviews =
+      user.id === product?.seller?.id || // Can always view seller reviews
+      (user.id && product && user.id === product.seller?.id); // Seller can view bidder reviews
+
+    const handleViewReviews = () => {
+      setSelectedUserId(user.id);
+      setSelectedUserName(user.fullName);
+      setShowReviewsDialog(true);
+    };
+
     return (
       <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
         <div className="h-12 w-12 overflow-hidden rounded-full bg-black">
@@ -372,6 +387,16 @@ export default function ProductDetailClient({
               </span>
             </div>
           )}
+          {totalRatings > 0 &&
+            (isSeller ||
+              (user && product && user.id === product.seller?.id)) && (
+              <button
+                onClick={handleViewReviews}
+                className="mt-1 cursor-pointer text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+              >
+                Xem chi tiết đánh giá
+              </button>
+            )}
         </div>
       </div>
     );
@@ -726,6 +751,7 @@ export default function ProductDetailClient({
           productId={product.id}
           isEnded={product.isEnded}
           isSeller={user?.id === product.seller?.id}
+          sellerId={product.seller.id}
         />
 
         {/* Bidding History Section */}
@@ -874,6 +900,16 @@ export default function ProductDetailClient({
         isVisible={showHighlight}
         onDismiss={() => setShowHighlight(false)}
       />
+
+      {/* User Reviews Dialog */}
+      {selectedUserId && (
+        <UserReviewsDialog
+          isOpen={showReviewsDialog}
+          onClose={() => setShowReviewsDialog(false)}
+          userId={selectedUserId}
+          userName={selectedUserName}
+        />
+      )}
     </div>
   );
 }

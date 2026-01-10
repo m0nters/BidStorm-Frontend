@@ -20,9 +20,15 @@ interface QASectionProps {
   productId: number;
   isEnded: boolean;
   isSeller: boolean;
+  sellerId: number;
 }
 
-export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
+export const QASection = ({
+  productId,
+  isEnded,
+  isSeller,
+  sellerId,
+}: QASectionProps) => {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const pathname = usePathname();
@@ -247,9 +253,10 @@ export const QASection = ({ productId, isEnded, isSeller }: QASectionProps) => {
           currentUserId={user?.id}
           highlightedCommentId={highlightedCommentId}
           isSeller={isSeller}
+          productSellerId={sellerId}
         />
       )),
-    [comments, handleReply, user?.id, highlightedCommentId, isSeller],
+    [comments, handleReply, user?.id, highlightedCommentId, isSeller, sellerId],
   );
 
   if (loading) {

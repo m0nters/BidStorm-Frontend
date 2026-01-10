@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfirmDialog } from "@/components/ui";
+import { ConfirmDialog, UserReviewsDialog } from "@/components/ui";
 import { BidResponse } from "@/types/bid";
 import { formatDateForFeed, formatFullDateTime } from "@/utils";
 import Link from "next/link";
@@ -42,6 +42,15 @@ export const BiddingHistoryTable = ({
     bidderId: number;
     bidderName: string;
   } | null>(null);
+  const [showReviewsDialog, setShowReviewsDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [selectedUserName, setSelectedUserName] = useState<string>("");
+
+  const handleViewReviews = (bidderId: number, bidderName: string) => {
+    setSelectedUserId(bidderId);
+    setSelectedUserName(bidderName);
+    setShowReviewsDialog(true);
+  };
 
   const handleRemoveBidder = async () => {
     if (!removeConfirm || !onRemoveBidder) return;
@@ -92,23 +101,36 @@ export const BiddingHistoryTable = ({
                 }`}
               >
                 <td className="px-4 py-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    {bid.isHighestBidder && (
-                      <span
-                        className="text-yellow-500"
-                        title="Người đặt giá cao nhất"
-                      >
-                        🏆
-                      </span>
-                    )}
-                    <span className="font-medium">
-                      {bid.bidderName}
-                      {bid.isYourself && (
-                        <span className="ml-1 text-xs text-blue-600">
-                          (Bạn)
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      {bid.isHighestBidder && (
+                        <span
+                          className="text-yellow-500"
+                          title="Người đặt giá cao nhất"
+                        >
+                          🏆
                         </span>
                       )}
-                    </span>
+                      <span className="font-medium">
+                        {bid.bidderName}
+                        {bid.isYourself && (
+                          <span className="ml-1 text-xs text-blue-600">
+                            (Bạn)
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    {/* Show review link: seller can see all bidders' reviews */}
+                    {isSeller && !bid.isYourself && (
+                      <button
+                        onClick={() =>
+                          handleViewReviews(bid.bidderId, bid.bidderName)
+                        }
+                        className="cursor-pointer text-left text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+                      >
+                        Xem chi tiết đánh giá
+                      </button>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3 text-sm font-semibold">
@@ -199,6 +221,16 @@ export const BiddingHistoryTable = ({
           cancelText="Hủy"
           onConfirm={handleRemoveBidder}
           onCancel={() => setRemoveConfirm(null)}
+        />
+      )}
+
+      {/* User Reviews Dialog */}
+      {selectedUserId && (
+        <UserReviewsDialog
+          isOpen={showReviewsDialog}
+          onClose={() => setShowReviewsDialog(false)}
+          userId={selectedUserId}
+          userName={selectedUserName}
         />
       )}
     </div>

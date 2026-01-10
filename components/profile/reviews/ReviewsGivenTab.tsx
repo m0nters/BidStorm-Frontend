@@ -8,6 +8,7 @@ import {
 import { ReviewResponse } from "@/types";
 import { UpdateReviewFormData, updateReviewSchema } from "@/validations/review";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -117,11 +118,17 @@ export function ReviewsGivenTab() {
 
   if (reviews.length === 0) {
     return (
-      <div className="py-12 text-center">
-        <p className="mb-2 text-xl font-semibold text-gray-900">
+      <div className="flex flex-col items-center justify-center">
+        <Image
+          src="/no-reviews.png"
+          alt="Chưa có đánh giá"
+          width={150}
+          height={200}
+        />
+        <p className="mt-4 text-xl font-semibold text-gray-900">
           Chưa có đánh giá nào
         </p>
-        <p className="text-gray-600">Bạn chưa đánh giá ai.</p>
+        <p className="mt-2 text-gray-600">Bạn chưa đánh giá ai.</p>
       </div>
     );
   }

@@ -52,6 +52,22 @@ export const getGivenReviews = async (page = 0, size = 10) => {
 };
 
 /**
+ * Get reviews of a specific user with authorization
+ * Anyone can view seller reviews. Only sellers can view reviews of bidders who interacted with their products.
+ */
+export const getUserReviewsByUserId = async (
+  userId: number,
+  page = 0,
+  size = 10,
+) => {
+  const response = await api.get<PaginatedResponse<ReviewResponse>>(
+    `/profile/reviews/user/${userId}?page=${page}&size=${size}`,
+    { auth: true, cache: "no-store" },
+  );
+  return response.data;
+};
+
+/**
  * Create a new review
  */
 export const createReview = async (request: CreateReviewRequest) => {

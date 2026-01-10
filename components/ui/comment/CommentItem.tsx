@@ -1,9 +1,11 @@
 "use client";
 
+import { UserReviewsDialog } from "@/components/ui/common";
 import { CommentResponse } from "@/types";
 import { formatFullDateTime, formatRelativeTime } from "@/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { FiClock, FiMessageCircle, FiTrash2 } from "react-icons/fi";
 
 interface CommentItemProps {
@@ -14,6 +16,7 @@ interface CommentItemProps {
   level?: number;
   highlightedCommentId?: number | null;
   isSeller?: boolean;
+  productSellerId?: number;
 }
 
 export const CommentItem = ({
@@ -24,10 +27,22 @@ export const CommentItem = ({
   level = 0,
   highlightedCommentId,
   isSeller = false,
+  productSellerId,
 }: CommentItemProps) => {
   const canDelete = currentUserId === comment.userId;
   const pathname = usePathname();
   const isHighlighted = highlightedCommentId === comment.id;
+  const [showReviewsDialog, setShowReviewsDialog] = useState(false);
+
+  // Determine if we can view reviews:
+  // - Anyone can view seller reviews
+  // - Only seller can view bidder reviews
+  const isCommentAuthorSeller = comment.userId === productSellerId;
+  const canViewReviews = isCommentAuthorSeller || isSeller;
+
+  const handleViewReviews = () => {
+    setShowReviewsDialog(true);
+  };
 
   return (
     <div
@@ -42,15 +57,25 @@ export const CommentItem = ({
         <div className="mb-2 flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             <div>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-gray-900">
-                  {comment.userName}
-                  {comment.isYourself ? ` (Bạn)` : ""}
-                </p>
-                {comment.isProductSeller && (
-                  <span className="rounded bg-black px-2 py-0.5 text-xs font-medium text-white">
-                    Người bán
-                  </span>
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-gray-900">
+                    {comment.userName}
+                    {comment.isYourself ? ` (Bạn)` : ""}
+                  </p>
+                  {comment.isProductSeller && (
+                    <span className="rounded bg-black px-2 py-0.5 text-xs font-medium text-white">
+                      Người bán
+                    </span>
+                  )}
+                </div>
+                {!comment.isYourself && canViewReviews && (
+                  <button
+                    onClick={handleViewReviews}
+                    className="cursor-pointer text-left text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+                  >
+                    Xem chi tiết đánh giá
+                  </button>
                 )}
               </div>
               <Link
@@ -103,10 +128,19 @@ export const CommentItem = ({
               level={level + 1}
               highlightedCommentId={highlightedCommentId}
               isSeller={isSeller}
+              productSellerId={productSellerId}
             />
           ))}
         </div>
       )}
+
+      {/* User Reviews Dialog */}
+      <UserReviewsDialog
+        isOpen={showReviewsDialog}
+        onClose={() => setShowReviewsDialog(false)}
+        userId={comment.userId}
+        userName={comment.userName}
+      />
     </div>
   );
 };
