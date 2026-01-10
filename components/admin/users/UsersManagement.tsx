@@ -9,13 +9,14 @@ import {
   getAllRoles,
   getUserDetails,
   listUsers,
+  resetUserPassword,
   unbanUser,
 } from "@/services";
 import { RoleResponse, UserDetailResponse, UserListResponse } from "@/types";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaBan } from "react-icons/fa6";
-import { FiEye, FiTrash2, FiUnlock } from "react-icons/fi";
+import { FiEye, FiKey, FiTrash2, FiUnlock } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { UserDetailModal } from "./UserDetailModal";
 
@@ -40,6 +41,7 @@ export const UsersManagement = () => {
   const [roles, setRoles] = useState<RoleResponse[]>([]);
   const [showRoleChangeConfirm, setShowRoleChangeConfirm] = useState(false);
   const [newRoleId, setNewRoleId] = useState<number | null>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -149,6 +151,25 @@ export const UsersManagement = () => {
   const handleDeleteUser = (userId: number) => {
     setActionUserId(userId);
     setShowDeleteConfirm(true);
+  };
+
+  const handleResetPassword = (userId: number) => {
+    setActionUserId(userId);
+    setShowResetConfirm(true);
+  };
+
+  const confirmResetPassword = async () => {
+    if (!actionUserId) return;
+    setShowResetConfirm(false);
+    try {
+      await resetUserPassword(actionUserId);
+      toast.success("Mật khẩu đã được đặt lại và gửi qua email cho người dùng");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error(error?.message || "Không thể đặt lại mật khẩu");
+    } finally {
+      setActionUserId(null);
+    }
   };
 
   const confirmDeleteUser = async () => {
@@ -287,7 +308,7 @@ export const UsersManagement = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                     Ngày tạo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="translate-x-10 px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
                     Thao tác
                   </th>
                 </tr>
@@ -380,6 +401,13 @@ export const UsersManagement = () => {
                         >
                           <FiTrash2 className="text-red-600" />
                         </button>
+                        <button
+                          onClick={() => handleResetPassword(user.id)}
+                          className="cursor-pointer rounded-lg p-2 transition-colors hover:bg-yellow-50"
+                          title="Đặt lại mật khẩu"
+                        >
+                          <FiKey className="text-yellow-600" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -447,6 +475,19 @@ export const UsersManagement = () => {
           setShowRoleChangeConfirm(false);
           setActionUserId(null);
           setNewRoleId(null);
+        }}
+      />
+
+      <ConfirmDialog
+        isOpen={showResetConfirm}
+        title="Xác nhận đặt lại mật khẩu"
+        message="Bạn có chắc chắn muốn đặt lại mật khẩu cho người dùng này? Người dùng sẽ nhận được mật khẩu tạm thời qua email."
+        confirmText="Đặt lại mật khẩu"
+        cancelText="Hủy"
+        onConfirm={confirmResetPassword}
+        onCancel={() => {
+          setShowResetConfirm(false);
+          setActionUserId(null);
         }}
       />
 

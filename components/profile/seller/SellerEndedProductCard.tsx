@@ -24,7 +24,6 @@ export function SellerEndedProductCard({
   const [existingReview, setExistingReview] = useState<ReviewResponse | null>(
     null,
   );
-  const [loadingReview, setLoadingReview] = useState(false);
 
   const hasWinner = product.winnerId !== null && product.winnerId !== undefined;
   const ratingPercentage = hasWinner
@@ -156,7 +155,6 @@ export function SellerEndedProductCard({
                 onClick={async (e) => {
                   e.preventDefault();
                   try {
-                    setLoadingReview(true);
                     if (product.hasReviewed) {
                       const review = await getUserReviewForProduct(
                         product.productId,
@@ -168,8 +166,6 @@ export function SellerEndedProductCard({
                     setShowReviewDialog(true);
                   } catch (err) {
                     console.error("Failed to load review:", err);
-                  } finally {
-                    setLoadingReview(false);
                   }
                 }}
                 className="w-full cursor-pointer rounded-lg bg-black px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-gray-800"

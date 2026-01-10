@@ -102,6 +102,7 @@ export const PaymentPanel = ({
         setExistingReview(review);
       } catch (error) {
         console.error("Failed to fetch review status:", error);
+        setExistingReview(null); // Explicitly set to null on error
       } finally {
         setLoadingReviewStatus(false);
       }
@@ -599,7 +600,7 @@ export const PaymentPanel = ({
               ? "Đánh giá người bán"
               : "Đánh giá người mua"
         }
-        hasReviewed={existingReview !== null}
+        hasReviewed={!!existingReview}
         existingReview={existingReview}
         onReviewSubmitted={async () => {
           // Refetch the review to update the UI

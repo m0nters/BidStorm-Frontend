@@ -101,7 +101,7 @@ export function WonProductCard({ product }: WonProductCardProps) {
                   setShowReviewDialog(true);
                 }}
                 className={`w-full cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
-                  existingReview !== null
+                  !!existingReview
                     ? "border border-gray-300 bg-white text-gray-900 hover:bg-gray-50"
                     : "bg-black text-white hover:bg-gray-800"
                 }`}
@@ -109,9 +109,7 @@ export function WonProductCard({ product }: WonProductCardProps) {
                 <div className="flex items-center justify-center gap-2">
                   <FiStar className="h-4 w-4" />
                   <span>
-                    {existingReview !== null && existingReview !== undefined
-                      ? "Đánh giá lại"
-                      : "Đánh giá người bán"}
+                    {!!existingReview ? "Đánh giá lại" : "Đánh giá người bán"}
                   </span>
                 </div>
               </button>
@@ -126,7 +124,7 @@ export function WonProductCard({ product }: WonProductCardProps) {
           productId={product.productId}
           productTitle={product.title}
           title="Đánh giá người bán"
-          hasReviewed={existingReview !== null}
+          hasReviewed={!!existingReview}
           existingReview={existingReview}
           onReviewSubmitted={async () => {
             const review = await getUserReviewForProduct(product.productId);
