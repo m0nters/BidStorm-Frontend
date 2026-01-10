@@ -1,7 +1,9 @@
 "use client";
 
+import gsap from "gsap";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface ImageGalleryProps {
   images: Array<{
@@ -27,6 +29,8 @@ export function ImageGallery({
     x: 0,
     y: 0,
   });
+  const [isAnimating, setIsAnimating] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const [magnifierViewPosition, setMagnifierViewPosition] = useState({
     left: 0,
@@ -88,6 +92,46 @@ export function ImageGallery({
     setMagnifierViewPosition({ left: magnifierLeft, top: magnifierTop });
   };
 
+  const navigateImage = (direction: "prev" | "next") => {
+    if (isAnimating || images.length <= 1) return;
+
+    setIsAnimating(true);
+    const imageElement = imageRef.current;
+    if (!imageElement) return;
+
+    const newIndex =
+      direction === "next"
+        ? (selectedImage + 1) % images.length
+        : (selectedImage - 1 + images.length) % images.length;
+
+    // Slide out current image
+    gsap.to(imageElement, {
+      x: direction === "next" ? -100 : 100,
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => {
+        // Update image
+        setSelectedImage(newIndex);
+
+        // Reset position and slide in new image
+        gsap.set(imageElement, {
+          x: direction === "next" ? 100 : -100,
+        });
+
+        gsap.to(imageElement, {
+          x: 0,
+          opacity: 1,
+          duration: 0.3,
+          ease: "power2.out",
+          onComplete: () => {
+            setIsAnimating(false);
+          },
+        });
+      },
+    });
+  };
+
   return (
     <div className="relative overflow-visible rounded-lg bg-white shadow-sm">
       {/* Main Image and Thumbnail Gallery */}
@@ -118,8 +162,21 @@ export function ImageGallery({
 
         {/* Main Image */}
         <div className="relative flex flex-1 items-center justify-center overflow-visible">
+          {/* Previous Button */}
+          {images.length > 1 && (
+            <button
+              onClick={() => navigateImage("prev")}
+              disabled={isAnimating}
+              className="absolute top-1/2 left-4 z-20 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow-lg transition-all hover:scale-110 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Previous image"
+            >
+              <FiChevronLeft className="h-6 w-6 text-gray-800" />
+            </button>
+          )}
+
           <div className="relative inline-block">
             <img
+              ref={imageRef}
               src={images[selectedImage]?.imageUrl || "/placeholder.jpg"}
               alt={title}
               className="max-h-[600px] max-w-full object-contain"
@@ -168,6 +225,18 @@ export function ImageGallery({
               </div>
             )}
           </div>
+
+          {/* Next Button */}
+          {images.length > 1 && (
+            <button
+              onClick={() => navigateImage("next")}
+              disabled={isAnimating}
+              className="absolute top-1/2 right-4 z-20 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow-lg transition-all hover:scale-110 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Next image"
+            >
+              <FiChevronRight className="h-6 w-6 text-gray-800" />
+            </button>
+          )}
         </div>
         {isEnded && (
           <div className="absolute inset-0 z-30 flex items-center justify-center rounded-lg bg-black/60 backdrop-blur-sm">
