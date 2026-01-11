@@ -102,7 +102,7 @@ export const UpgradeRequestsManagement = () => {
                 : "bg-gray-100 hover:bg-gray-200"
             }`}
           >
-            Tất cả
+            Đã xử lý
           </button>
         </div>
       </div>

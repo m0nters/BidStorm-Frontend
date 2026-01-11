@@ -2,6 +2,7 @@ import { SellerActiveProductResponse } from "@/types";
 import { calculateCountdown, formatFullDateTime, formatPrice } from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiClock } from "react-icons/fi";
 import { RiAuctionFill } from "react-icons/ri";
@@ -11,6 +12,7 @@ export function SellerActiveProductCard({
 }: {
   product: SellerActiveProductResponse;
 }) {
+  const router = useRouter();
   const [timeLeft, setTimeLeft] = useState<string>("");
   const [isUrgent, setIsUrgent] = useState(false);
 
@@ -95,12 +97,15 @@ export function SellerActiveProductCard({
         <div className="mt-3 flex gap-1 border-t border-gray-100 pt-3">
           <p className="text-xs font-semibold text-black">Danh mục: </p>
 
-          <Link
-            href={`/danh-muc/${product.categorySlug}`}
-            className="text-xs font-medium text-gray-700 hover:text-black hover:underline"
+          <span
+            className="cursor-pointer text-xs font-medium text-gray-700 hover:text-black hover:underline"
+            onClick={(e) => {
+              e.stopPropagation(); // ← Very important!
+              router.push(`/danh-muc/${product.categorySlug}`);
+            }}
           >
             {product.categoryName}
-          </Link>
+          </span>
         </div>
       </div>
     </Link>
