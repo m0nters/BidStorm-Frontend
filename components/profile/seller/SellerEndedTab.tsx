@@ -5,11 +5,13 @@ import { cancelOrder } from "@/services/orders";
 import { getSellerEndedProducts } from "@/services/products";
 import { SellerEndedProductResponse } from "@/types/product";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { SellerEndedProductCard } from "./SellerEndedProductCard";
 
 export function SellerEndedTab() {
+  const router = useRouter();
   const [products, setProducts] = useState<SellerEndedProductResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -59,12 +61,21 @@ export function SellerEndedTab() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">
           Sản phẩm đã kết thúc và đã có nguời thắng
         </h2>
-        <p className="text-sm text-gray-600">{totalElements} sản phẩm</p>
+
+        <button
+          onClick={() => router.push("/dang-san-pham")}
+          aria-label="Đăng sản phẩm"
+          className="mb-4 cursor-pointer rounded-md bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+        >
+          Đăng sản phẩm mới
+        </button>
       </div>
+
+      <p className="mb-6 text-sm text-gray-600">{totalElements} sản phẩm</p>
 
       {/* Empty State */}
       {products.length === 0 && (

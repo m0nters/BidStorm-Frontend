@@ -5,10 +5,12 @@ import { getSellerActiveProducts } from "@/services/products";
 import { SellerActiveProductResponse } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SellerActiveProductCard } from "./SellerActiveProductCard";
 
 export function SellerActiveTab() {
+  const router = useRouter();
   const [products, setProducts] = useState<SellerActiveProductResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -46,12 +48,20 @@ export function SellerActiveTab() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">
           Sản phẩm đang đăng và còn hạn
         </h2>
-        <p className="text-sm text-gray-600">{totalElements} sản phẩm</p>
+        <button
+          onClick={() => router.push("/dang-san-pham")}
+          aria-label="Đăng sản phẩm"
+          className="mb-4 cursor-pointer rounded-md bg-black px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+        >
+          Đăng sản phẩm mới
+        </button>
       </div>
+
+      <p className="mb-6 text-sm text-gray-600">{totalElements} sản phẩm</p>
 
       {/* Empty State */}
       {products.length === 0 && (
