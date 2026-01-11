@@ -201,7 +201,7 @@ export function DropdownMenu({
 
       {/* Dropdown Options */}
       <div
-        className={`absolute top-full right-0 left-0 z-50 mt-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-200 ${
+        className={`absolute top-full right-0 left-0 z-40 mt-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg transition-all duration-200 ${
           isOpen
             ? "translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"
@@ -239,7 +239,7 @@ export function DropdownMenu({
                 }}
                 type="button"
                 onClick={() => handleOptionClick(option.value)}
-                className={`z-50 flex w-full cursor-pointer items-center truncate px-3 py-2.5 text-left text-sm transition-colors focus:outline-none ${
+                className={`z-40 flex w-full cursor-pointer items-center truncate px-3 py-2.5 text-left text-sm transition-colors focus:outline-none ${
                   option.value === value
                     ? "bg-black font-medium text-white"
                     : index === focusedIndex

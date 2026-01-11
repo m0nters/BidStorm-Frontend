@@ -64,6 +64,21 @@ async function request<T>(
       next,
     });
 
+    // Handle 403 with no JSON response (Spring Boot default forbidden page)
+    if (response.status === 403) {
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const forbiddenError: ApiErrorResponse = {
+          success: false,
+          status: 403,
+          error: "Forbidden",
+          message: "Người dùng không đủ thẩm quyền thực hiện hành động này",
+          timestamp: new Date().toISOString(),
+        };
+        throw forbiddenError;
+      }
+    }
+
     const data: ApiResponse<T> = await response.json();
 
     // Handle 401 Unauthorized - token expired or invalid

@@ -335,7 +335,6 @@ export default function ProductDetailClient({
   // User rating display helper
   const UserRating = ({ user }: { user: UserBasicInfo }) => {
     const totalRatings = user.positiveRating + user.negativeRating;
-    const isSeller = user.id === product?.seller?.id;
 
     const handleViewReviews = () => {
       setSelectedUserId(user.id);
@@ -384,16 +383,14 @@ export default function ProductDetailClient({
               </span>
             </div>
           )}
-          {totalRatings > 0 &&
-            (isSeller ||
-              (user && product && user.id === product.seller?.id)) && (
-              <button
-                onClick={handleViewReviews}
-                className="mt-1 cursor-pointer text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
-              >
-                Xem chi tiết đánh giá
-              </button>
-            )}
+          {totalRatings > 0 && (
+            <button
+              onClick={handleViewReviews}
+              className="mt-1 cursor-pointer text-xs text-blue-600 transition-colors hover:text-blue-800 hover:underline"
+            >
+              Xem chi tiết đánh giá
+            </button>
+          )}
         </div>
       </div>
     );
@@ -591,7 +588,7 @@ export default function ProductDetailClient({
                             </span>
                           )}
                       </div>
-                      {(user?.role === "ADMIN" ||
+                      {(product.seller.id === user?.id ||
                         product.highestBidderId === user?.id) && (
                         <button
                           onClick={() => {
@@ -624,7 +621,7 @@ export default function ProductDetailClient({
                           )}
                       </div>
                       {/* winnder id is literally highest bidder id :D we can reuse this variable */}
-                      {(user?.role === "ADMIN" ||
+                      {(product.seller.id === user?.id ||
                         product.highestBidderId === user?.id) && (
                         <button
                           onClick={() => {
